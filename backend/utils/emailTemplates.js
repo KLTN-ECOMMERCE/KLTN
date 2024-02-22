@@ -1,4 +1,4 @@
-export const getResetPasswordTemplate = (username, resetUrl) => `
+export const getResetPasswordTemplate = (username, resetUrl,otp) => `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
@@ -513,13 +513,13 @@ export const getResetPasswordTemplate = (username, resetUrl) => `
                             </td>
                           </tr>
                         </table>
+                        </p>Mã OTP yêu cầu đổi mật khẩu: ${otp} <p>
                         <p>
                         Nếu bạn không yêu cầu reset password thì tham khảo đường dẫn bên dưới
                         Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua
                         email này hoặc
                           <a href="{{support_url}}">contact support</a> if you
                           have questions.
-                        </p>
                         <p>Thanks, <br />EcStore</p>
 
                         <table class="body-sub" role="presentation">

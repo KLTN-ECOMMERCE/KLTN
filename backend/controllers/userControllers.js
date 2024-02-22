@@ -131,16 +131,19 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return next(new ErrorHandler("User not found with this email", 404));
   }
-
+  if(!user.verify){
+    return next(new ErrorHandler("You have not verified your email yet"));
+  }
   // Get reset password token
   const resetToken = user.getResetPasswordToken();
-
+  const newOtp = Math.floor(100000 + Math.random() * 900000); // generate a 6-digit OTP
+  user.otp = newOtp;
   await user.save();
 
   // Create reset password url
   const resetUrl = `${process.env.FRONTEND_URL}/password/reset/${resetToken}`;
 
-  const message = getResetPasswordTemplate(user?.name, resetUrl);
+  const message = getResetPasswordTemplate(user?.name, resetUrl,newOtp);
 
   try {
     await sendEmail({
@@ -160,7 +163,11 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error?.message, 500));
   }
 });
+//
+export const passwordChange = catchAsyncErrors(async (req,res,next) => {
 
+
+})
 // Reset password   =>  /api/v1/password/reset/:token
 export const resetPassword = catchAsyncErrors(async (req, res, next) => {
   // Hash the URL Token
@@ -182,7 +189,9 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
       )
     );
   }
-
+  if(req.body.otp !== user.otp){
+    return next(new ErrorHandler("your otp is not correct"))
+  }
   if (req.body.password !== req.body.confirmPassword) {
     return next(new ErrorHandler("Passwords does not match", 400));
   }
@@ -192,7 +201,6 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
   user.resetPasswordToken = undefined;
   user.resetPasswordExpire = undefined;
-
   await user.save();
 
   sendToken(user, 200, res);
