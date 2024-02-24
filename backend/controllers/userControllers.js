@@ -312,3 +312,65 @@ export const deleteUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+// test api for mobile 
+// Forgot password endpoint  =>  /api/v1/password/forgot
+export const forgotPasswordMobile = catchAsyncErrors(async (req, res, next) => {
+  const { email } = req.body;
+
+  // Find the user with the provided email
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  // Generate a secure, random OTP
+  const otp = Math.floor(100000 + Math.random() * 900000);
+
+  // Set OTP and expiration on the user
+
+  try {
+    // Save OTP to user record
+    user.otp = otp;
+    await user.save();
+
+    // Send OTP to user via email
+    await sendEmail({
+      email: email,
+      subject: "OTP Verification",
+      message: `Your OTP for registration is: ${otp}`,
+    });
+
+    return res.status(200).json({
+      message: `Email sent to: ${email}`,
+      otp: otp
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error?.message, 500));
+  }
+});
+// Reset password with OTP => /api/v1/password/reset/otp
+export const resetPasswordWithOTP = catchAsyncErrors(async (req, res, next) => {
+  const { otp, password, confirmPassword } = req.body;
+
+  const user = await User.findOne({
+    otp,
+  });
+
+  if (!user) {
+    return next(new ErrorHandler("Invalid or expired OTP", 400));
+  }
+
+  if (password !== confirmPassword) {
+    return next(new ErrorHandler("Passwords do not match", 400));
+  }
+
+  // Set new password
+  user.password = password;
+
+  // Clear OTP fields
+  user.otp = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password reset successful" });
+});

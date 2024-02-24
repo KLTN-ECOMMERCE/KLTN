@@ -13,7 +13,9 @@ import {
   updateProfile,
   updateUser,
   uploadAvatar,
-  checkOTP
+  checkOTP,
+  forgotPasswordMobile,
+  resetPasswordWithOTP
 } from "../controllers/userControllers.js";
 const router = express.Router();
 
@@ -26,6 +28,10 @@ router.route("/logout").get(logout);
 
 router.route("/password/forgot").post(forgotPassword);
 router.route("/password/reset/:token").put(resetPassword);
+
+router.route("/password/forgot/mobile").post(forgotPasswordMobile);
+router.route("/password/reset").put(resetPasswordWithOTP);
+
 
 router.route("/me").get(isAuthenticatedUser, getUserProfile);
 router.route("/me/update").put(isAuthenticatedUser, updateProfile);
