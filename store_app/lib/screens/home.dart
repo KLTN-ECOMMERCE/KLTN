@@ -23,7 +23,7 @@ class _HomeState extends State<HomeScreen> {
   List<ProductItem> list = [
     const ProductItem(
       name: 'Apple Iphone 15 Pro Max',
-      price: 1200.6473,
+      price: 1200.333,
       ratings: 4,
       thumbUrl:
           'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
@@ -59,7 +59,7 @@ class _HomeState extends State<HomeScreen> {
     ),
     const ProductItem(
       name: 'Apple Iphone 15 Pro Max',
-      price: 1200.6473,
+      price: 696.96,
       ratings: 4,
       thumbUrl:
           'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
