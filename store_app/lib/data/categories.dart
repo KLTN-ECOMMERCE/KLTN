@@ -1,45 +1,44 @@
-import 'package:flutter/material.dart';
 import 'package:store_app/models/category.dart';
 
 const categories = {
   Categories.accessories: Category(
     title: 'Accessories',
-    color: Color.fromARGB(255, 0, 255, 128),
+    image: 'assets/images/banner_category.jpg',
   ),
   Categories.books: Category(
     title: 'Books',
-    color: Color.fromARGB(255, 145, 255, 0),
+    image: 'assets/images/banner_category2.jpg',
   ),
   Categories.cameras: Category(
     title: 'Cameras',
-    color: Color.fromARGB(255, 255, 102, 0),
+    image: 'assets/images/banner_category3.jpg',
   ),
   Categories.electronics: Category(
     title: 'Electronics',
-    color: Color.fromARGB(255, 0, 208, 255),
+    image: 'assets/images/banner_category4.jpg',
   ),
   Categories.food: Category(
     title: 'Food',
-    color: Color.fromARGB(255, 0, 60, 255),
+    image: 'assets/images/banner_category5.jpg',
   ),
   Categories.headphones: Category(
     title: 'Headphones',
-    color: Color.fromARGB(255, 255, 149, 0),
+    image: 'assets/images/banner_category6.jpg',
   ),
   Categories.home: Category(
     title: 'Home',
-    color: Color.fromARGB(255, 255, 187, 0),
+    image: 'assets/images/banner_category7.jpg',
   ),
   Categories.laptops: Category(
     title: 'Laptops',
-    color: Color.fromARGB(255, 191, 0, 255),
+    image: 'assets/images/banner_category8.jpg',
   ),
   Categories.outdoor: Category(
     title: 'Outdoor',
-    color: Color.fromARGB(255, 149, 0, 225),
+    image: 'assets/images/banner_category9.jpg',
   ),
   Categories.sports: Category(
     title: 'Sports',
-    color: Color.fromARGB(255, 0, 255, 255),
+    image: 'assets/images/banner_category10.jpg',
   ),
 };

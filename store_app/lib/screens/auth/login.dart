@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/api/api_start.dart';
+import 'package:store_app/models/login.dart';
 import 'package:store_app/screens/app.dart';
 import 'package:store_app/screens/auth/forgot_password.dart';
 import 'package:store_app/screens/auth/signup.dart';
@@ -15,12 +17,46 @@ class LoginScreen extends StatefulWidget {
 class _LoginState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  var _isAuthenticating = false;
+
+  final ApiStart _apiStart = ApiStart();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _login() async {
+    final data = Login(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+    try {
+      setState(() {
+        _isAuthenticating = true;
+      });
+      final responseLogin = await _apiStart.login(data);
+      print(responseLogin);
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const AppScreen(),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+      setState(() {
+        _isAuthenticating = false;
+      });
+    }
   }
 
   void _openForgotPasswordOverlay() {
@@ -109,25 +145,24 @@ class _LoginState extends State<LoginScreen> {
                 const SizedBox(
                   height: 25,
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const AppScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    child: const Text(
-                      'LOGIN',
+                if (_isAuthenticating)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                if (!_isAuthenticating)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      child: const Text(
+                        'LOGIN',
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(
                   height: 10,
                 ),

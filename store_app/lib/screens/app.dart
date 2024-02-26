@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:store_app/screens/home.dart';
 
 class AppScreen extends StatefulWidget {
@@ -12,6 +13,25 @@ class AppScreen extends StatefulWidget {
 
 class _AppState extends State<AppScreen> {
   final ScrollController _scrollController = ScrollController();
+  final storage = const FlutterSecureStorage();
+  String _token = '';
+
+  Future<String> _getToken() async {
+    final token = await storage.read(key: 'access-token');
+    if (token == null) return '';
+    return token;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getToken().then((value) {
+      setState(() {
+        _token = value;
+      });
+    });
+  }
+
   int currentPageIndex = 0;
 
   @override
@@ -70,10 +90,10 @@ class _AppState extends State<AppScreen> {
         ],
       ),
       body: [
-        HomeScreen(
-          homeController: _scrollController,
+        const HomeScreen(
+          //homeController: _scrollController,
         ),
-        const Text('2'),
+        Text(_token),
         const Text('3'),
         const Text('4'),
         const Text('5'),

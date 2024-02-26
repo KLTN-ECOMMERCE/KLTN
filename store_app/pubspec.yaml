@@ -36,6 +36,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_rating_bar: ^4.0.1
+  flutter_secure_storage: ^9.0.0
+  http: ^1.2.0
+  lazy_load_scrollview: ^1.3.0
+  pull_to_refresh: ^2.0.0
+  flutter_svg: ^2.0.10+1
+  transparent_image: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -62,8 +68,19 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/logo.png
-    - assets/images/category.png
     - assets/images/banner1.jpg
+    - assets/images/banner_category.jpg
+    - assets/images/banner_category2.jpg
+    - assets/images/banner_category3.jpg
+    - assets/images/banner_category4.jpg
+    - assets/images/banner_category5.jpg
+    - assets/images/banner_category6.jpg
+    - assets/images/banner_category7.jpg
+    - assets/images/banner_category8.jpg
+    - assets/images/banner_category9.jpg
+    - assets/images/banner_category10.jpg
+    - assets/icons/Cart Icon.svg
+    - assets/icons/Bell.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

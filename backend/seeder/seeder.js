@@ -5,7 +5,7 @@ import Product from "../models/product.js";
 const seedProducts = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://dongocduyhung7:duyhung20062002@tlcn.odjbqxz.mongodb.net/TLCN?retryWrites=true&w=majority"
+      "mongodb://localhost:27017/TLCN"
     );
 
     await Product.deleteMany();

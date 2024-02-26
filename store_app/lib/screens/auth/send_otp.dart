@@ -1,56 +1,52 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
-import 'package:store_app/screens/auth/reset_password.dart';
+import 'package:store_app/models/send_otp.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({super.key});
+class SendOtpScreen extends StatefulWidget {
+  const SendOtpScreen({
+    super.key,
+    required this.email,
+  });
+
+  final String email;
 
   @override
-  State<ForgotPasswordScreen> createState() {
-    return _ForgotPasswordState();
+  State<SendOtpScreen> createState() {
+    return _SendOtpState();
   }
 }
 
-class _ForgotPasswordState extends State<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
+class _SendOtpState extends State<SendOtpScreen> {
+  final _otpController = TextEditingController();
   var _isAuthenticating = false;
-  dynamic _responseForgotPassword;
   var _hasMessage = false;
+  dynamic _responseSendOtp;
 
   final ApiStart _apiStart = ApiStart();
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
-  void _openSubmitOTPOverlay(BuildContext context) {
-    showModalBottomSheet(
-      useSafeArea: true,
-      isScrollControlled: true,
-      context: context,
-      builder: (context) => const ResetPasswordScreen(),
-      constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width,
-        maxHeight: (MediaQuery.of(context).size.height) / 1.5,
-      ),
+  void _verify() async {
+    final data = SendOTP(
+      email: widget.email,
+      otp: int.parse(_otpController.text),
     );
-  }
-
-  void _forgotPassword() async {
     try {
       setState(() {
         _isAuthenticating = true;
       });
-      _responseForgotPassword =
-          await _apiStart.forgotPassword(_emailController.text);
-      if (!mounted) return;
+      final responseSendOtp = await _apiStart.sendOtp(data);
+      _responseSendOtp = responseSendOtp;
       setState(() {
         _isAuthenticating = false;
         _hasMessage = true;
       });
-      _openSubmitOTPOverlay(context);
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).clearSnackBars();
@@ -74,12 +70,11 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-
         return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text(
-              'FORGOT PASSWORD',
+              'VERIFY',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -96,7 +91,7 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Please, enter your email address. You will receive a OTP code to create a new password.',
+                        'Please, enter your OTP which sent to your email',
                         style: TextStyle(
                           fontSize: 15,
                         ),
@@ -105,13 +100,13 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                         height: 25,
                       ),
                       TextField(
-                        controller: _emailController,
-                        maxLength: 200,
-                        keyboardType: TextInputType.emailAddress,
+                        controller: _otpController,
+                        maxLength: 6,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: surfaceColor,
-                          labelText: 'Email',
+                          labelText: 'OTP Code',
                           labelStyle: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
@@ -133,7 +128,7 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                       if (_hasMessage)
                         Center(
                           child: Text(
-                            _responseForgotPassword,
+                            _responseSendOtp['message'],
                             style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w200,
@@ -144,7 +139,7 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: _forgotPassword,
+                            onPressed: _verify,
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,

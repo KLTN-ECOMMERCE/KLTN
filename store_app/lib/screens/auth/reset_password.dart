@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/api/api_start.dart';
+import 'package:store_app/models/reset_password.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -13,6 +15,11 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
   final _otpController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  var _isAuthenticating = false;
+  dynamic _responseResetPassword;
+  var _hasMessage = false;
+
+  final ApiStart _apiStart = ApiStart();
 
   @override
   void dispose() {
@@ -22,8 +29,36 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
     super.dispose();
   }
 
-  void _recoveryPassword(BuildContext context) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+  void _resetPassword() async {
+    final data = ResetPassword(
+      password: _newPasswordController.text,
+      confirmPassword: _confirmPasswordController.text,
+      otp: int.parse(_otpController.text),
+    );
+    try {
+      setState(() {
+        _isAuthenticating = true;
+      });
+      _responseResetPassword = await _apiStart.resetPassword(data);
+      setState(() {
+        _isAuthenticating = false;
+        _hasMessage = true;
+      });
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+      setState(() {
+        _isAuthenticating = false;
+        _hasMessage = false;
+      });
+    }
   }
 
   @override
@@ -63,12 +98,12 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                     ),
                     TextField(
                       controller: _otpController,
-                      maxLength: 4,
+                      maxLength: 6,
                       keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: surfaceColor,
-                        labelText: 'OTP CODE',
+                        labelText: 'OTP Code',
                         labelStyle: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -90,7 +125,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: surfaceColor,
-                        labelText: 'NEW PASSWORD',
+                        labelText: 'New Password',
                         labelStyle: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -112,7 +147,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: surfaceColor,
-                        labelText: 'CONFIRM NEW PASSWORD',
+                        labelText: 'Confirm New Password',
                         labelStyle: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
@@ -127,12 +162,24 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                     const SizedBox(
                       height: 25,
                     ),
+                    if (_isAuthenticating)
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    if (_hasMessage)
+                      Center(
+                        child: Text(
+                          _responseResetPassword,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w200,
+                          ),
+                        ),
+                      ),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          _recoveryPassword(context);
-                        },
+                        onPressed: _resetPassword,
                         style: ElevatedButton.styleFrom(
                           backgroundColor:
                               Theme.of(context).colorScheme.primary,
