@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/api/api_start.dart';
+import 'package:store_app/models/register.dart';
 import 'package:store_app/screens/auth/forgot_password.dart';
+import 'package:store_app/screens/auth/send_otp.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,6 +17,11 @@ class _SignupState extends State<SignupScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  var _isAuthenticating = false;
+  dynamic _responseRegister;
+  var _hasMessage = false;
+
+  final ApiStart _apiStart = ApiStart();
 
   @override
   void dispose() {
@@ -36,8 +44,49 @@ class _SignupState extends State<SignupScreen> {
     );
   }
 
-  void _signup(BuildContext context) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+  void _openSendOTPOverlay() {
+    showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => SendOtpScreen(email: _emailController.text),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width,
+        maxHeight: (MediaQuery.of(context).size.height) / 1.3,
+      ),
+    );
+  }
+
+  void _register() async {
+    final data = Register(
+      email: _emailController.text,
+      password: _passwordController.text,
+      name: _nameController.text,
+    );
+    try {
+      setState(() {
+        _isAuthenticating = true;
+      });
+      final responseRegister = await _apiStart.register(data);
+      _responseRegister = responseRegister;
+      setState(() {
+        _isAuthenticating = false;
+        _hasMessage = true;
+      });
+      _openSendOTPOverlay();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+      setState(() {
+        _isAuthenticating = false;
+        _hasMessage = false;
+      });
+    }
   }
 
   @override
@@ -133,21 +182,35 @@ class _SignupState extends State<SignupScreen> {
                 const SizedBox(
                   height: 25,
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      _signup(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                    child: const Text(
-                      'SIGN UP',
+                if (_isAuthenticating)
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                if (_hasMessage)
+                  Center(
+                    child: Text(
+                      _responseRegister,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w200,
+                      ),
                     ),
                   ),
-                ),
+                if (!_isAuthenticating && !_hasMessage)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _register,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      child: const Text(
+                        'SIGN UP',
+                      ),
+                    ),
+                  ),
                 const SizedBox(
                   height: 10,
                 ),

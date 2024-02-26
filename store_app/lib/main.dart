@@ -25,14 +25,6 @@ class MyApp extends StatelessWidget {
           onSecondary: const Color.fromARGB(255, 255, 255, 255),
           onBackground: const Color.fromARGB(255, 0, 0, 0),
         ),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(
-            color: Color.fromARGB(255, 0, 0, 0),
-          ),
-          bodyMedium: TextStyle(
-            color: Color.fromARGB(255, 0, 0, 0),
-          ),
-        ),
         navigationBarTheme: NavigationBarThemeData(
           labelTextStyle: MaterialStateProperty.resolveWith(
             (states) {

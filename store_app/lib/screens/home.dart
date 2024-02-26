@@ -1,196 +1,167 @@
-import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:store_app/data/categories.dart';
+import 'package:store_app/api/api_product.dart';
+import 'package:store_app/models/category.dart';
 import 'package:store_app/models/product_item.dart';
-import 'package:store_app/widgets/category/category_item.dart';
-import 'package:store_app/widgets/product/product_item.dart';
+import 'package:store_app/widgets/category/list_category_hor.dart';
+import 'package:store_app/widgets/home/discount_banner.dart';
+import 'package:store_app/widgets/home/home_header.dart';
+import 'package:store_app/widgets/product/list_product_hor.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    required this.homeController,
-  });
-
-  final ScrollController homeController;
+  const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() {
-    return _HomeState();
-  }
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeState extends State<HomeScreen> {
-  List<ProductItem> list = [
-    const ProductItem(
-      name: 'Apple Iphone 15 Pro Max',
-      price: 1200.333,
-      ratings: 4,
-      thumbUrl:
-          'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
-      numOfReview: 15,
-      stock: 200,
-    ),
-    const ProductItem(
-      name: 'Apple Iphone 15 Pro Max',
-      price: 1200.6473,
-      ratings: 4,
-      thumbUrl:
-          'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
-      numOfReview: 15,
-      stock: 200,
-    ),
-    const ProductItem(
-      name: 'Apple Iphone 15 Pro Max',
-      price: 1200.6473,
-      ratings: 4,
-      thumbUrl:
-          'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
-      numOfReview: 15,
-      stock: 200,
-    ),
-    const ProductItem(
-      name: 'Apple Iphone 15 Pro Max',
-      price: 1200.6473,
-      ratings: 4,
-      thumbUrl:
-          'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
-      numOfReview: 15,
-      stock: 200,
-    ),
-    const ProductItem(
-      name: 'Apple Iphone 15 Pro Max',
-      price: 696.96,
-      ratings: 4,
-      thumbUrl:
-          'https://shopdunk.com/images/thumbs/0020079_iphone-15-pro-max-128gb.jpeg',
-      numOfReview: 15,
-      stock: 200,
-    ),
-  ];
-  void _selectProductItem(BuildContext context, ProductItem productItem) {}
+class _HomeScreenState extends State<HomeScreen> {
+  final ApiProduct _apiProduct = ApiProduct();
 
-  void _selectCategoryItem(BuildContext context, String category) {}
+  Future<List<dynamic>> _getProducts(int page) async {
+    try {
+      final response = await _apiProduct.getProducts(page);
+      //_responseGetProducts = response;
+      final products = response['products'] as List<dynamic>;
+      return products;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
 
-  PageController pageController = PageController();
-  int pageNo = 0;
+      throw HttpException(e.toString());
+    }
+  }
 
   @override
   void initState() {
-    pageController = PageController(
-      initialPage: 0,
-      viewportFraction: 0.88,
-    );
-    Timer.periodic(const Duration(seconds: 3), (timer) {
-      if (pageNo == categories.length) {
-        pageNo = 0;
-      }
-      pageController.animateToPage(
-        pageNo,
-        duration: const Duration(
-          seconds: 1,
-        ),
-        curve: Curves.easeInOutCirc,
-      );
-      pageNo++;
-    });
     super.initState();
   }
 
-  @override
-  void dispose() {
-    pageController.dispose();
-    super.dispose();
-  }
+  void _selectProduct(BuildContext context, ProductItem productItem) {}
+
+  void _selectCategory(BuildContext context, Category category) {}
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text('HOME'),
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
-        leading: Image.asset(
-          'assets/images/logo.png',
-        ),
-      ),
-      backgroundColor: theme.colorScheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          controller: widget.homeController,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.asset(
-                'assets/images/banner1.jpg',
-                width: double.infinity,
-              ),
-              SizedBox(
-                height: 100,
-                child: PageView.builder(
-                  itemCount: categories.length,
-                  controller: pageController,
-                  onPageChanged: (value) {
-                    setState(() {
-                      pageNo = value;
-                    });
-                  },
-                  itemBuilder: (context, index) {
-                    return AnimatedBuilder(
-                      animation: pageController,
-                      builder: (context, child) {
-                        return child!;
-                      },
-                      child: CategoryItemWidget(
-                        category: categories.entries.elementAt(index).value,
-                        onSelectCategory: _selectCategoryItem,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  categories.length,
-                  (index) => GestureDetector(
-                    onTap: () {
-                      //pageNo = index;
-                      pageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOutCirc,
-                      );
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.all(2.0),
-                      child: Icon(
-                        Icons.circle,
-                        size: 15,
-                        color: pageNo == index
-                            ? categories.entries.elementAt(pageNo).value.color
-                            : Colors.white,
-                      ),
-                    ),
+              Column(
+                children: [
+                  const HomeHeader(),
+                  const DiscountBanner(),
+                  ListCategoryHor(
+                    sectionTitle: 'Special for you',
+                    onSelectCategory: _selectCategory,
                   ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: list.length,
-                itemBuilder: (context, index) => ProductItemWidget(
-                  productItem: list[index],
-                  onSelectProduct: _selectProductItem,
-                ),
+                  const SizedBox(
+                    height: 14,
+                  ),
+                  FutureBuilder(
+                    future: _getProducts(1),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          'Error: ${snapshot.error}',
+                        );
+                      } else {
+                        final popularProducts = snapshot.data as List<dynamic>;
+                        return ListProductHor(
+                          sectionTitle: 'Popular Products',
+                          onSelectProduct: _selectProduct,
+                          products: popularProducts,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  FutureBuilder(
+                    future: _getProducts(2),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          'Error: ${snapshot.error}',
+                        );
+                      } else {
+                        final popularProducts = snapshot.data as List<dynamic>;
+                        return ListProductHor(
+                          sectionTitle: 'Best Seller',
+                          onSelectProduct: _selectProduct,
+                          products: popularProducts,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  FutureBuilder(
+                    future: _getProducts(3),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          'Error: ${snapshot.error}',
+                        );
+                      } else {
+                        final popularProducts = snapshot.data as List<dynamic>;
+                        return ListProductHor(
+                          sectionTitle: 'Professional',
+                          onSelectProduct: _selectProduct,
+                          products: popularProducts,
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  FutureBuilder(
+                    future: _getProducts(4),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          'Error: ${snapshot.error}',
+                        );
+                      } else {
+                        final popularProducts = snapshot.data as List<dynamic>;
+                        return ListProductHor(
+                          sectionTitle: 'For Family',
+                          onSelectProduct: _selectProduct,
+                          products: popularProducts,
+                        );
+                      }
+                    },
+                  ),
+                ],
               ),
             ],
           ),

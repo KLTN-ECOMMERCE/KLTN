@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/models/category.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class CategoryItemWidget extends StatelessWidget {
   const CategoryItemWidget({
@@ -9,35 +10,65 @@ class CategoryItemWidget extends StatelessWidget {
   });
 
   final Category? category;
-  final void Function(BuildContext context, String category) onSelectCategory;
+  final void Function(BuildContext context, Category category) onSelectCategory;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //color: Theme.of(context).colorScheme.primaryContainer,
-      margin: const EdgeInsets.only(
-        right: 8,
-        left: 8,
-        top: 24,
-        bottom: 12,
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: category!.color,
-      ),
-      clipBehavior: Clip.hardEdge,
+    return Padding(
+      padding: const EdgeInsets.only(left: 20),
       child: InkWell(
         onTap: () {
-          onSelectCategory(context, 'category');
+          onSelectCategory(context, category!);
         },
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Text(
-              category!.title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
+        child: SizedBox(
+          width: 242,
+          height: 100,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Stack(
+              children: [
+                FadeInImage(
+                  placeholder: MemoryImage(kTransparentImage),
+                  image: AssetImage(category!.image),
+                  fit: BoxFit.cover,
+                  height: 120,
+                  width: double.infinity,
+                ),
+                Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black54,
+                        Colors.black38,
+                        Colors.black26,
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 10,
+                  ),
+                  child: Text.rich(
+                    TextSpan(
+                      style: const TextStyle(color: Colors.white),
+                      children: [
+                        TextSpan(
+                          text: "${category!.title}\n",
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
