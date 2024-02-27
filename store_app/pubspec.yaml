@@ -81,6 +81,10 @@ flutter:
     - assets/images/banner_category10.jpg
     - assets/icons/Cart Icon.svg
     - assets/icons/Bell.svg
+    - assets/icons/Error.svg
+    - assets/icons/Lock.svg
+    - assets/icons/Mail.svg
+    - assets/icons/User Icon.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

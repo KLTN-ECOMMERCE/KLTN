@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
+import 'package:store_app/components/custom_surfix_icon.dart';
+import 'package:store_app/components/form_error.dart';
+import 'package:store_app/constants.dart';
+import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/screens/auth/reset_password.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -12,18 +16,14 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordState extends State<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
+  var _enteredEmail = '';
   var _isAuthenticating = false;
   dynamic _responseForgotPassword;
   var _hasMessage = false;
+  final _formKey = GlobalKey<FormState>();
+  final List<String?> errors = [];
 
   final ApiStart _apiStart = ApiStart();
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
-  }
 
   void _openSubmitOTPOverlay(BuildContext context) {
     showModalBottomSheet(
@@ -38,13 +38,35 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
     );
   }
 
+    void addError(String? error) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error);
+      });
+    }
+  }
+
+  void removeError(String? error) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
+  }
+
   void _forgotPassword() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    _formKey.currentState!.save();
+    KeyboardUtil.hideKeyboard(context);
     try {
       setState(() {
         _isAuthenticating = true;
       });
       _responseForgotPassword =
-          await _apiStart.forgotPassword(_emailController.text);
+          await _apiStart.forgotPassword(_enteredEmail);
       if (!mounted) return;
       setState(() {
         _isAuthenticating = false;
@@ -104,58 +126,93 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                       const SizedBox(
                         height: 25,
                       ),
-                      TextField(
-                        controller: _emailController,
-                        maxLength: 200,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: surfaceColor,
-                          labelText: 'Email',
-                          labelStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          border: const OutlineInputBorder(
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(4),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              keyboardType: TextInputType.emailAddress,
+                              onSaved: (newValue) => _enteredEmail = newValue!,
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  removeError(kEmailNullError);
+                                } else if (value.contains('@')) {
+                                  removeError(kInvalidEmailError);
+                                }
+                                _enteredEmail = value;
+                              },
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  addError(kEmailNullError);
+                                  return "";
+                                } else if (!value.contains('@')) {
+                                  addError(kInvalidEmailError);
+                                  return "";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: surfaceColor,
+                                labelText: "Email",
+                                labelStyle: TextStyle(
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                hintText: "Enter your email",
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                                suffixIcon: const CustomSurffixIcon(
+                                  svgIcon: "assets/icons/Mail.svg",
+                                ),
+                                border: const OutlineInputBorder(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(4),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            FormError(
+                              errors: errors,
+                            ),
+                            const SizedBox(
+                              height: 25,
+                            ),
+                            if (_isAuthenticating)
+                              const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            if (_hasMessage)
+                              Center(
+                                child: Text(
+                                  _responseForgotPassword,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w200,
+                                  ),
+                                ),
+                              ),
+                            if (!_isAuthenticating && !_hasMessage)
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _forgotPassword,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        Theme.of(context).colorScheme.primary,
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                                  child: const Text(
+                                    'SEND',
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
-                      const SizedBox(
-                        height: 25,
-                      ),
-                      if (_isAuthenticating)
-                        const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      if (_hasMessage)
-                        Center(
-                          child: Text(
-                            _responseForgotPassword,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w200,
-                            ),
-                          ),
-                        ),
-                      if (!_isAuthenticating && !_hasMessage)
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: _forgotPassword,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.primary,
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            child: const Text(
-                              'SEND',
-                            ),
-                          ),
-                        ),
+                      
                     ],
                   ),
                 ),

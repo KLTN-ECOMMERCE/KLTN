@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+const ipv4Address = '192.168.0.110';
 const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
@@ -27,6 +28,8 @@ final RegExp emailValidatorRegExp =
 const String kEmailNullError = "Please Enter your email";
 const String kInvalidEmailError = "Please Enter Valid Email";
 const String kPassNullError = "Please Enter your password";
+const String kOtpNullError = "Please Enter your OTP";
+const String kInvalidOtpError = "Please Enter Valid OTP code";
 const String kShortPassError = "Password is too short";
 const String kMatchPassError = "Passwords don't match";
 const String kNamelNullError = "Please Enter your name";

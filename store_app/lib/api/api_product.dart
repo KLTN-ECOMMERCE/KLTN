@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:http/http.dart' as http;
+import 'package:store_app/constants.dart';
 
 class ApiProduct {
   Future<dynamic> getProducts(int page) async {
     var pageString = page.toString();
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/products/',
       {
         'page': pageString,

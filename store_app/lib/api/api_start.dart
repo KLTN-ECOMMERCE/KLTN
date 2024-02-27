@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:store_app/constants.dart';
 import 'package:store_app/models/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -14,7 +15,7 @@ class ApiStart {
 
   Future<Object> login(Login userData) async {
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/login',
     );
     Map<String, String> body = {
@@ -54,7 +55,7 @@ class ApiStart {
 
   Future<Object> register(Register userData) async {
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/register',
     );
     Map<String, String> body = {
@@ -82,7 +83,7 @@ class ApiStart {
 
   Future<Object> sendOtp(SendOTP data) async {
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/check',
     );
     Map<String, dynamic> body = {
@@ -108,7 +109,7 @@ class ApiStart {
 
   Future<Object> forgotPassword(String email) async {
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/password/forgot/mobile',
     );
     Map<String, dynamic> body = {
@@ -133,7 +134,7 @@ class ApiStart {
 
   Future<Object> resetPassword(ResetPassword data) async {
     final url = Uri.http(
-      '192.168.0.110:4000',
+      '$ipv4Address:4000',
       'api/v1/password/reset',
     );
     Map<String, dynamic> body = {
