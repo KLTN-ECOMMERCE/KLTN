@@ -6,7 +6,7 @@ class ProductItemWidget extends StatelessWidget {
   const ProductItemWidget({
     super.key,
     this.aspectRetio = 1.02,
-    this.width = 140,
+    this.width = 160,
     required this.productItem,
     required this.onSelectProduct,
   });
@@ -18,8 +18,12 @@ class ProductItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       width: width,
+      decoration: BoxDecoration(
+        color: kSecondaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: InkWell(
         onTap: () {
           onSelectProduct(context, productItem);
@@ -28,52 +32,68 @@ class ProductItemWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             AspectRatio(
-              aspectRatio: 1.02,
+              aspectRatio: 0.85,
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: kSecondaryColor.withOpacity(0.1),
+                  color: kSecondaryColor.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Image.network(
                   productItem.thumbUrl,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(
-              productItem.name,
-              style: Theme.of(context).textTheme.bodyMedium,
-              maxLines: 2,
+            Container(
+              padding: const EdgeInsets.only(
+                top: 4,
+                left: 8,
+                right: 8,
+                bottom: 2,
+              ),
+              height: 75,
+              child: Text(
+                productItem.name,
+                style: Theme.of(context).textTheme.bodyLarge,
+                maxLines: 3,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(
               height: 4,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '\$${productItem.price}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Theme.of(context).colorScheme.primary,
+            Container(
+              padding: const EdgeInsets.only(
+                top: 4,
+                left: 8,
+                right: 8,
+                bottom: 2,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '\$${productItem.price}',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
-                ),
-                IconButton.filledTonal(
-                  style: IconButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(30, 30),
-                    fixedSize: const Size(30, 30),
+                  IconButton.filledTonal(
+                    style: IconButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: const Size(30, 30),
+                      fixedSize: const Size(30, 30),
+                    ),
+                    iconSize: 20,
+                    icon: const Icon(Icons.favorite_border),
+                    onPressed: () {},
                   ),
-                  iconSize: 20,
-                  icon: const Icon(Icons.favorite_border),
-                  onPressed: () {},
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

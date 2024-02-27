@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
+import 'package:store_app/components/custom_surfix_icon.dart';
+import 'package:store_app/components/form_error.dart';
+import 'package:store_app/constants.dart';
+import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/models/reset_password.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
@@ -12,28 +16,45 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordState extends State<ResetPasswordScreen> {
-  final _otpController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
+  var _enteredPassword = '';
+  var _enteredConfirmPassword = '';
+  var _enteredOtp = '';
+  final _formKey = GlobalKey<FormState>();
   var _isAuthenticating = false;
   dynamic _responseResetPassword;
   var _hasMessage = false;
+  final List<String?> errors = [];
 
   final ApiStart _apiStart = ApiStart();
 
-  @override
-  void dispose() {
-    _otpController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
+  void addError(String? error) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error);
+      });
+    }
+  }
+
+  void removeError(String? error) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
   }
 
   void _resetPassword() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    _formKey.currentState!.save();
+    KeyboardUtil.hideKeyboard(context);
+
     final data = ResetPassword(
-      password: _newPasswordController.text,
-      confirmPassword: _confirmPasswordController.text,
-      otp: int.parse(_otpController.text),
+      password: _enteredPassword,
+      confirmPassword: _enteredConfirmPassword,
+      otp: int.parse(_enteredOtp),
     );
     try {
       setState(() {
@@ -96,101 +117,180 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                     const SizedBox(
                       height: 25,
                     ),
-                    TextField(
-                      controller: _otpController,
-                      maxLength: 6,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: surfaceColor,
-                        labelText: 'OTP Code',
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(4),
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            maxLength: 6,
+                            keyboardType: TextInputType.number,
+                            onSaved: (newValue) => _enteredOtp = newValue!,
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                removeError(kOtpNullError);
+                              } else if (value.length == 6) {
+                                removeError(kInvalidOtpError);
+                              }
+                              _enteredOtp = value;
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                addError(kOtpNullError);
+                                return "";
+                              } else if (value.length < 6) {
+                                addError(kInvalidOtpError);
+                                return "";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: surfaceColor,
+                              labelText: 'OTP Code',
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              suffixIcon: const CustomSurffixIcon(
+                                svgIcon: "assets/icons/Lock.svg",
+                              ),
+                              hintText: "Enter your OTP code",
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(4),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    TextField(
-                      controller: _newPasswordController,
-                      maxLength: 100,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: surfaceColor,
-                        labelText: 'New Password',
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(4),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            obscureText: true,
+                            onSaved: (newValue) => _enteredPassword = newValue!,
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                removeError(kPassNullError);
+                              } else if (value.length >= 6) {
+                                removeError(kShortPassError);
+                              }
+                              _enteredPassword = value;
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                addError(kPassNullError);
+                                return "";
+                              } else if (value.length < 6) {
+                                addError(kShortPassError);
+                                return "";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: surfaceColor,
+                              labelText: "Password",
+                              hintText: "Enter your password",
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              suffixIcon: const CustomSurffixIcon(
+                                svgIcon: "assets/icons/Lock.svg",
+                              ),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(4),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    TextField(
-                      controller: _confirmPasswordController,
-                      maxLength: 100,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: surfaceColor,
-                        labelText: 'Confirm New Password',
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(4),
+                          const SizedBox(height: 20),
+                          TextFormField(
+                            obscureText: true,
+                            onSaved: (newValue) =>
+                                _enteredConfirmPassword = newValue!,
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                removeError(kPassNullError);
+                              } else if (value.isNotEmpty &&
+                                  _enteredPassword == _enteredConfirmPassword) {
+                                removeError(kMatchPassError);
+                              }
+                              _enteredConfirmPassword = value;
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                addError(kPassNullError);
+                                return "";
+                              } else if ((_enteredPassword != value)) {
+                                addError(kMatchPassError);
+                                return "";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: surfaceColor,
+                              labelText: "Confirm Password",
+                              hintText: "Confirm your password",
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              suffixIcon: const CustomSurffixIcon(
+                                svgIcon: "assets/icons/Lock.svg",
+                              ),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(4),
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 25,
-                    ),
-                    if (_isAuthenticating)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    if (_hasMessage)
-                      Center(
-                        child: Text(
-                          _responseResetPassword,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w200,
+                          FormError(
+                            errors: errors,
                           ),
-                        ),
-                      ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _resetPassword,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
-                        ),
-                        child: const Text(
-                          'SUBMIT',
-                        ),
+                          const SizedBox(
+                            height: 25,
+                          ),
+                          if (_isAuthenticating)
+                            const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          if (_hasMessage)
+                            Center(
+                              child: Text(
+                                _responseResetPassword,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w200,
+                                ),
+                              ),
+                            ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _resetPassword,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.onPrimary,
+                              ),
+                              child: const Text(
+                                'SUBMIT',
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    
                   ],
                 ),
               ),

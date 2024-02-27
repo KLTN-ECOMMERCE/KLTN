@@ -29,7 +29,7 @@ class ListProductHor extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 240,
+          height: 323,
           child: ListView.builder(
             physics: const ClampingScrollPhysics(),
             shrinkWrap: true,
@@ -37,15 +37,16 @@ class ListProductHor extends StatelessWidget {
             itemCount: products.length,
             itemBuilder: (context, index) {
               return Padding(
-                padding: const EdgeInsets.only(left: 20,),
+                padding: const EdgeInsets.only(
+                  left: 20,
+                ),
                 child: ProductItemWidget(
                   productItem: ProductItem(
                     id: products[index]['_id'].toString(),
                     name: products[index]['name'].toString(),
                     price: products[index]['price'].toDouble(),
                     ratings: products[index]['ratings'].toDouble(),
-                    thumbUrl:
-                        products[index]['images'][0]['url'].toString(),
+                    thumbUrl: products[index]['images'][0]['url'].toString(),
                     numOfReviews: products[index]['numOfReviews'].toInt(),
                     stock: products[index]['stock'].toInt(),
                   ),

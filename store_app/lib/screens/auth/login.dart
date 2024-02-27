@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
+import 'package:store_app/components/custom_surfix_icon.dart';
+import 'package:store_app/components/form_error.dart';
+import 'package:store_app/constants.dart';
+import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/models/login.dart';
 import 'package:store_app/screens/app.dart';
 import 'package:store_app/screens/auth/forgot_password.dart';
@@ -15,24 +19,45 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
   var _isAuthenticating = false;
+
+  final _formKey = GlobalKey<FormState>();
+  var _enteredEmail = '';
+  var _enteredPassword = '';
+
+  final List<String?> errors = [];
 
   final ApiStart _apiStart = ApiStart();
 
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void addError(String? error) {
+    if (!errors.contains(error)) {
+      setState(() {
+        errors.add(error);
+      });
+    }
+  }
+
+  void removeError(String? error) {
+    if (errors.contains(error)) {
+      setState(() {
+        errors.remove(error);
+      });
+    }
   }
 
   void _login() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+    _formKey.currentState!.save();
+    KeyboardUtil.hideKeyboard(context);
+
     final data = Login(
-      email: _emailController.text,
-      password: _passwordController.text,
+      email: _enteredEmail,
+      password: _enteredPassword,
     );
+
     try {
       setState(() {
         _isAuthenticating = true;
@@ -104,101 +129,162 @@ class _LoginState extends State<LoginScreen> {
                 const SizedBox(
                   height: 12,
                 ),
-                TextField(
-                  controller: _emailController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: surfaceColor,
-                    labelText: 'Email',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: surfaceColor,
-                    labelText: 'Password',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(4),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 25,
-                ),
-                if (_isAuthenticating)
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                if (!_isAuthenticating)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                      child: const Text(
-                        'LOGIN',
-                      ),
-                    ),
-                  ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: TextButton(
-                    onPressed: _openForgotPasswordOverlay,
-                    style: TextButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.onBackground),
-                    child: const Text('Forgotten Password?'),
-                  ),
-                ),
-                const SizedBox(
-                  height: 85,
-                ),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const SignupScreen(),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        onSaved: (newValue) => _enteredEmail = newValue!,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            removeError(kEmailNullError);
+                          } else if (value.contains('@')) {
+                            removeError(kInvalidEmailError);
+                          }
+                          _enteredEmail = value;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            addError(kEmailNullError);
+                            return "";
+                          } else if (!value.contains('@')) {
+                            addError(kInvalidEmailError);
+                            return "";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: surfaceColor,
+                          labelText: "Email",
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: "Enter your email",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          suffixIcon: const CustomSurffixIcon(
+                            svgIcon: "assets/icons/Mail.svg",
+                          ),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(4),
+                            ),
+                          ),
                         ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.primary,
                       ),
-                    ),
-                    child: const Text('Create new account'),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        onSaved: (newValue) => _enteredPassword = newValue!,
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            removeError(kPassNullError);
+                          } else if (value.length >= 6) {
+                            removeError(kShortPassError);
+                          }
+                          _enteredPassword = value;
+                        },
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            addError(kPassNullError);
+                            return "";
+                          } else if (value.length < 6) {
+                            addError(kShortPassError);
+                            return "";
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: surfaceColor,
+                          labelText: "Password",
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          hintText: "Enter your password",
+                          floatingLabelBehavior: FloatingLabelBehavior.always,
+                          suffixIcon: const CustomSurffixIcon(
+                            svgIcon: "assets/icons/Lock.svg",
+                          ),
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                      FormError(
+                        errors: errors,
+                      ),
+                      const SizedBox(
+                        height: 25,
+                      ),
+                      if (_isAuthenticating)
+                        const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      if (!_isAuthenticating)
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _login,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            child: const Text(
+                              'LOGIN',
+                            ),
+                          ),
+                        ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Center(
+                        child: TextButton(
+                          onPressed: _openForgotPasswordOverlay,
+                          style: TextButton.styleFrom(
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onBackground),
+                          child: const Text(
+                            'Forgotten Password?',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 85,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => const SignupScreen(),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              width: 2,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                          child: const Text('Create new account'),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(
-                  height: 15,
                 ),
               ],
             ),
