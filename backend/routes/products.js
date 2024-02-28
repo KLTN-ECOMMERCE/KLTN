@@ -12,6 +12,7 @@ import {
   newProduct,
   updateProduct,
   uploadProductImages,
+  getProductCategory
 } from "../controllers/productControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 const router = express.Router();
@@ -38,6 +39,7 @@ router
 router
   .route("/admin/products/:id")
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
+router.route("/products/category/:category").get(getProductCategory);
 
 router
   .route("/reviews")
