@@ -10,6 +10,14 @@ export default [
         public_id: "Product",
         url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
       },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
+      },
     ],
     category: "Phones",
     seller: "Apple",
@@ -28,6 +36,14 @@ export default [
         public_id: "Product",
         url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391929/Products/airpods-3-23-650x650_jyxl4n.webp",
       },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391929/Products/airpods-3-23-650x650_jyxl4n.webp",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391929/Products/airpods-3-23-650x650_jyxl4n.webp",
+      },
     ],
     category: "Headphones",
     seller: "Apple",
@@ -42,6 +58,14 @@ export default [
       "AirPods Pro 2 là tai nghe true wireless mới nhất của Apple, được ra mắt vào tháng 12 năm 2023. Tai nghe này có thiết kế tương tự như AirPods Pro thế hệ đầu tiên, nhưng được trang bị nhiều tính năng mới và cải tiến, bao gồm khử tiếng ồn, âm thanh không gian. chế độ xuyên âm",
     ratings: 3.5,
     images: [
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391922/Products/airpods-pro-2-thumb-12-650x650_isx9bc.webp",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391922/Products/airpods-pro-2-thumb-12-650x650_isx9bc.webp",
+      },
       {
         public_id: "Product",
         url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391922/Products/airpods-pro-2-thumb-12-650x650_isx9bc.webp",
