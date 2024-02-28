@@ -241,3 +241,12 @@ export const canUserReview = catchAsyncErrors(async (req, res) => {
     canReview: true,
   });
 });
+// product category => /api/v1/products/category/:category
+export const getProductCategory = catchAsyncErrors(async (req,res,next)=>{
+  const {category} = req.params;
+  const product = await Product.find({ category}) 
+  if(product===0){
+    res.status(404).json({message:'Không có danh mục sản phẩm'})
+  }
+  res.status(200).json({product})
+})
