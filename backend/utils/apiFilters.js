@@ -17,7 +17,20 @@ class APIFilters {
     this.query = this.query.find({ ...keyword });
     return this;
   }
-
+  sort( options = {}) {
+    if (!this.query) {
+      throw new Error("Mongoose query not set!");
+    }
+  
+    const sortOptions = {};
+  
+    const sortField = options.nested ? `${options.nested}.${this.queryStr._sort}` : this.queryStr._sort;
+    sortOptions[sortField] = this.queryStr._order === "asc" ? 1 : -1;
+  console.log(this.queryStr._sort);
+    this.query = this.query.sort(sortOptions);
+    return this;
+  }
+  
   filters() {
     const queryCopy = { ...this.queryStr };
 
@@ -32,26 +45,7 @@ class APIFilters {
     this.query = this.query.find(JSON.parse(queryStr));
     return this;
   }
-  //
-  arrange() {
-    const sortBy = this.queryStr.sortBy;
-  
-    if (sortBy) {
-      let sortField = sortBy;
-      let sortOrder = 1;
-  
-      if (sortBy.startsWith('-')) {
-        sortField = sortBy.slice(1);
-        sortOrder = -1;
-      }
-  
-      if (sortField === 'price') {
-        this.query = this.query.sort({ price: sortOrder });
-      } 
-    }
-  
-    return this;
-  }
+
   pagination(resPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;
     const skip = resPerPage * (currentPage - 1);
