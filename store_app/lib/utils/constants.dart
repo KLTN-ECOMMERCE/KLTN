@@ -20,7 +20,7 @@ const headingStyle = TextStyle(
   height: 1.5,
 );
 
-const defaultDuration = Duration(milliseconds: 250);
+const defaultDuration = Duration(milliseconds: 190);
 
 // Form Error
 final RegExp emailValidatorRegExp =
