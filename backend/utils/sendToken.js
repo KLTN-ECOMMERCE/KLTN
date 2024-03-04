@@ -2,7 +2,6 @@
 export default (user, statusCode, res) => {
   // Create JWT Token
   const token = user.getJwtToken();
-
   // Options for cookie
   const options = {
     expires: new Date(
@@ -10,7 +9,6 @@ export default (user, statusCode, res) => {
     ),
     httpOnly: true,
   };
-
   res.status(statusCode).cookie("token", token, options).json({
     token,
   });
