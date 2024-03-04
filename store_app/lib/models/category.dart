@@ -5,11 +5,9 @@ enum Categories {
   laptops,
   accessories,
   headphones,
-  food,
-  books,
-  sports,
-  outdoor,
-  home,
+  tablets,
+  smartwatchs,
+  phones,
 }
 
 class Category {

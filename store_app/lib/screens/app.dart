@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:store_app/screens/home.dart';
+import 'package:store_app/screens/profile/profile.dart';
 
 class AppScreen extends StatefulWidget {
   const AppScreen({super.key});
@@ -90,13 +91,11 @@ class _AppState extends State<AppScreen> {
         ],
       ),
       body: [
-        const HomeScreen(
-          //homeController: _scrollController,
-        ),
+        const HomeScreen(),
         Text(_token),
         const Text('3'),
         const Text('4'),
-        const Text('5'),
+        const ProfileScreen(),
       ][currentPageIndex],
     );
   }

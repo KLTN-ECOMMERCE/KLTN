@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:store_app/api/api_product.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/models/product_item.dart';
+import 'package:store_app/screens/product/list_product.dart';
+import 'package:store_app/screens/product/product_detail.dart';
 import 'package:store_app/widgets/category/list_category_hor.dart';
 import 'package:store_app/widgets/home/discount_banner.dart';
 import 'package:store_app/widgets/home/home_header.dart';
@@ -21,8 +23,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<dynamic>> _getProducts(int page) async {
     try {
-      final response = await _apiProduct.getProducts(page);
-      //_responseGetProducts = response;
+      final response = await _apiProduct.getProducts(
+        page,
+        '',
+        {},
+      );
       final products = response['products'] as List<dynamic>;
       return products;
     } catch (e) {
@@ -44,9 +49,45 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  void _selectProduct(BuildContext context, ProductItem productItem) {}
+  void _selectProduct(BuildContext context, ProductItem productItem) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(productItem: productItem),
+      ),
+    );
+  }
 
-  void _selectCategory(BuildContext context, Category category) {}
+  Future<List> _getProductsInCategory(String category) async {
+    try {
+      final response = await _apiProduct.getProductsInCategory(category);
+      final products = response['product'] as List;
+      return products;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+      throw HttpException(e.toString());
+    }
+  }
+
+  void _selectCategory(BuildContext context, Category category) async {
+    final products = await _getProductsInCategory(category.title);
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ListProductScreen(
+          products: products,
+          category: category,
+          onGetProductInCategory: _getProductsInCategory,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +101,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Column(
                 children: [
                   const HomeHeader(),
-                  const DiscountBanner(),
+                  const DiscountBanner(
+                    firstString: 'Welcome to E-Shop',
+                    secondString: 'Special Month: Sale off to 20%',
+                  ),
                   ListCategoryHor(
                     sectionTitle: 'Special for you',
                     onSelectCategory: _selectCategory,

@@ -1,32 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/data/categories.dart';
 import 'package:store_app/models/category.dart';
+import 'package:store_app/screens/category/categories.dart';
 import 'package:store_app/widgets/category/category_item.dart';
 import 'package:store_app/widgets/home/section_title.dart';
 
 class ListCategoryHor extends StatelessWidget {
   const ListCategoryHor({
     super.key,
-    required this.sectionTitle,
+    this.sectionTitle = '',
     required this.onSelectCategory,
   });
 
   final String sectionTitle;
-
-  final void Function(BuildContext context, Category category)
-      onSelectCategory;
+final void Function(BuildContext context, Category category) onSelectCategory;
+  
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: SectionTitle(
-            title: sectionTitle,
-            press: () {},
+        if (sectionTitle != '')
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: SectionTitle(
+              title: sectionTitle,
+              press: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CategoriesScreen(),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
         SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

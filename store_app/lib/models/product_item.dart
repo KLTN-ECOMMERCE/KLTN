@@ -1,3 +1,4 @@
+
 class ProductItem {
   const ProductItem({
     required this.id,
@@ -7,13 +8,21 @@ class ProductItem {
     required this.thumbUrl,
     required this.numOfReviews,
     required this.stock,
+    required this.category,
+    required this.description,
+    required this.images,
+    required this.seller,
   });
 
   final String id;
   final String name;
+  final String description;
   final double price;
   final double ratings;
   final String thumbUrl;
+  final List<String> images;
+  final String category;
+  final String seller;
   final int numOfReviews;
   final int stock;
 }

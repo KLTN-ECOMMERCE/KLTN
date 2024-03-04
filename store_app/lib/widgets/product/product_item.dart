@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:store_app/constants.dart';
+import 'package:store_app/utils/constants.dart';
 import 'package:store_app/models/product_item.dart';
 
 class ProductItemWidget extends StatelessWidget {
@@ -76,10 +76,10 @@ class ProductItemWidget extends StatelessWidget {
                 children: [
                   Text(
                     '\$${productItem.price}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: Colors.redAccent,
                     ),
                   ),
                   IconButton.filledTonal(

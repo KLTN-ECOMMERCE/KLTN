@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:store_app/constants.dart';
+import 'package:store_app/utils/constants.dart';
 import 'package:store_app/models/login.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';

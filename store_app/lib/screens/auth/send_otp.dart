@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
 import 'package:store_app/components/form_error.dart';
-import 'package:store_app/constants.dart';
+import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/models/send_otp.dart';
 

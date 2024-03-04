@@ -18,6 +18,30 @@ export default [
         public_id: "Product",
         url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
       },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391910/Products/ipad-pro-m1-129-inch-wifi-cellular-gray-label-650x650_yfcmdd.webp",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391910/Products/ipad-pro-m1-129-inch-wifi-cellular-gray-label-650x650_yfcmdd.webp",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png",
+      },
+      {
+        public_id: "Product",
+        url: "https://res.cloudinary.com/daf4umk5i/image/upload/v1693391910/Products/ipad-pro-m1-129-inch-wifi-cellular-gray-label-650x650_yfcmdd.webp",
+      },
     ],
     category: "Phones",
     seller: "Apple",
