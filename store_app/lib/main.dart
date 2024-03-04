@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const AppScreen(),
+      home: const LoginScreen(),
     );
   }
 }
