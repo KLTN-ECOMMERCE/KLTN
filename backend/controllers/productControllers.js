@@ -8,20 +8,22 @@ import { delete_file, upload_file } from "../utils/cloudinary.js";
 // Create new Product   =>  /api/v1/products
 export const getProducts = catchAsyncErrors(async (req, res, next) => {
   const resPerPage = 8;
-  const apiFilters = new APIFilters(Product, req.query).search().filters();
+let { _sort = "price", _order = "asc" } = req.query;
+const apiFilters = new APIFilters(Product, req.query).search().filters().sort();
+let products = await apiFilters.query;
+let filteredProductsCount = products.length;
+apiFilters.pagination(resPerPage);
+products = await apiFilters.query.clone();
 
-  let products = await apiFilters.query;
-  let filteredProductsCount = products.length;
-
-  apiFilters.pagination(resPerPage);
-  products = await apiFilters.query.clone();
-
-  res.status(200).json({
-    resPerPage,
-    filteredProductsCount,
-    products,
-  });
+res.status(200).json({
+  resPerPage,
+  filteredProductsCount,
+  products,
 });
+
+});
+
+
 
 // Create new Product   =>  /api/v1/admin/products
 export const newProduct = catchAsyncErrors(async (req, res) => {
