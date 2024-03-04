@@ -32,26 +32,7 @@ class APIFilters {
     this.query = this.query.find(JSON.parse(queryStr));
     return this;
   }
-  //
-  arrange() {
-    const sortBy = this.queryStr.sortBy;
-  
-    if (sortBy) {
-      let sortField = sortBy;
-      let sortOrder = 1;
-  
-      if (sortBy.startsWith('-')) {
-        sortField = sortBy.slice(1);
-        sortOrder = -1;
-      }
-  
-      if (sortField === 'price') {
-        this.query = this.query.sort({ price: sortOrder });
-      } 
-    }
-  
-    return this;
-  }
+
   pagination(resPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;
     const skip = resPerPage * (currentPage - 1);
