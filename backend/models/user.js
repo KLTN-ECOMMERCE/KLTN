@@ -36,6 +36,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    newName: {
+      type: String,
+      maxLength: [50, "Your name cannot exceed 50 characters"],
+    },
+    newEmail: {
+      type: String,
+      unique: true,
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

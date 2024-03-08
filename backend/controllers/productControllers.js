@@ -23,8 +23,6 @@ res.status(200).json({
 
 });
 
-
-
 // Create new Product   =>  /api/v1/admin/products
 export const newProduct = catchAsyncErrors(async (req, res) => {
   req.body.user = req.user._id;
@@ -252,3 +250,15 @@ export const getProductCategory = catchAsyncErrors(async (req,res,next)=>{
   }
   res.status(200).json({product})
 })
+// product favourite => api/v1/products/popular
+export const getFavouriteProduct = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const products = await Product.find({}).sort({ Sold: -1 }).limit(10);
+    res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});

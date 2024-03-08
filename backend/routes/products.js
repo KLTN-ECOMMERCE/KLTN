@@ -12,12 +12,14 @@ import {
   newProduct,
   updateProduct,
   uploadProductImages,
-  getProductCategory
+  getProductCategory,
+  getFavouriteProduct
 } from "../controllers/productControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.route("/products").get(getProducts);
+router.route("/products/popular").get(getFavouriteProduct);
 router
   .route("/admin/products")
   .post(isAuthenticatedUser, authorizeRoles("admin"), newProduct)

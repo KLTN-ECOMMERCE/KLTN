@@ -6,6 +6,8 @@ import sendToken from "../utils/sendToken.js";
 import sendEmail from "../utils/sendEmail.js";
 import crypto from "crypto";
 import { delete_file, upload_file } from "../utils/cloudinary.js";
+import user from "../models/user.js";
+import { log } from "console";
 
 // Register user => /api/v1/register
 export const registerUser = catchAsyncErrors(async (req, res, next) => {
@@ -55,6 +57,7 @@ export const checkOTP = catchAsyncErrors(async (req, res, next) => {
   // Check if OTP matches
   if (user.otp === otp) {
     user.verify = true;
+    user.otp = undefined
     await user.save();
 
     return res.status(200).json({ user, message: 'OTP verified successfully' });
@@ -236,20 +239,91 @@ export const updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 // Update User Profile  =>  /api/v1/me/update
 export const updateProfile = catchAsyncErrors(async (req, res, next) => {
-  const newUserData = {
+
+  const newUserData =  {
     name: req.body.name,
     email: req.body.email,
   };
+  const user = await User.findById(req.user._id);
 
-  const user = await User.findByIdAndUpdate(req.user._id, newUserData, {
-    new: true,
-  });
+  if(user.email !== newUserData.email){
+    // Generate random OTP
+  const otp = Math.floor(100000 + Math.random() * 900000); // generate a 6-digit OTP
+  try {
+    // Save OTP to user record
+    user.otp = otp;
+    user.newName = req.body.name;
+    user.newEmail = req.body.email;
+    await user.save();
 
-  res.status(200).json({
-    user,
-  });
+    // Send OTP to user via email
+    await sendEmail({
+      email: user.email,
+      subject: "OTP Verification",
+      message: `Your OTP for registration is: ${otp}`,
+    });
+     res.status(200).json({
+      message: `Email sent to: ${user.email}`,
+      otp: otp,
+    });
+  } catch (error) {
+    return next(new ErrorHandler(error?.message, 500));
+  }
+
+  }else{
+    await User.findByIdAndUpdate(req.user._id, newUserData, {
+      new: true,
+    });
+    res.status(200).json({
+      user,
+    });
+  }
+
 });
+// check otp change email => api/v1/checkOtpChangeEmail
+export const checkOtpChangeEmail = catchAsyncErrors(async (req, res, next) => {
 
+  const user = await User.findById(req.user._id);
+  const checkOtp = req.body.otp;
+  if(checkOtp===user.otp){
+    const otp = Math.floor(100000 + Math.random() * 900000); // generate a 6-digit OTP
+    user.otp = otp;
+    await user.save();
+
+    await sendEmail({
+      email: user.newEmail,
+      subject: "OTP Verification",
+      message: `Your OTP for registration is: ${otp}`,
+    });
+     res.status(200).json({
+      message: `Email sent to: ${user.newEmail}`,
+      otp: otp,
+    });
+  }
+});
+// check otp change email => api/v1/checkOtpNewEmail
+export const checkOtpNewEmail = catchAsyncErrors(async(req,res,next)=>{
+
+  const user = await User.findById(req.user._id);
+  const checkOtp = req.body.otp;
+  const newUserData = {
+    name: user.newName,
+    email: user.newEmail,
+  };
+  console.log(user.newEmail);
+  if(checkOtp===user.otp){
+    await User.findByIdAndUpdate(req.user._id, newUserData, {
+      new: true,
+    });
+    user.otp = undefined;
+    user.newEmail = undefined
+    user.newName = undefined
+    await user.save();
+    res.status(200).json({
+      user,
+    });
+  }
+})
 // Get all Users - ADMIN  =>  /api/v1/admin/users
 export const allUsers = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
