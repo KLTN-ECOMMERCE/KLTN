@@ -12,7 +12,6 @@ import {
   newProduct,
   updateProduct,
   uploadProductImages,
-  getProductCategory,
   getFavouriteProduct
 } from "../controllers/productControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";

@@ -37,7 +37,6 @@ class APIFilters {
   
     const sortField = options.nested ? `${options.nested}.${this.queryStr._sort}` : this.queryStr._sort;
     sortOptions[sortField] = this.queryStr._order === "asc" ? 1 : -1;
-  console.log(this.queryStr._sort);
     this.query = this.query.sort(sortOptions);
     return this;
   }
