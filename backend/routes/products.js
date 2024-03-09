@@ -41,7 +41,7 @@ router
 router
   .route("/admin/products/:id")
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
-router.route("/products/category/:category").get(getProductCategory);
+router.route("/products/category").get(getProductCategory);
 
 router
   .route("/reviews")

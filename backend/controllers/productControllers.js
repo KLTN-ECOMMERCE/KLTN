@@ -9,7 +9,7 @@ import { delete_file, upload_file } from "../utils/cloudinary.js";
 export const getProducts = catchAsyncErrors(async (req, res, next) => {
   const resPerPage = 8;
 let { _sort = "price", _order = "asc" } = req.query;
-const apiFilters = new APIFilters(Product, req.query).search().filters().sort();
+const apiFilters = new APIFilters(Product, req.query).search().filters().sort().findProductByCategory();
 let products = await apiFilters.query;
 let filteredProductsCount = products.length;
 apiFilters.pagination(resPerPage);
@@ -241,15 +241,22 @@ export const canUserReview = catchAsyncErrors(async (req, res) => {
     canReview: true,
   });
 });
-// product category => /api/v1/products/category/:category
-export const getProductCategory = catchAsyncErrors(async (req,res,next)=>{
-  const {category} = req.params;
-  const product = await Product.find({ category}) 
-  if(product===0){
-    res.status(404).json({message:'Không có danh mục sản phẩm'})
-  }
-  res.status(200).json({product})
-})
+// product category => /api/v1/products/category/
+// export const getProductCategory = catchAsyncErrors(async (req,res,next)=>{
+//   const resPerPage = 8;
+// let { _sort = "price", _order = "asc" } = req.query;
+// const apiFilters = new APIFilters(Product, req.query).search().filters().sort().findProductByCategory();
+// let products = await apiFilters.query;
+// let filteredProductsCount = products.length;
+// apiFilters.pagination(resPerPage);
+// products = await apiFilters.query.clone();
+
+// res.status(200).json({
+//   resPerPage,
+//   filteredProductsCount,
+//   products,
+// });
+// })
 // product favourite => api/v1/products/popular
 export const getFavouriteProduct = catchAsyncErrors(async (req, res, next) => {
   try {

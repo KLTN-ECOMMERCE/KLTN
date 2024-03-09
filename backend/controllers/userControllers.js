@@ -310,9 +310,8 @@ export const checkOtpNewEmail = catchAsyncErrors(async(req,res,next)=>{
     name: user.newName,
     email: user.newEmail,
   };
-  console.log(user.newEmail);
   if(checkOtp===user.otp){
-    await User.findByIdAndUpdate(req.user._id, newUserData, {
+    const result = await User.findByIdAndUpdate(req.user._id, newUserData, {
       new: true,
     });
     user.otp = undefined;
@@ -320,8 +319,10 @@ export const checkOtpNewEmail = catchAsyncErrors(async(req,res,next)=>{
     user.newName = undefined
     await user.save();
     res.status(200).json({
-      user,
+      result,
     });
+  }else{
+    return next(new ErrorHandler("your OTP is nit correct", 400));
   }
 })
 // Get all Users - ADMIN  =>  /api/v1/admin/users

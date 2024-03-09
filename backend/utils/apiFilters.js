@@ -17,6 +17,17 @@ class APIFilters {
     this.query = this.query.find({ ...keyword });
     return this;
   }
+  findProductByCategory() {
+
+    const category = this.queryStr.category;
+
+    if (category) {
+      this.query = this.query.find({ category }); // Apply the category filter
+    }
+
+    return this;
+  }
+
   sort( options = {}) {
     if (!this.query) {
       throw new Error("Mongoose query not set!");
@@ -35,7 +46,7 @@ class APIFilters {
     const queryCopy = { ...this.queryStr };
 
     // Fields to remove
-    const fieldsToRemove = ["keyword", "page"];
+    const fieldsToRemove = ["keyword", "page","category"];
     fieldsToRemove.forEach((el) => delete queryCopy[el]);
 
     // Advance filter for price, ratings etc
