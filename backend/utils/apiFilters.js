@@ -28,24 +28,23 @@ class APIFilters {
     return this;
   }
 
-  sort( options = {}) {
-    if (!this.query) {
-      throw new Error("Mongoose query not set!");
+  sort( ) {
+    const price = this.queryStr.price;
+    const name = this.queryStr.name;
+    if( price){
+      this.query =  this.query.find({}).sort({price:price})
     }
-  
-    const sortOptions = {};
-  
-    const sortField = options.nested ? `${options.nested}.${this.queryStr._sort}` : this.queryStr._sort;
-    sortOptions[sortField] = this.queryStr._order === "asc" ? 1 : -1;
-    this.query = this.query.sort(sortOptions);
-    return this;
+    if(name){
+      this.query = this.query.find({}).sort({name:name})
+    }
+    return this
   }
   
   filters() {
     const queryCopy = { ...this.queryStr };
 
     // Fields to remove
-    const fieldsToRemove = ["keyword", "page","category"];
+    const fieldsToRemove = ["keyword", "page","category","price","name"];
     fieldsToRemove.forEach((el) => delete queryCopy[el]);
 
     // Advance filter for price, ratings etc

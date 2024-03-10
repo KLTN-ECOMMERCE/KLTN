@@ -12,12 +12,14 @@ import {
   newProduct,
   updateProduct,
   uploadProductImages,
-  getFavouriteProduct
+  getFavouriteProduct,
+  Sort
 } from "../controllers/productControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 const router = express.Router();
 
 router.route("/products").get(getProducts);
+router.route("/sort").get(Sort);
 router.route("/products/popular").get(getFavouriteProduct);
 router
   .route("/admin/products")
@@ -40,7 +42,6 @@ router
 router
   .route("/admin/products/:id")
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteProduct);
-// router.route("/products/category").get(getProductCategory);
 
 router
   .route("/reviews")

@@ -8,8 +8,7 @@ import { delete_file, upload_file } from "../utils/cloudinary.js";
 // Create new Product   =>  /api/v1/products
 export const getProducts = catchAsyncErrors(async (req, res, next) => {
   const resPerPage = 8;
-let { _sort = "price", _order = "asc" } = req.query;
-const apiFilters = new APIFilters(Product, req.query).search().filters().sort().findProductByCategory();
+const apiFilters = new APIFilters(Product, req.query).search().filters().findProductByCategory().sort();
 let products = await apiFilters.query;
 let filteredProductsCount = products.length;
 apiFilters.pagination(resPerPage);
@@ -241,23 +240,6 @@ export const canUserReview = catchAsyncErrors(async (req, res) => {
     canReview: true,
   });
 });
-// product category => /api/v1/products/category/
-// export const getProductCategory = catchAsyncErrors(async (req,res,next)=>{
-//   const resPerPage = 8;
-// let { _sort = "price", _order = "asc" } = req.query;
-// const apiFilters = new APIFilters(Product, req.query).search().filters().sort().findProductByCategory();
-// let products = await apiFilters.query;
-// let filteredProductsCount = products.length;
-// apiFilters.pagination(resPerPage);
-// products = await apiFilters.query.clone();
-
-// res.status(200).json({
-//   resPerPage,
-//   filteredProductsCount,
-//   products,
-// });
-// })
-// product favourite => api/v1/products/popular
 export const getFavouriteProduct = catchAsyncErrors(async (req, res, next) => {
   try {
     const products = await Product.find({}).sort({ Sold: -1 }).limit(10);
@@ -269,3 +251,11 @@ export const getFavouriteProduct = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+export const Sort = catchAsyncErrors(async(req,res,next)=>{
+   const name = req.query.name;
+   const price = req.query.price;
+  const products = await Product.find({}).sort({name:name,price:price})
+  res.status(200).json({
+    products
+  })
+})
