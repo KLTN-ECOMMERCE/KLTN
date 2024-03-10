@@ -22,29 +22,42 @@ class APIFilters {
     const category = this.queryStr.category;
 
     if (category) {
-      this.query = this.query.find({ category }); // Apply the category filter
+      this.query = this.query.find({ category });
     }
 
     return this;
   }
 
-  sort( ) {
-    const price = this.queryStr.price;
-    const name = this.queryStr.name;
-    if( price){
-      this.query =  this.query.find({}).sort({price:price})
+  sort() {
+    const value = this.queryStr.sort;
+  
+  
+    switch (parseInt(value)) {
+      case 1:
+        this.query = this.query.find({}).sort({ price: 1 });
+        break;
+      case 2:
+        this.query = this.query.find({}).sort({ price: -1 });
+        break;
+      case 3:
+        this.query = this.query.find({}).sort({ name: 1 });
+        break;
+      case 4:
+        this.query = this.query.find({}).sort({ name: -1 });
+        break;
+      default:
+        return this;
     }
-    if(name){
-      this.query = this.query.find({}).sort({name:name})
-    }
-    return this
+  
+    return this;
   }
+  
   
   filters() {
     const queryCopy = { ...this.queryStr };
 
     // Fields to remove
-    const fieldsToRemove = ["keyword", "page","category","price","name"];
+    const fieldsToRemove = ["keyword", "page","category","sort"];
     fieldsToRemove.forEach((el) => delete queryCopy[el]);
 
     // Advance filter for price, ratings etc
