@@ -1,9 +1,8 @@
-import 'dart:io';
+
 
 import 'package:flutter/material.dart';
-import 'package:store_app/api/api_product.dart';
 import 'package:store_app/models/category.dart';
-import 'package:store_app/screens/product/list_product.dart';
+import 'package:store_app/screens/product/products.dart';
 import 'package:store_app/widgets/category/list_category_ver.dart';
 import 'package:store_app/widgets/home/discount_banner.dart';
 import 'package:store_app/widgets/home/home_header.dart';
@@ -18,35 +17,13 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoryState extends State<CategoriesScreen> {
-  final ApiProduct _apiProduct = ApiProduct();
-
-  Future<List> _getProductsInCategory(String category) async {
-    try {
-      final response = await _apiProduct.getProductsInCategory(category);
-      final products = response['product'] as List;
-      return products;
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
-      }
-      throw HttpException(e.toString());
-    }
-  }
 
   void _selectCategory(BuildContext context, Category category) async {
-    final products = await _getProductsInCategory(category.title);
     if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => ListProductScreen(
-          products: products,
-          category: category,
-          onGetProductInCategory: _getProductsInCategory,
+        builder: (context) => ProductScreen(
+          category: category.title,
         ),
       ),
     );

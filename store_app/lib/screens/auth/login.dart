@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
 import 'package:store_app/components/form_error.dart';
+import 'package:store_app/screens/success/success.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/models/login.dart';
@@ -68,6 +69,11 @@ class _LoginState extends State<LoginScreen> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const AppScreen(),
+        ),
+      );
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const SuccessScreen(text: 'Login Success'),
         ),
       );
     } catch (e) {

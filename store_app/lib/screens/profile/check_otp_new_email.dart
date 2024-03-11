@@ -1,36 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:store_app/api/api_start.dart';
+import 'package:store_app/api/api_user.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
 import 'package:store_app/components/form_error.dart';
+import 'package:store_app/screens/profile/my_profile.dart';
 import 'package:store_app/screens/success/success.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
-import 'package:store_app/models/send_otp.dart';
 
-class SendOtpScreen extends StatefulWidget {
-  const SendOtpScreen({
+class CheckOTPNewEmailScreen extends StatefulWidget {
+  const CheckOTPNewEmailScreen({
     super.key,
-    required this.email,
+    required this.message,
   });
 
-  final String email;
+  final String message;
 
   @override
-  State<SendOtpScreen> createState() {
-    return _SendOtpState();
+  State<CheckOTPNewEmailScreen> createState() {
+    return _CheckOTPNewEmailState();
   }
 }
 
-class _SendOtpState extends State<SendOtpScreen> {
+class _CheckOTPNewEmailState extends State<CheckOTPNewEmailScreen> {
   var _enteredOtp = '';
   var _isAuthenticating = false;
   final _formKey = GlobalKey<FormState>();
-  var _hasMessage = false;
-  dynamic _responseSendOtp;
 
   final List<String?> errors = [];
 
-  final ApiStart _apiStart = ApiStart();
+  final ApiUser _apiUser = ApiUser();
 
   void addError(String? error) {
     if (!errors.contains(error)) {
@@ -56,26 +54,30 @@ class _SendOtpState extends State<SendOtpScreen> {
     _formKey.currentState!.save();
     KeyboardUtil.hideKeyboard(context);
 
-    final data = SendOTP(
-      email: widget.email,
-      otp: int.parse(_enteredOtp),
-    );
     try {
       setState(() {
         _isAuthenticating = true;
       });
-      final responseSendOtp = await _apiStart.sendOtp(data);
-      _responseSendOtp = responseSendOtp;
+
+      await _apiUser.checkOtpNewEmail(
+        int.parse(_enteredOtp),
+      );
+
+
       setState(() {
         _isAuthenticating = false;
-        _hasMessage = true;
       });
       if (!mounted) return;
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pop();
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const MyProfileScreen(),
+        ),
+      );
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => const SuccessScreen(
-            text: 'Verify Email Success',
+            text: 'Change Email Success',
           ),
         ),
       );
@@ -89,7 +91,6 @@ class _SendOtpState extends State<SendOtpScreen> {
       );
       setState(() {
         _isAuthenticating = false;
-        _hasMessage = false;
       });
     }
   }
@@ -123,7 +124,7 @@ class _SendOtpState extends State<SendOtpScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Please, enter your OTP which sent to: ${widget.email}',
+                        widget.message.toString(),
                         style: const TextStyle(
                           fontSize: 18,
                         ),
@@ -189,17 +190,7 @@ class _SendOtpState extends State<SendOtpScreen> {
                               const Center(
                                 child: CircularProgressIndicator(),
                               ),
-                            if (_hasMessage)
-                              Center(
-                                child: Text(
-                                  _responseSendOtp['message'],
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w200,
-                                  ),
-                                ),
-                              ),
-                            if (!_isAuthenticating && !_hasMessage)
+                            if (!_isAuthenticating)
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(

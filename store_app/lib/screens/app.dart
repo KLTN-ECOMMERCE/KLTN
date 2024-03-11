@@ -13,7 +13,8 @@ class AppScreen extends StatefulWidget {
 }
 
 class _AppState extends State<AppScreen> {
-  final ScrollController _scrollController = ScrollController();
+  final ScrollController _scrollController =
+      ScrollController(initialScrollOffset: 0.0);
   final storage = const FlutterSecureStorage();
   String _token = '';
 
@@ -91,7 +92,9 @@ class _AppState extends State<AppScreen> {
         ],
       ),
       body: [
-        const HomeScreen(),
+        HomeScreen(
+          homeScrollController: _scrollController,
+        ),
         Text(_token),
         const Text('3'),
         const Text('4'),

@@ -12,6 +12,7 @@ class ApiUser {
 
   Future<dynamic> getProfile() async {
     final jwtToken = await storage.read(key: 'access-token');
+    print(jwtToken);
     final url = Uri.http(
       '$ipv4Address:4000',
       'api/v1/me',
@@ -28,6 +29,156 @@ class ApiUser {
       print(resData);
       if (response.statusCode != 200) throw HttpException(resData['message']);
       return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> changePassword(String oldPassword, String newPassword) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/password/update',
+    );
+    Map<String, String> body = {
+      'oldPassword': oldPassword,
+      'password': newPassword,
+    };
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> changeName(String name, String email) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/update',
+    );
+    Map<String, String> body = {
+      'name': name,
+      'email': email,
+    };
+
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> changeEmail(String email, String name) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/update',
+    );
+    Map<String, String> body = {
+      'name': name,
+      'email': email,
+    };
+
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> checkOtpChangeEmail(int otp) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/checkOtpChangeEmail',
+    );
+    Map<String, dynamic> body = {
+      'otp': otp,
+    };
+
+    try {
+      Response response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> checkOtpNewEmail(int otp) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/checkOtpNewEmail',
+    );
+    Map<String, dynamic> body = {
+      'otp': otp,
+    };
+
+    try {
+      Response response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData['result'];
     } catch (e) {
       throw HttpException(e.toString());
     }

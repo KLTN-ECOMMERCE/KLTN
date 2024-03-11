@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_product.dart';
+import 'package:store_app/data/type_of_sort.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/models/product_item.dart';
 import 'package:store_app/screens/filter/filters.dart';
 import 'package:store_app/screens/filter/sorts.dart';
-import 'package:store_app/screens/product/list_product.dart';
 import 'package:store_app/screens/product/product_detail.dart';
 import 'package:store_app/widgets/category/list_category_hor.dart';
 import 'package:store_app/widgets/home/home_header.dart';
@@ -16,9 +16,11 @@ class ProductScreen extends StatefulWidget {
   const ProductScreen({
     super.key,
     this.searchKeyword = '',
+    this.category = '',
   });
 
   final String searchKeyword;
+  final String category;
 
   @override
   State<ProductScreen> createState() {
@@ -29,13 +31,14 @@ class ProductScreen extends StatefulWidget {
 class _ProductState extends State<ProductScreen> {
   final ApiProduct _apiProduct = ApiProduct();
   final _scrollController = ScrollController();
+
   var _currentPage = 1;
   bool _moreProduct = true;
   bool _isSort = false;
   bool _isLoadingMore = false;
   bool _isFilters = false;
+  var _sortValue = 0;
   List _products = [];
-  List _filtersProducts = [];
   Map<String, RangeValues> _filtersValue = {};
 
   @override
@@ -50,17 +53,15 @@ class _ProductState extends State<ProductScreen> {
         _currentPage,
         widget.searchKeyword,
         _filtersValue,
+        widget.category,
+        _sortValue,
       );
       final products = response['products'] as List;
       if (products.length < 8) {
         _moreProduct = false;
       }
       setState(() {
-        if (_isFilters) {
-          _filtersProducts = _filtersProducts + products;
-        } else {
-          _products = _products + products;
-        }
+        _products = _products + products;
       });
     } catch (e) {
       if (mounted) {
@@ -123,7 +124,6 @@ class _ProductState extends State<ProductScreen> {
       _filtersValue = data != null ? data as Map<String, RangeValues> : {};
 
       _products = [];
-      _filtersProducts = [];
 
       _isFilters = data != null ? true : false;
       _currentPage = 1;
@@ -134,62 +134,56 @@ class _ProductState extends State<ProductScreen> {
     });
   }
 
-  void _openSortsOverlay() {
-    showModalBottomSheet(
+  void _openSortsOverlay() async {
+    final data = await showModalBottomSheet(
       useSafeArea: true,
       isScrollControlled: true,
       context: context,
       builder: (context) => const SortsScreen(),
       constraints: BoxConstraints(
         maxWidth: MediaQuery.of(context).size.width,
-        maxHeight: (MediaQuery.of(context).size.height) / 1.4,
+        maxHeight: (MediaQuery.of(context).size.height) / 1.7,
       ),
     );
-  }
+    setState(() {
+      _isSort = data != null ? true : false;
 
-  Future<List> _getProductsInCategory(String category) async {
-    try {
-      final response = await _apiProduct.getProductsInCategory(category);
-      final products = response['product'] as List;
-      return products;
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
+      _products = [];
+
+      if (data != null) {
+        if (data == typeOfSort[0]) {
+          _sortValue = 1;
+        }
+        if (data == typeOfSort[1]) {
+          _sortValue = 2;
+        }
+        if (data == typeOfSort[2]) {
+          _sortValue = 3;
+        }
+        if (data == typeOfSort[3]) {
+          _sortValue = 4;
+        }
+      } else {
+        _sortValue = 0;
       }
-      throw HttpException(e.toString());
-    }
+
+      _currentPage = 1;
+      _moreProduct = true;
+      _isLoadingMore = false;
+
+      _getProducts();
+    });
   }
 
   void _selectCategory(BuildContext context, Category category) async {
-    final products = await _getProductsInCategory(category.title);
     if (!mounted) return;
-    if (widget.searchKeyword == '') {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => ListProductScreen(
-            products: products,
-            category: category,
-            onGetProductInCategory: _getProductsInCategory,
-          ),
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => ProductScreen(
+          category: category.title,
         ),
-      );
-    } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ListProductScreen(
-            products: products,
-            category: category,
-            onGetProductInCategory: _getProductsInCategory,
-          ),
-        ),
-      );
-    }
-    
+      ),
+    );
   }
 
   @override
@@ -277,15 +271,27 @@ class _ProductState extends State<ProductScreen> {
                 height: 8,
               ),
               if (widget.searchKeyword != '')
-                Text(
-                  'Results of: \'${widget.searchKeyword}\'',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                Center(
+                  child: Text(
+                    'Results of: \'${widget.searchKeyword}\'',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              if (widget.category != '')
+                Center(
+                  child: Text(
+                    'Results of: \'${widget.category}\'',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ListProductVer(
-                products: _isFilters ? _filtersProducts : _products,
+                products: _products,
                 onSelectProduct: _selectProduct,
                 isLoadingMore: _isLoadingMore,
               ),

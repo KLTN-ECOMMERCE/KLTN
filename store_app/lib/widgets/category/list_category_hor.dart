@@ -13,8 +13,7 @@ class ListCategoryHor extends StatelessWidget {
   });
 
   final String sectionTitle;
-final void Function(BuildContext context, Category category) onSelectCategory;
-  
+  final void Function(BuildContext context, Category category) onSelectCategory;
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,3 @@
-
 enum Categories {
   electronics,
   cameras,
@@ -8,6 +7,7 @@ enum Categories {
   tablets,
   smartwatchs,
   phones,
+  popular,
 }
 
 class Category {

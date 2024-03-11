@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:store_app/api/api_start.dart';
+import 'package:store_app/api/api_user.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
 import 'package:store_app/components/form_error.dart';
+import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/screens/success/success.dart';
 import 'package:store_app/utils/constants.dart';
-import 'package:store_app/helper/keyboard.dart';
-import 'package:store_app/models/reset_password.dart';
 
-class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+class ChangePasswordScreen extends StatefulWidget {
+  const ChangePasswordScreen({super.key});
 
   @override
-  State<ResetPasswordScreen> createState() {
-    return _ResetPasswordState();
+  State<ChangePasswordScreen> createState() {
+    return _ChangePasswordState();
   }
 }
 
-class _ResetPasswordState extends State<ResetPasswordScreen> {
-  var _enteredPassword = '';
+class _ChangePasswordState extends State<ChangePasswordScreen> {
+  var _enteredOldPassword = '';
+  var _enteredNewPassword = '';
   var _enteredConfirmPassword = '';
-  var _enteredOtp = '';
   final _formKey = GlobalKey<FormState>();
   var _isAuthenticating = false;
-  dynamic _responseResetPassword;
+  //dynamic _responseChangePassword;
   var _hasMessage = false;
+  var errorApi = '';
   final List<String?> errors = [];
-
-  final ApiStart _apiStart = ApiStart();
+  final ApiUser _apiUser = ApiUser();
 
   void addError(String? error) {
     if (!errors.contains(error)) {
@@ -44,34 +43,30 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
     }
   }
 
-  void _resetPassword() async {
+  void _changePassword() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
       return;
     }
     _formKey.currentState!.save();
     KeyboardUtil.hideKeyboard(context);
-
-    final data = ResetPassword(
-      password: _enteredPassword,
-      confirmPassword: _enteredConfirmPassword,
-      otp: int.parse(_enteredOtp),
-    );
     try {
       setState(() {
         _isAuthenticating = true;
       });
-      _responseResetPassword = await _apiStart.resetPassword(data);
+      await _apiUser.changePassword(
+        _enteredOldPassword,
+        _enteredNewPassword,
+      );
+
       setState(() {
         _isAuthenticating = false;
-        _hasMessage = true;
       });
       if (!mounted) return;
-      Navigator.of(context).popUntil((route) => route.isFirst);
-      Navigator.of(context).push(
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const SuccessScreen(
-            text: 'Reset Password Success',
+            text: 'Change Password Success',
           ),
         ),
       );
@@ -84,8 +79,9 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
         ),
       );
       setState(() {
+        errorApi = e.toString();
         _isAuthenticating = false;
-        _hasMessage = false;
+        _hasMessage = true;
       });
     }
   }
@@ -93,7 +89,6 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final keyboardSpace = MediaQuery.of(context).viewInsets.bottom;
-    final surfaceColor = Theme.of(context).colorScheme.surface;
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
@@ -101,7 +96,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
             title: const Text(
-              'PASSWORD RECOVERY',
+              'CHANGE PASSWORD',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -117,7 +112,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Please, enter your OTP code and new password. If your OTP code is correct, your password will be changed',
+                      'Please, enter your old password and new password to change your password',
                       style: TextStyle(
                         fontSize: 15,
                       ),
@@ -130,59 +125,16 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                       child: Column(
                         children: [
                           TextFormField(
-                            maxLength: 6,
-                            keyboardType: TextInputType.number,
-                            onSaved: (newValue) => _enteredOtp = newValue!,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                removeError(kOtpNullError);
-                              } else if (value.length == 6) {
-                                removeError(kInvalidOtpError);
-                              }
-                              _enteredOtp = value;
-                            },
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                addError(kOtpNullError);
-                                return "";
-                              } else if (value.length < 6) {
-                                addError(kInvalidOtpError);
-                                return "";
-                              }
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: surfaceColor,
-                              labelText: 'OTP Code',
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                              suffixIcon: const CustomSurffixIcon(
-                                svgIcon: "assets/icons/Lock.svg",
-                              ),
-                              hintText: "Enter your OTP code",
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(4),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          TextFormField(
                             obscureText: true,
-                            onSaved: (newValue) => _enteredPassword = newValue!,
+                            onSaved: (newValue) =>
+                                _enteredOldPassword = newValue!,
                             onChanged: (value) {
                               if (value.isNotEmpty) {
                                 removeError(kPassNullError);
                               } else if (value.length >= 6) {
                                 removeError(kShortPassError);
                               }
-                              _enteredPassword = value;
+                              _enteredOldPassword = value;
                             },
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -196,9 +148,9 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                             },
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: surfaceColor,
-                              labelText: "Password",
-                              hintText: "Enter your password",
+                              fillColor: Theme.of(context).colorScheme.surface,
+                              labelText: 'Old Password',
+                              hintText: 'Enter your old password',
                               labelStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
@@ -206,7 +158,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                               suffixIcon: const CustomSurffixIcon(
-                                svgIcon: "assets/icons/Lock.svg",
+                                svgIcon: 'assets/icons/Lock.svg',
                               ),
                               border: const OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
@@ -215,7 +167,55 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          TextFormField(
+                            obscureText: true,
+                            onSaved: (newValue) =>
+                                _enteredNewPassword = newValue!,
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                removeError(kPassNullError);
+                              } else if (value.length >= 6) {
+                                removeError(kShortPassError);
+                              }
+                              _enteredNewPassword = value;
+                            },
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                addError(kPassNullError);
+                                return "";
+                              } else if (value.length < 6) {
+                                addError(kShortPassError);
+                                return "";
+                              }
+                              return null;
+                            },
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Theme.of(context).colorScheme.surface,
+                              labelText: 'New Password',
+                              hintText: 'Enter your new password',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              suffixIcon: const CustomSurffixIcon(
+                                svgIcon: 'assets/icons/Lock.svg',
+                              ),
+                              border: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(4),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
                           TextFormField(
                             obscureText: true,
                             onSaved: (newValue) =>
@@ -224,7 +224,8 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                               if (value.isNotEmpty) {
                                 removeError(kPassNullError);
                               } else if (value.isNotEmpty &&
-                                  _enteredPassword == _enteredConfirmPassword) {
+                                  _enteredNewPassword ==
+                                      _enteredConfirmPassword) {
                                 removeError(kMatchPassError);
                               }
                               _enteredConfirmPassword = value;
@@ -233,7 +234,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                               if (value!.isEmpty) {
                                 addError(kPassNullError);
                                 return "";
-                              } else if ((_enteredPassword != value)) {
+                              } else if ((_enteredNewPassword != value)) {
                                 addError(kMatchPassError);
                                 return "";
                               }
@@ -241,9 +242,9 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                             },
                             decoration: InputDecoration(
                               filled: true,
-                              fillColor: surfaceColor,
-                              labelText: "Confirm Password",
-                              hintText: "Confirm your password",
+                              fillColor: Theme.of(context).colorScheme.surface,
+                              labelText: 'Confirm Password',
+                              hintText: 'Confirm your new password',
                               labelStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
@@ -251,7 +252,7 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                               suffixIcon: const CustomSurffixIcon(
-                                svgIcon: "assets/icons/Lock.svg",
+                                svgIcon: 'assets/icons/Lock.svg',
                               ),
                               border: const OutlineInputBorder(
                                 borderRadius: BorderRadius.all(
@@ -273,28 +274,32 @@ class _ResetPasswordState extends State<ResetPasswordScreen> {
                           if (_hasMessage)
                             Center(
                               child: Text(
-                                _responseResetPassword,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w200,
+                                errorApi,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).colorScheme.error),
+                              ),
+                            ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          if (!_isAuthenticating)
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _changePassword,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                ),
+                                child: const Text(
+                                  'SEND',
                                 ),
                               ),
                             ),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _resetPassword,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.primary,
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.onPrimary,
-                              ),
-                              child: const Text(
-                                'SUBMIT',
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
