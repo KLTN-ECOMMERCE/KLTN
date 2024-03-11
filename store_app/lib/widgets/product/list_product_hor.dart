@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/models/product_item.dart';
-import 'package:store_app/screens/product/products.dart';
 import 'package:store_app/widgets/home/section_title.dart';
 import 'package:store_app/widgets/product/product_item.dart';
 
@@ -10,6 +9,7 @@ class ListProductHor extends StatelessWidget {
     required this.sectionTitle,
     required this.products,
     required this.onSelectProduct,
+    required this.onSelectShowMore,
   });
 
   final String sectionTitle;
@@ -17,6 +17,7 @@ class ListProductHor extends StatelessWidget {
 
   final void Function(BuildContext context, ProductItem productItem)
       onSelectProduct;
+  final void Function(BuildContext context) onSelectShowMore;
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +26,10 @@ class ListProductHor extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: SectionTitle(
-            title: sectionTitle,
-            press: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const ProductScreen(),
-                ),
-              );
-            },
-          ),
+              title: sectionTitle,
+              press: () {
+                onSelectShowMore(context);
+              }),
         ),
         SizedBox(
           height: 323,
@@ -53,18 +49,18 @@ class ListProductHor extends StatelessWidget {
                 ),
                 child: ProductItemWidget(
                   productItem: ProductItem(
-                      id: products[index]['_id'].toString(),
-                      name: products[index]['name'].toString(),
-                      price: products[index]['price'].toDouble(),
-                      ratings: products[index]['ratings'].toDouble(),
-                      thumbUrl: products[index]['images'][0]['url'].toString(),
-                      numOfReviews: products[index]['numOfReviews'].toInt(),
-                      stock: products[index]['stock'].toInt(),
-                      description: products[index]['description'].toString(),
-                      seller: products[index]['seller'].toString(),
-                      category: products[index]['category'].toString(),
-                      images: images,
-                      ),
+                    id: products[index]['_id'].toString(),
+                    name: products[index]['name'].toString(),
+                    price: products[index]['price'].toDouble(),
+                    ratings: products[index]['ratings'].toDouble(),
+                    thumbUrl: products[index]['images'][0]['url'].toString(),
+                    numOfReviews: products[index]['numOfReviews'].toInt(),
+                    stock: products[index]['stock'].toInt(),
+                    description: products[index]['description'].toString(),
+                    seller: products[index]['seller'].toString(),
+                    category: products[index]['category'].toString(),
+                    images: images,
+                  ),
                   onSelectProduct: onSelectProduct,
                 ),
               );

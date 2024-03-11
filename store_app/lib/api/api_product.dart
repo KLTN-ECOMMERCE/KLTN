@@ -11,8 +11,11 @@ class ApiProduct {
     int page,
     String keyword,
     Map<String, RangeValues>? filters,
+    String category,
+    int sort,
   ) async {
     var pageString = page.toString();
+    var sortString = sort.toString();
     Uri url;
     if (filters!.isEmpty) {
       url = Uri.http(
@@ -21,6 +24,8 @@ class ApiProduct {
         {
           'page': pageString,
           'keyword': keyword,
+          'category': category,
+          'sort': sortString,
         },
       );
       print(url);
@@ -31,6 +36,8 @@ class ApiProduct {
         {
           'page': pageString,
           'keyword': keyword,
+          'category': category,
+          'sort': sortString,
           'price[gte]': filters['rangePriceValue']?.start.round().toString(),
           'price[lte]': filters['rangePriceValue']?.end.round().toString(),
           'ratings[gte]': filters['rangeRatingValue']?.start.toString(),
@@ -41,9 +48,12 @@ class ApiProduct {
     }
 
     try {
-      Response response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-      });
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
       //print(response.body);
 
       final Map<String, dynamic> resData = json.decode(response.body);
@@ -59,16 +69,19 @@ class ApiProduct {
     }
   }
 
-  Future<dynamic> getProductsInCategory(String category) async {
+  Future<dynamic> getPopularProducts() async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/products/category/$category',
+      'api/v1/products/popular',
     );
-
+    print(url);
     try {
-      Response response = await http.get(url, headers: {
-        'Content-Type': 'application/json',
-      });
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
       final Map<String, dynamic> resData = json.decode(response.body);
       if (response.statusCode != 200) {
         throw const HttpException('Failed to load products');

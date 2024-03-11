@@ -1,21 +1,29 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_product.dart';
+import 'package:store_app/data/sale_image.dart';
 import 'package:store_app/models/category.dart';
 import 'package:store_app/models/product_item.dart';
 import 'package:store_app/screens/product/list_product.dart';
 import 'package:store_app/screens/product/product_detail.dart';
+import 'package:store_app/screens/product/products.dart';
 import 'package:store_app/widgets/category/list_category_hor.dart';
 import 'package:store_app/widgets/home/discount_banner.dart';
 import 'package:store_app/widgets/home/home_header.dart';
 import 'package:store_app/widgets/product/list_product_hor.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.homeScrollController,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+  final ScrollController homeScrollController;
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -23,11 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<dynamic>> _getProducts(int page) async {
     try {
-      final response = await _apiProduct.getProducts(
-        page,
-        '',
-        {},
-      );
+      final response = await _apiProduct.getProducts(page, '', {}, '', 0);
       final products = response['products'] as List<dynamic>;
       return products;
     } catch (e) {
@@ -44,11 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   void _selectProduct(BuildContext context, ProductItem productItem) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -57,10 +56,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<List> _getProductsInCategory(String category) async {
+  void _selectShowMore(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ProductScreen(),
+      ),
+    );
+  }
+
+  Future<List> _getProductPopular(String category) async {
     try {
-      final response = await _apiProduct.getProductsInCategory(category);
-      final products = response['product'] as List;
+      final response = await _apiProduct.getPopularProducts();
+      final products = response['products'] as List;
       return products;
     } catch (e) {
       if (mounted) {
@@ -75,15 +82,28 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _selectCategory(BuildContext context, Category category) async {
-    final products = await _getProductsInCategory(category.title);
+  void _selectShowMorePopularProduct(BuildContext context) async {
+    final products = await _getProductPopular('Popular');
+    Category category = const Category(title: 'Popular', image: '');
+
     if (!mounted) return;
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => ListProductScreen(
           products: products,
           category: category,
-          onGetProductInCategory: _getProductsInCategory,
+          onGetProductInCategory: _getProductPopular,
+        ),
+      ),
+    );
+  }
+
+  void _selectCategory(BuildContext context, Category category) async {
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ProductScreen(
+          category: category.title,
         ),
       ),
     );
@@ -94,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: widget.homeScrollController,
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -112,8 +133,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(
                     height: 14,
                   ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 3, right: 3),
+                    child: FadeInImage(
+                      image: AssetImage(saleImages[0]),
+                      placeholder: MemoryImage(kTransparentImage),
+                      fit: BoxFit.cover,
+                      height: 200,
+                      width: double.infinity,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 14,
+                  ),
                   FutureBuilder(
-                    future: _getProducts(1),
+                    future: _getProductPopular('Popular'),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -129,15 +163,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           sectionTitle: 'Popular Products',
                           onSelectProduct: _selectProduct,
                           products: popularProducts,
+                          onSelectShowMore: _selectShowMorePopularProduct,
                         );
                       }
                     },
                   ),
                   const SizedBox(
-                    height: 12,
+                    height: 14,
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 3, right: 3),
+                    child: FadeInImage(
+                      image: AssetImage(saleImages[1]),
+                      placeholder: MemoryImage(kTransparentImage),
+                      fit: BoxFit.cover,
+                      height: 200,
+                      width: double.infinity,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 14,
                   ),
                   FutureBuilder(
-                    future: _getProducts(2),
+                    future: _getProducts(1),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(
@@ -150,60 +198,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       } else {
                         final popularProducts = snapshot.data as List<dynamic>;
                         return ListProductHor(
-                          sectionTitle: 'Best Seller',
+                          sectionTitle: 'Our Product',
                           onSelectProduct: _selectProduct,
                           products: popularProducts,
+                          onSelectShowMore: _selectShowMore,
                         );
                       }
                     },
                   ),
                   const SizedBox(
                     height: 12,
-                  ),
-                  FutureBuilder(
-                    future: _getProducts(3),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text(
-                          'Error: ${snapshot.error}',
-                        );
-                      } else {
-                        final popularProducts = snapshot.data as List<dynamic>;
-                        return ListProductHor(
-                          sectionTitle: 'Professional',
-                          onSelectProduct: _selectProduct,
-                          products: popularProducts,
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  FutureBuilder(
-                    future: _getProducts(4),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return Text(
-                          'Error: ${snapshot.error}',
-                        );
-                      } else {
-                        final popularProducts = snapshot.data as List<dynamic>;
-                        return ListProductHor(
-                          sectionTitle: 'For Family',
-                          onSelectProduct: _selectProduct,
-                          products: popularProducts,
-                        );
-                      }
-                    },
                   ),
                 ],
               ),

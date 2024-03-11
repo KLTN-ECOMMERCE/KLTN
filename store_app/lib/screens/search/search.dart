@@ -28,7 +28,9 @@ class _SearchState extends State<SearchScreen> {
   final ApiProduct _apiProduct = ApiProduct();
   final _scrollController = ScrollController();
   var _currentPage = 1;
+  var _sort = 0;
   var _query = '';
+  var _category = '';
   bool _moreProduct = true;
   bool _isLoadingMore = false;
   List _products = [];
@@ -236,6 +238,8 @@ class _SearchState extends State<SearchScreen> {
         _currentPage,
         _query,
         _filtersValue,
+        _category,
+        _sort,
       );
       final products = response['products'] as List;
       if (products.length < 8) {

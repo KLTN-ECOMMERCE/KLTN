@@ -49,6 +49,7 @@ class _ListProductState extends State<ListProductScreen> {
       _isFilters = false;
       _filtersProducts = [];
       _products = products;
+      _isSort = false;
     });
   }
 
@@ -67,6 +68,7 @@ class _ListProductState extends State<ListProductScreen> {
     );
     setState(() {
       _filtersProducts = [];
+      _isSort = false;
       _filtersValue = data != null ? data as Map<String, RangeValues> : {};
       _isFilters = data != null ? true : false;
       if (_isFilters == true && data != null && _filtersValue.isNotEmpty) {
@@ -83,8 +85,8 @@ class _ListProductState extends State<ListProductScreen> {
     });
   }
 
-  void _openSortsOverlay() {
-    showModalBottomSheet(
+  void _openSortsOverlay() async {
+    final data = await showModalBottomSheet(
       useSafeArea: true,
       isScrollControlled: true,
       context: context,
@@ -94,6 +96,49 @@ class _ListProductState extends State<ListProductScreen> {
         maxHeight: (MediaQuery.of(context).size.height) / 1.4,
       ),
     );
+    setState(() {
+      _isSort = data != null ? true : false;
+      if (_isSort && _isFilters) {
+        sortProduct(_filtersProducts, data);
+      } else if (_isSort && !_isFilters && _changeProduct) {
+        sortProduct(_products, data);
+      } else if (_isSort && !_isFilters && !_changeProduct) {
+        sortProduct(widget.products, data);
+      }
+    });
+  }
+
+  void sortProduct(List<dynamic> products, String typeOfSort) {
+    if (typeOfSort == 'Price: lowest to high') {
+      selectionSort(products, 'price', false);
+    } else if (typeOfSort == 'Price: highest to low') {
+      selectionSort(products, 'price', true);
+    } else if (typeOfSort == 'Alphabet: A-Z') {
+      selectionSort(products, 'name', false);
+    } else if (typeOfSort == 'Alphabet: Z-A') {
+      selectionSort(products, 'name', true);
+    }
+  }
+
+  void selectionSort(List<dynamic> list, String sortBy, bool reversed) {
+    for (var i = 0; i < list.length - 1; i++) {
+      var minIndex = i;
+      for (var j = i + 1; j < list.length; j++) {
+        if (!reversed) {
+          if (list[j][sortBy].compareTo(list[minIndex][sortBy]) < 0) {
+            minIndex = j;
+          }
+        } else {
+          if (list[j][sortBy].compareTo(list[minIndex][sortBy]) > 0) {
+            minIndex = j;
+          }
+        }
+      }
+
+      final temp = list[i];
+      list[i] = list[minIndex];
+      list[minIndex] = temp;
+    }
   }
 
   @override

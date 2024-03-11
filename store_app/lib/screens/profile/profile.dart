@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:store_app/screens/profile/my_account.dart';
+import 'package:store_app/screens/profile/my_profile.dart';
 import 'package:store_app/widgets/profile/profile_menu.dart';
 import 'package:store_app/widgets/profile/profile_pic.dart';
 
@@ -25,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
                 onSelectMenu: (context) {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => const MyAccountScreen(),
+                      builder: (context) => const MyProfileScreen(),
                     ),
                   );
                 },
