@@ -271,11 +271,11 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
   }
 
   }else{
-    await User.findByIdAndUpdate(req.user._id, newUserData, {
+    const users = await User.findByIdAndUpdate(req.user._id, newUserData, {
       new: true,
     });
     res.status(200).json({
-      user,
+      users,
     });
   }
 
