@@ -74,9 +74,9 @@ class _FiltersState extends State<FiltersScreen> {
                     },
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(170, 50),
-                      backgroundColor: Theme.of(context).colorScheme.secondary,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor:
-                          Theme.of(context).colorScheme.onSecondary,
+                          Theme.of(context).colorScheme.onPrimary,
                     ),
                     child: const Text('APPLY'),
                   ),
