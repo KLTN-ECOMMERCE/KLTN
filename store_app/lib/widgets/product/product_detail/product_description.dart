@@ -3,7 +3,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:store_app/models/product_item.dart';
 
-class ProductDescription extends StatelessWidget {
+class ProductDescription extends StatefulWidget {
   const ProductDescription({
     super.key,
     required this.productItem,
@@ -11,6 +11,12 @@ class ProductDescription extends StatelessWidget {
 
   final ProductItem productItem;
 
+  @override
+  State<ProductDescription> createState() => _ProductDescriptionState();
+}
+
+class _ProductDescriptionState extends State<ProductDescription> {
+  //int _quantity = 1;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -24,7 +30,7 @@ class ProductDescription extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                '${productItem.stock} products',
+                '${widget.productItem.stock} products',
                 style: const TextStyle(
                   fontSize: 13,
                 ),
@@ -45,7 +51,7 @@ class ProductDescription extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Center(
             child: Text(
-              productItem.name,
+              widget.productItem.name,
               style: const TextStyle(
                 fontSize: 21,
                 fontWeight: FontWeight.bold,
@@ -76,7 +82,7 @@ class ProductDescription extends StatelessWidget {
                     width: 8,
                   ),
                   Text(
-                    '${productItem.price}\$',
+                    '${widget.productItem.price}\$',
                     style: const TextStyle(
                       fontSize: 23,
                       fontWeight: FontWeight.bold,
@@ -89,7 +95,7 @@ class ProductDescription extends StatelessWidget {
                 children: [
                   RatingBar.builder(
                     ignoreGestures: true,
-                    initialRating: productItem.ratings,
+                    initialRating: widget.productItem.ratings,
                     tapOnlyMode: true,
                     itemSize: 21,
                     maxRating: 5,
@@ -104,7 +110,7 @@ class ProductDescription extends StatelessWidget {
                     onRatingUpdate: (value) {},
                   ),
                   Text(
-                    '(${productItem.ratings} / 5.0)',
+                    '(${widget.productItem.ratings} / 5.0)',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
@@ -114,6 +120,79 @@ class ProductDescription extends StatelessWidget {
             ],
           ),
         ),
+        // const SizedBox(
+        //   height: 16,
+        // ),
+        // Container(
+        //   padding: const EdgeInsets.all(16),
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.circular(25),
+        //     color: Theme.of(context).colorScheme.surface,
+        //   ),
+        //   width: double.infinity,
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Row(
+        //         children: [
+        //           Text(
+        //             'Quantity',
+        //             style: TextStyle(
+        //               color: Theme.of(context).colorScheme.onSurface,
+        //               fontWeight: FontWeight.bold,
+        //               fontSize: 23,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       Row(
+        //         children: [
+        //           IconButton(
+        //             iconSize: 28,
+        //             onPressed: () {
+        //               if (_quantity == 1) {
+        //                 setState(() {
+        //                   _quantity;
+        //                 });
+        //               }
+        //               if (_quantity > 1) {
+        //                 setState(() {
+        //                   _quantity--;
+        //                 });
+        //               }
+        //             },
+        //             icon: const Icon(Icons.remove),
+        //           ),
+        //           const SizedBox(
+        //             width: 8,
+        //           ),
+        //           Text(
+        //             '$_quantity',
+        //             style: TextStyle(
+        //               fontSize: 18,
+        //               color: Theme.of(context).colorScheme.onSurface,
+        //             ),
+        //           ),
+        //           const SizedBox(
+        //             width: 8,
+        //           ),
+        //           IconButton(
+        //             iconSize: 28,
+        //             onPressed: () {
+        //               setState(() {
+        //                 _quantity++;
+        //               });
+        //             },
+        //             icon: const Icon(Icons.add),
+        //           ),
+        //           const SizedBox(
+        //             width: 8,
+        //           ),
+        //         ],
+        //       ),
+        //     ],
+        //   ),
+        // ),
         const SizedBox(
           height: 16,
         ),
@@ -125,7 +204,7 @@ class ProductDescription extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                '${productItem.numOfReviews} reviews',
+                '${widget.productItem.numOfReviews} reviews',
                 style: const TextStyle(
                   fontSize: 13,
                 ),
@@ -162,7 +241,7 @@ class ProductDescription extends StatelessWidget {
           ),
           width: double.infinity,
           child: Text(
-            productItem.description.toString().trim(),
+            widget.productItem.description.toString().trim(),
             style: TextStyle(
               fontSize: 16,
               color: Theme.of(context).colorScheme.onSurface,

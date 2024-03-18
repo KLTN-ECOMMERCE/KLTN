@@ -91,4 +91,27 @@ class ApiProduct {
       throw HttpException(e.toString());
     }
   }
+
+  Future<dynamic> getProductDetail(String productId) async {
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/products/$productId',
+    );
+    print(url);
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw const HttpException('Failed to load products');
+      }
+      return resData['product'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
 }

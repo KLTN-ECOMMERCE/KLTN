@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:persistent_shopping_cart/model/cart_model.dart';
 import 'package:store_app/models/product_item.dart';
 import 'package:store_app/widgets/product/product_detail/product_description.dart';
 import 'package:store_app/widgets/product/product_detail/product_images.dart';
+import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({
@@ -56,17 +58,47 @@ class _ProductDetailState extends State<ProductDetailScreen> {
         height: 100,
         width: double.infinity,
         alignment: Alignment.center,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.all(16),
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              foregroundColor: Theme.of(context).colorScheme.onSecondary,
+        child: PersistentShoppingCart().showAndUpdateCartItemWidget(
+          inCartWidget: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Theme.of(context).colorScheme.primary,
             ),
-            child: const Text('ADD TO CART'),
+            child: Center(
+              child: Text(
+                'REMOVE TO CART',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+          notInCartWidget: Container(
+            width: double.infinity,
+            height: 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: Center(
+              child: Text(
+                'ADD TO CART',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
+            ),
+          ),
+          product: PersistentShoppingCartItem(
+            productId: widget.productItem.id,
+            productName: widget.productItem.name,
+            unitPrice: widget.productItem.price,
+            quantity: 1,
+            productThumbnail: widget.productItem.thumbUrl,
           ),
         ),
       ),
