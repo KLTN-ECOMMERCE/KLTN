@@ -42,6 +42,9 @@ dependencies:
   pull_to_refresh: ^2.0.0
   flutter_svg: ^2.0.10+1
   transparent_image: ^2.0.1
+  persistent_shopping_cart: ^0.0.7
+  country_picker: ^2.0.25
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +90,10 @@ flutter:
     - assets/images/8-sale-basket-1.png
     - assets/images/13-best-offer-basket.png
     - assets/images/success.png
+    - assets/images/alpha_express.jpg
+    - assets/images/best_express.png
+    - assets/images/thai_express.png
+    - assets/images/add_address.jpg
     - assets/icons/Cart Icon.svg
     - assets/icons/Bell.svg
     - assets/icons/Error.svg
@@ -97,6 +104,8 @@ flutter:
     - assets/icons/Cash.svg
     - assets/icons/Camera Icon.svg
     - assets/icons/Log out.svg
+    - assets/icons/receipt.svg
+    - assets/icons/Parcel.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

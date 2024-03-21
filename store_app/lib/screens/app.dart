@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
+import 'package:store_app/screens/cart/cart.dart';
 import 'package:store_app/screens/home.dart';
+import 'package:store_app/screens/order/my_orders.dart';
 import 'package:store_app/screens/profile/profile.dart';
 
 class AppScreen extends StatefulWidget {
-  const AppScreen({super.key});
+  const AppScreen({
+    super.key,
+    required this.currentIndex,
+  });
+
+  final int currentIndex;
 
   @override
   State<StatefulWidget> createState() {
@@ -24,6 +32,7 @@ class _AppState extends State<AppScreen> {
     return token;
   }
 
+  int _currentPageIndex = 0;
   @override
   void initState() {
     super.initState();
@@ -32,9 +41,8 @@ class _AppState extends State<AppScreen> {
         _token = value;
       });
     });
+    _currentPageIndex = widget.currentIndex;
   }
-
-  int currentPageIndex = 0;
 
   @override
   void dispose() {
@@ -46,9 +54,19 @@ class _AppState extends State<AppScreen> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     return Scaffold(
+      body: IndexedStack(
+        index: _currentPageIndex,
+        children: [
+          HomeScreen(homeScrollController: _scrollController),
+          CartScreen(homeScrollController: _scrollController),
+          Text(_token),
+          const MyOrdersScreen(),
+          const ProfileScreen(),
+        ],
+      ),
       bottomNavigationBar: NavigationBar(
         onDestinationSelected: (value) {
-          if (currentPageIndex == value) {
+          if (_currentPageIndex == value) {
             _scrollController.animateTo(
               0.0,
               duration: const Duration(
@@ -58,48 +76,54 @@ class _AppState extends State<AppScreen> {
             );
           }
           setState(() {
-            currentPageIndex = value;
+            _currentPageIndex = value;
           });
         },
         indicatorColor: theme.colorScheme.primary,
-        selectedIndex: currentPageIndex,
-        destinations: const [
-          NavigationDestination(
+        selectedIndex: _currentPageIndex,
+        destinations: [
+          const NavigationDestination(
             selectedIcon: Icon(Icons.home),
             icon: Icon(Icons.home_outlined),
             label: 'Home',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.shopping_bag),
-            icon: Icon(Icons.shopping_bag_outlined),
+            selectedIcon: const Icon(Icons.shopping_bag),
+            icon: PersistentShoppingCart().showCartItemCountWidget(
+              cartItemCountWidgetBuilder: (itemCount) {
+                if (itemCount != 0) {
+                  return Badge(
+                    label: Text(itemCount.toString()),
+                    child: const Icon(
+                      Icons.shopping_bag_outlined,
+                    ),
+                  );
+                } else {
+                  return const Icon(
+                    Icons.shopping_bag_outlined,
+                  );
+                }
+              },
+            ),
             label: 'Cart',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             selectedIcon: Icon(Icons.favorite_outlined),
             icon: Icon(Icons.favorite_border),
             label: 'Favorite',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             selectedIcon: Icon(Icons.local_shipping),
             icon: Icon(Icons.local_shipping_outlined),
             label: 'My Orders',
           ),
-          NavigationDestination(
+          const NavigationDestination(
             selectedIcon: Icon(Icons.manage_accounts),
             icon: Icon(Icons.manage_accounts_outlined),
             label: 'Profile',
           ),
         ],
       ),
-      body: [
-        HomeScreen(
-          homeScrollController: _scrollController,
-        ),
-        Text(_token),
-        const Text('3'),
-        const Text('4'),
-        const ProfileScreen(),
-      ][currentPageIndex],
     );
   }
 }

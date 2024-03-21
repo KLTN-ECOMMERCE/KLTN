@@ -22,7 +22,7 @@ class ApiStart {
       'email': userData.email,
       'password': userData.password,
     };
-  
+
     try {
       Response response = await http.post(
         url,
@@ -33,6 +33,8 @@ class ApiStart {
       );
       final Map<String, dynamic> resData = json.decode(response.body);
       if (response.statusCode != 200) throw HttpException(resData['message']);
+
+      await storage.deleteAll();
 
       await storage.write(
         key: 'access-token',
