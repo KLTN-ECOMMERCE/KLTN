@@ -17,7 +17,7 @@ import {
   forgotPasswordMobile,
   resetPasswordWithOTP,
   checkOtpChangeEmail,
-  checkOtpNewEmail
+  checkOtpNewEmail,
 } from "../controllers/userControllers.js";
 const router = express.Router();
 
