@@ -10,8 +10,6 @@ export const newOrder = catchAsyncErrors(async (req, res, next) => {
     shippingInfo,
     itemsPrice,
     taxAmount,
-    shippingAmount,
-    shippingUnit,
     totalAmount,
     paymentMethod,
     paymentInfo,
@@ -22,8 +20,6 @@ export const newOrder = catchAsyncErrors(async (req, res, next) => {
     shippingInfo,
     itemsPrice,
     taxAmount,
-    shippingAmount,
-    shippingUnit,
     totalAmount,
     paymentMethod,
     paymentInfo,
@@ -206,5 +202,14 @@ export const getSales = catchAsyncErrors(async (req, res, next) => {
     totalSales,
     totalNumOrders,
     sales: salesData,
+  });
+});
+// get order by status  =>  /api/v1/me/getOrderByStatus
+export const getOrderByStatus = catchAsyncErrors(async (req, res, next) => {
+  const status = req.params.status; 
+  const orders = await Order.find({ user: req.user._id, orderStatus: status }); 
+  console.log(status);
+  res.status(200).json({
+    orders,
   });
 });
