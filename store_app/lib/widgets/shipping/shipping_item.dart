@@ -8,10 +8,14 @@ class ShippingItem extends StatefulWidget {
     required this.shippingAddress,
     required this.buttonString,
     this.selectShippingItem,
+    this.selectButton,
+    this.deleteShippingAddress,
   });
   final ShippingAddress shippingAddress;
   final String buttonString;
-  final Function()? selectShippingItem;
+  final Function(ShippingAddress shippingAddress)? selectShippingItem;
+  final Function(ShippingAddress shippingAddress)? deleteShippingAddress;
+  final Function(BuildContext context)? selectButton;
 
   @override
   State<ShippingItem> createState() => _ShippingItemState();
@@ -27,7 +31,9 @@ class _ShippingItemState extends State<ShippingItem> {
 
   @override
   Widget build(BuildContext context) {
+    Key key = UniqueKey();
     return Container(
+      key: key,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -42,7 +48,11 @@ class _ShippingItemState extends State<ShippingItem> {
           left: 30,
         ),
         child: InkWell(
-          onTap: widget.selectShippingItem,
+          onTap: widget.selectShippingItem == null
+              ? null
+              : () {
+                  widget.selectShippingItem!(_shippingAddress);
+                },
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -50,27 +60,34 @@ class _ShippingItemState extends State<ShippingItem> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _shippingAddress.fullName,
+                    _shippingAddress.address,
                     style: const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                   TextButton(
-                    onPressed: () async {
-                      final data = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => AddShippingAddressScreen(
-                            shippingAddress: _shippingAddress,
-                          ),
-                        ),
-                      );
-                      if (data != null) {
-                        setState(() {
-                          _shippingAddress = data as ShippingAddress;
-                        });
-                      }
-                    },
+                    onPressed: widget.selectButton != null
+                        ? () {
+                            widget.selectButton!(context);
+                          }
+                        : () async {
+                            final data = await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => AddShippingAddressScreen(
+                                  shippingAddress: _shippingAddress,
+                                  isUpdate: true,
+                                ),
+                              ),
+                            );
+                            if (data != null) {
+                              setState(() {
+                                _shippingAddress =
+                                    data['shippingAddress'] as ShippingAddress;
+                                key = data['key'] as Key;
+                              });
+                            }
+                          },
                     child: Text(
                       widget.buttonString,
                       style: const TextStyle(
@@ -81,22 +98,24 @@ class _ShippingItemState extends State<ShippingItem> {
                   ),
                 ],
               ),
-              Text(
-                _shippingAddress.address,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Text(
-                '${_shippingAddress.city}, ${_shippingAddress.zipCode}, ${_shippingAddress.country.displayNameNoCountryCode}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '${_shippingAddress.city}, ${_shippingAddress.zipCode}, ${_shippingAddress.country.displayNameNoCountryCode}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (widget.deleteShippingAddress != null)
+                    IconButton(
+                      onPressed: () {
+                        widget.deleteShippingAddress!(_shippingAddress);
+                      },
+                      icon: const Icon(Icons.delete_outline),
+                    ),
+                ],
               ),
               const SizedBox(
                 height: 12,
@@ -104,7 +123,7 @@ class _ShippingItemState extends State<ShippingItem> {
               Text(
                 _shippingAddress.phoneNo,
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),

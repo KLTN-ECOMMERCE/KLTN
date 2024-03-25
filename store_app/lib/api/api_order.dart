@@ -39,14 +39,17 @@ class ApiOrder {
       );
     }
 
+    final shippingUnit = '${deliveryMethod.name}, ${deliveryMethod.duration}';
+
     Map<String, dynamic> body = {
       'shippingInfo': {
-        'fullName': shippingInfo.fullName,
         'address': shippingInfo.address,
         'city': shippingInfo.city,
         'phoneNo': shippingInfo.phoneNo,
         'zipCode': shippingInfo.zipCode,
         'country': shippingInfo.country.displayNameNoCountryCode,
+        'shippingAmount': deliveryMethod.price,
+        'shippingUnit': shippingUnit,
       },
       'orderItems': products,
       'paymentMethod': paymentMethod,
@@ -76,12 +79,13 @@ class ApiOrder {
     }
   }
 
-  Future<dynamic> getOrders() async {
+  Future<dynamic> getOrdersByStatus(String status) async {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/orders',
+      'api/v1/me/getOrderByStatus/$status',
     );
+    print(url);
     try {
       Response response = await http.get(
         url,

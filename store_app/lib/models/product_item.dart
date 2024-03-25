@@ -1,6 +1,5 @@
-
 class ProductItem {
-  const ProductItem({
+  ProductItem({
     required this.id,
     required this.name,
     required this.price,
@@ -12,6 +11,8 @@ class ProductItem {
     required this.description,
     required this.images,
     required this.seller,
+    required this.reviews,
+    this.sold,
   });
 
   final String id;
@@ -25,4 +26,6 @@ class ProductItem {
   final String seller;
   final int numOfReviews;
   final int stock;
+  final List<Map<String, dynamic>> reviews;
+  final int? sold;
 }

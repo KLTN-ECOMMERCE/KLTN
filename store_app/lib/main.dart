@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
-import 'package:store_app/models/login.dart';
 import 'package:store_app/screens/app.dart';
 import 'package:store_app/screens/auth/login.dart';
 
 void main() async {
   await PersistentShoppingCart().init();
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -47,7 +51,7 @@ class MyApp extends StatelessWidget {
       home: const AppScreen(
         currentIndex: 0,
       ),
-      //home: const LoginScreen(),
+      // home: const LoginScreen(),
     );
   }
 }

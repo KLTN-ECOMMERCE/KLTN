@@ -16,7 +16,6 @@ class ProductDescription extends StatefulWidget {
 }
 
 class _ProductDescriptionState extends State<ProductDescription> {
-  //int _quantity = 1;
   @override
   Widget build(BuildContext context) {
     return Column(

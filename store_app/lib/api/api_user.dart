@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart';
+import 'package:store_app/models/shipping_address.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -179,6 +180,130 @@ class ApiUser {
         throw HttpException(resData['message']);
       }
       return resData['result'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> addShippingAddress(ShippingAddress shippingAddress) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/createShippingInfo',
+    );
+    Map<String, dynamic> body = {
+      'address': shippingAddress.address.trim(),
+      'city': shippingAddress.city.trim(),
+      'phoneNo': shippingAddress.phoneNo.trim(),
+      'zipCode': shippingAddress.zipCode.trim(),
+      'country': shippingAddress.country.displayNameNoCountryCode.trim(),
+    };
+
+    try {
+      Response response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 201) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData['shippingInfo'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> getShippingAddresses() async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/getShippingInfo',
+    );
+
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData['shippingInfo'] as List<dynamic>;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> updateShippingAddress(
+    ShippingAddress shippingAddress,
+  ) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/updateShippingInfo/${shippingAddress.id}',
+    );
+    Map<String, dynamic> body = {
+      'address': shippingAddress.address.trim(),
+      'city': shippingAddress.city.trim(),
+      'phoneNo': shippingAddress.phoneNo.trim(),
+      'zipCode': shippingAddress.zipCode.trim(),
+      'country': shippingAddress.country.displayNameNoCountryCode.trim(),
+    };
+
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+  
+  Future<dynamic> deleteShippingAddress(String shippingAddressId) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/deleteShippingInfo/$shippingAddressId',
+    );
+
+    try {
+      Response response = await http.delete(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData['message'];
     } catch (e) {
       throw HttpException(e.toString());
     }

@@ -280,19 +280,19 @@ class _SearchState extends State<SearchScreen> {
   }
 
   searchSuggestionsTiem(String text) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _searchController.text = text;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.only(left: 8),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primaryContainer,
-          borderRadius: BorderRadius.circular(30),
-        ),
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _searchController.text = text;
+          });
+        },
         child: Text(
           text,
           style: TextStyle(

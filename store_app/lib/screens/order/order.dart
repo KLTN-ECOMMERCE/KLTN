@@ -141,6 +141,7 @@ class _OrderScreenState extends State<OrderScreen> {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     _tax = (widget.totalPrice + _deliveryMethodChoose.price) * 0.05;
     _summary = (widget.totalPrice + _deliveryMethodChoose.price + _tax);
+    Key shippingAddressKey = UniqueKey();
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -168,9 +169,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       onTap: () async {
                         final data = await Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => const ShippingAddressesScreen(
-                              shippingAddresses: [],
-                            ),
+                            builder: (context) =>
+                                const ShippingAddressesScreen(),
                           ),
                         );
                         if (data != null) {
@@ -180,6 +180,7 @@ class _OrderScreenState extends State<OrderScreen> {
                         }
                       },
                       child: Container(
+                        key: shippingAddressKey,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: surface,
@@ -224,8 +225,24 @@ class _OrderScreenState extends State<OrderScreen> {
                       ),
                     )
                   : ShippingItem(
+                      key: shippingAddressKey,
                       shippingAddress: _shippingAddress!,
                       buttonString: 'Change',
+                      selectButton: (BuildContext context) async {
+                        final data = await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ShippingAddressesScreen(),
+                          ),
+                        );
+                        if (data != null) {
+                          setState(() {
+                            _shippingAddress = data as ShippingAddress;
+                            shippingAddressKey =
+                                Key(_shippingAddress!.id as String);
+                          });
+                        }
+                      },
                     ),
               const SizedBox(
                 height: 12,
