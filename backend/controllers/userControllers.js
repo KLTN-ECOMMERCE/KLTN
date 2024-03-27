@@ -430,3 +430,12 @@ export const resetPasswordWithOTP = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({ message: 'Password reset successful' })
 })
+export const updatePoint = catchAsyncErrors(async (req, res, next) => {
+  const { point } = req.body
+
+  const user = await User.findOneAndUpdate({ _id: req?.user?._id }, { point: point }, { new: true })
+
+  res.status(200).json({
+    user,
+  })
+})
