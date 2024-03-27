@@ -28,7 +28,7 @@ const orderSchema = new mongoose.Schema(
         required: true,
       },
       shippingUnit:{
-        Type: String,
+        type: String,
       }
     },
     user: {
