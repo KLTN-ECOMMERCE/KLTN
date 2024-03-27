@@ -15,6 +15,15 @@ export const getAllVoucher = catchAsyncErrors(async (req, res, next) => {
     voucher: voucher,
   })
 })
+export const getVoucherbyId = catchAsyncErrors(async (req, res, next) => {
+  const voucher = await Voucher.findById(req?.params?.voucherId)
+  if (!voucher) {
+    return next(new ErrorHandler('voucher not found'))
+  }
+  res.status(200).json({
+    voucher: voucher,
+  })
+})
 export const updateVoucher = catchAsyncErrors(async (req, res, next) => {
   let voucher = await Voucher.findById(req?.params?.voucherId)
   if (!voucher) {
