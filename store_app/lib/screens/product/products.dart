@@ -175,7 +175,7 @@ class _ProductState extends State<ProductScreen> {
     });
   }
 
-  void _selectCategory(BuildContext context, Category category) async {
+  void _selectCategory(BuildContext context, Category category) {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
 import 'package:store_app/screens/cart/cart.dart';
+import 'package:store_app/screens/favorite/favorite_products.dart';
 import 'package:store_app/screens/home.dart';
 import 'package:store_app/screens/order/my_orders.dart';
 import 'package:store_app/screens/profile/profile.dart';
@@ -23,24 +23,11 @@ class AppScreen extends StatefulWidget {
 class _AppState extends State<AppScreen> {
   final ScrollController _scrollController =
       ScrollController(initialScrollOffset: 0.0);
-  final storage = const FlutterSecureStorage();
-  String _token = '';
-
-  Future<String> _getToken() async {
-    final token = await storage.read(key: 'access-token');
-    if (token == null) return '';
-    return token;
-  }
 
   int _currentPageIndex = 0;
   @override
   void initState() {
     super.initState();
-    _getToken().then((value) {
-      setState(() {
-        _token = value;
-      });
-    });
     _currentPageIndex = widget.currentIndex;
   }
 
@@ -57,9 +44,13 @@ class _AppState extends State<AppScreen> {
       body: IndexedStack(
         index: _currentPageIndex,
         children: [
-          HomeScreen(homeScrollController: _scrollController),
-          CartScreen(homeScrollController: _scrollController),
-          Text(_token),
+          HomeScreen(
+            homeScrollController: _scrollController,
+          ),
+          const CartScreen(),
+          FavoriteProductsScreen(
+            homeScrollController: _scrollController,
+          ),
           const MyOrdersScreen(),
           const ProfileScreen(),
         ],

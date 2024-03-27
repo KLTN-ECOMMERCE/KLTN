@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:store_app/api/api_order.dart';
+import 'package:store_app/data/status_color.dart';
+import 'package:store_app/screens/app.dart';
+import 'package:store_app/screens/review/review.dart';
 import 'package:store_app/widgets/order/order_information.dart';
+import 'package:shimmer/shimmer.dart';
 
 class DetailOrderScreen extends StatefulWidget {
   const DetailOrderScreen({
@@ -145,9 +149,11 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                 ),
                                 Text(
                                   order['paymentInfo']['status'].toString(),
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.orange,
+                                    color: statusColor[order['paymentInfo']
+                                            ['status']
+                                        .toString()],
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -159,10 +165,11 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             Center(
                               child: Text(
                                 order['orderStatus'].toString(),
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.brown,
+                                  color: statusColor[
+                                      order['orderStatus'].toString()],
                                 ),
                               ),
                             ),
@@ -181,6 +188,47 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                 ),
                               ],
                             ),
+                            if (order['orderStatus'].toString() == 'Delivered')
+                              Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                    Shimmer.fromColors(
+                                      period: const Duration(
+                                        milliseconds: 1000,
+                                      ),
+                                      baseColor: Colors.red,
+                                      highlightColor: Colors.purple,
+                                      direction: ShimmerDirection.ltr,
+                                      child: const Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Click product to review !!!',
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 12,
+                                          ),
+                                          Icon(
+                                            Icons.arrow_downward_outlined,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 12,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ListView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
@@ -202,12 +250,45 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                   ),
                                   clipBehavior: Clip.hardEdge,
                                   child: InkWell(
-                                    onTap: () {},
+                                    onTap: order['orderStatus'].toString() !=
+                                            'Delivered'
+                                        ? null
+                                        : () {
+                                            showModalBottomSheet(
+                                              useSafeArea: true,
+                                              isScrollControlled: true,
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                  top: Radius.circular(30),
+                                                ),
+                                              ),
+                                              context: context,
+                                              builder: (context) =>
+                                                  ReviewScreen(
+                                                productId: orderItems[index]
+                                                        ['product']
+                                                    .toString(),
+                                              ),
+                                              constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width,
+                                                maxHeight:
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .height /
+                                                        1.3,
+                                              ),
+                                            );
+                                          },
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                         bottom: 4,
                                         top: 4,
                                         right: 8,
+                                        left: 4,
                                       ),
                                       child: Row(
                                         children: [
@@ -381,7 +462,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             ),
                             OrderInformation(
                               title: 'Delivery Method: ',
-                              information: order['shippingAmount'].toString(),
+                              information:
+                                  '${order['shippingInfo']['shippingUnit'].toString()}, ${order['shippingInfo']['shippingAmount'].toString()}\$',
                             ),
                             const SizedBox(
                               height: 25,
@@ -396,36 +478,74 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             OrderInformation(
                               title: 'Total Amount: ',
                               information:
-                                  order['totalAmount'].toStringAsFixed(2),
+                                  '${order['totalAmount'].toStringAsFixed(2)}\$',
                             ),
                             const SizedBox(
                               height: 25,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(180, 50),
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onSurface,
-                                  ),
-                                  child: const Text('Reorder'),
+                            if (order['orderStatus'].toString() !=
+                                    'Delivered' &&
+                                order['orderStatus'].toString() != 'Shipped' &&
+                                order['orderStatus'].toString() != 'Cancel')
+                              ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) => Dialog(
+                                      child: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        margin: const EdgeInsets.all(8),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const SizedBox(
+                                              height: 12,
+                                            ),
+                                            const Text(
+                                              'Cancel Order Successfully',
+                                            ),
+                                            const SizedBox(
+                                              height: 12,
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context)
+                                                    .pushReplacement(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const AppScreen(
+                                                      currentIndex: 3,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text('Close'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.error,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onError,
                                 ),
-                                ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    fixedSize: const Size(180, 50),
-                                    backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.onPrimary,
+                                child: const SizedBox(
+                                  height: 30,
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      'Cancel Order',
+                                    ),
                                   ),
-                                  child: const Text('Leave feedback'),
                                 ),
-                              ],
-                            ),
+                              ),
                             const SizedBox(
                               height: 12,
                             ),

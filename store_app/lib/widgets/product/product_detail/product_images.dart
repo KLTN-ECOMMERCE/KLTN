@@ -18,19 +18,34 @@ class ProductImages extends StatefulWidget {
 
 class _ProductImagesState extends State<ProductImages> {
   int _selectedImage = 0;
+  final ScrollController _controller = ScrollController();
+
+  void _animateList(double value) {
+    final currentPosition = _controller.offset;
+    final newPosition = currentPosition + value;
+    _controller.animateTo(
+      newPosition,
+      duration: const Duration(
+        milliseconds: 200,
+      ),
+      curve: Curves.easeInOutCirc,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(
         bottom: 20,
-        right: 18,
+        // right: 18,
+        // left: 18,
       ),
       padding: const EdgeInsets.only(
         top: 16,
         bottom: 4,
-        right: 16,
-        left: 16,
+        // right: 16,
+        // left: 16,
       ),
       child: Center(
         child: Column(
@@ -47,25 +62,64 @@ class _ProductImagesState extends State<ProductImages> {
             const SizedBox(
               height: 12,
             ),
-            SizedBox(
-              height: 60,
-              child: ListView.builder(
-                physics: const ClampingScrollPhysics(),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                itemCount: widget.productItem.images.length,
-                itemBuilder: (context, index) {
-                  return SmallProductImage(
-                    isSelected: index == _selectedImage,
-                    press: () {
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_rounded,
+                  ),
+                  onPressed: () {
+                    if (_selectedImage == 0) {
+                    } else {
                       setState(() {
-                        _selectedImage = index;
+                        _selectedImage--;
                       });
-                    },
-                    image: widget.productItem.images[index],
-                  );
-                },
-              ),
+                    }
+                    _animateList(-(MediaQuery.of(context).size.width / 7));
+                  },
+                ),
+                Expanded(
+                  child: SizedBox(
+                    height: 60,
+                    child: Center(
+                      child: ListView.builder(
+                        physics: const ClampingScrollPhysics(),
+                        controller: _controller,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: widget.productItem.images.length,
+                        itemBuilder: (context, index) {
+                          return SmallProductImage(
+                            isSelected: index == _selectedImage,
+                            press: () {
+                              setState(() {
+                                _selectedImage = index;
+                              });
+                            },
+                            image: widget.productItem.images[index],
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(
+                    Icons.arrow_forward_ios_rounded,
+                  ),
+                  onPressed: () {
+                    if (_selectedImage ==
+                        widget.productItem.images.length - 1) {
+                    } else {
+                      setState(() {
+                        _selectedImage++;
+                      });
+                    }
+                    _animateList(MediaQuery.of(context).size.width / 7);
+                  },
+                ),
+              ],
             ),
           ],
         ),

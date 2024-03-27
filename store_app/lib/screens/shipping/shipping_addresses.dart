@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:store_app/api/api_user.dart';
 import 'package:store_app/models/shipping_address.dart';
 import 'package:store_app/screens/shipping/add_shipping_address.dart';
 import 'package:store_app/widgets/shipping/shipping_item.dart';
@@ -6,9 +10,7 @@ import 'package:store_app/widgets/shipping/shipping_item.dart';
 class ShippingAddressesScreen extends StatefulWidget {
   const ShippingAddressesScreen({
     super.key,
-    required this.shippingAddresses,
   });
-  final List<ShippingAddress>? shippingAddresses;
 
   @override
   State<ShippingAddressesScreen> createState() =>
@@ -16,7 +18,25 @@ class ShippingAddressesScreen extends StatefulWidget {
 }
 
 class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
-  final List<ShippingAddress> _shippingAddresses = [];
+  final ApiUser _apiUser = ApiUser();
+
+  Future<List<dynamic>> _getShippingAddresses() async {
+    try {
+      final response = await _apiUser.getShippingAddresses();
+      final addresses = response as List<dynamic>;
+      return addresses;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+      throw HttpException(e.toString());
+    }
+  }
 
   @override
   void initState() {
@@ -25,7 +45,9 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Key key = UniqueKey();
     return Scaffold(
+      key: key,
       appBar: AppBar(
         title: const Text(
           'Shipping Addresses',
@@ -43,7 +65,7 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
           );
           if (data != null) {
             setState(() {
-              _shippingAddresses.add(data as ShippingAddress);
+              key = data['key'] as Key;
             });
           }
         },
@@ -55,51 +77,102 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
         ),
       ),
       body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          margin: const EdgeInsets.only(
-            bottom: 20,
-            top: 20,
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.shippingAddresses!.isEmpty &&
-                  _shippingAddresses.isEmpty)
-                const Center(
-                  child: Text(
-                    'No Shipping Address ...',
-                    style: TextStyle(
-                      fontSize: 18,
-                    ),
-                  ),
-                ),
-              if (_shippingAddresses.isNotEmpty)
-                //   // ListView.builder(
-                //   //   shrinkWrap: true,
-                //   //   itemCount: 1,
-                //   //   itemBuilder: (context, index) {
-                //   //     return ShippingItem(
-                //   //       shippingAddress: _shippingAddresses![index],
-                //   //       buttonString: 'Edit',
-                //   //       selectShippingItem: () {
-                //   //         Navigator.of(context).pop(
-                //   //           _shippingAddresses![index]
-                //   //         );
-                //   //       },
-                //   //     );
-                //   //   },
-                //   // ),
-                ShippingItem(
-                  shippingAddress: _shippingAddresses[0],
-                  buttonString: 'Edit',
-                  selectShippingItem: () {
-                    Navigator.of(context).pop(
-                      _shippingAddresses[0],
-                    );
+        child: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(
+              bottom: 20,
+              top: 20,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                FutureBuilder(
+                  future: _getShippingAddresses(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Text(
+                        'Error: ${snapshot.error}',
+                      );
+                    } else {
+                      final shippingAddresses = snapshot.data;
+                      if (shippingAddresses == null ||
+                          shippingAddresses.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No Shipping Address ...',
+                            style: TextStyle(
+                              fontSize: 18,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          physics: const ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: shippingAddresses.length,
+                          itemBuilder: (context, index) {
+                            final countryCode = RegExp(r'\((.*?)\)')
+                                .firstMatch(shippingAddresses[index]['country']
+                                    .toString())
+                                ?.group(1);
+                            Country country =
+                                CountryParser.parseCountryCode(countryCode!);
+                            final shippingAddress = ShippingAddress(
+                              id: shippingAddresses[index]['_id'].toString(),
+                              address: shippingAddresses[index]['address']
+                                  .toString(),
+                              city: shippingAddresses[index]['city'].toString(),
+                              country: country,
+                              phoneNo: shippingAddresses[index]['phoneNo']
+                                  .toString(),
+                              zipCode: shippingAddresses[index]['zipCode']
+                                  .toString(),
+                            );
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ShippingItem(
+                                shippingAddress: shippingAddress,
+                                buttonString: 'Edit',
+                                selectShippingItem: (ShippingAddress address) {
+                                  Navigator.of(context).pop(address);
+                                },
+                                deleteShippingAddress: (shippingAddress) async {
+                                  try {
+                                    await _apiUser.deleteShippingAddress(
+                                      shippingAddress.id as String,
+                                    );
+                                    setState(() {
+                                      key = UniqueKey();
+                                    });
+                                  } catch (e) {
+                                    if (mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .clearSnackBars();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(e.toString()),
+                                        ),
+                                      );
+                                    }
+                                    throw HttpException(e.toString());
+                                  }
+                                },
+                              ),
+                            );
+                          },
+                        );
+                      }
+                    }
                   },
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

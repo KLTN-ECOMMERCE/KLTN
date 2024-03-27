@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:store_app/providers/favorites_provider.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/models/product_item.dart';
 
-class ProductItemWidget extends StatelessWidget {
+class ProductItemWidget extends ConsumerWidget {
   const ProductItemWidget({
     super.key,
     this.aspectRetio = 1.02,
@@ -17,7 +19,9 @@ class ProductItemWidget extends StatelessWidget {
       onSelectProduct;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteProducts = ref.watch(favoriteProductsProvider);
+    final isFavorite = favoriteProducts.contains(productItem.id);
     return Container(
       width: width,
       decoration: BoxDecoration(
@@ -89,8 +93,38 @@ class ProductItemWidget extends StatelessWidget {
                       fixedSize: const Size(30, 30),
                     ),
                     iconSize: 20,
-                    icon: const Icon(Icons.favorite_border),
-                    onPressed: () {},
+                    icon: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: Colors.red,
+                      ),
+                      transitionBuilder: (child, animation) {
+                        return RotationTransition(
+                          turns: Tween<double>(begin: 0.7, end: 1)
+                              .animate(animation),
+                          child: child,
+                        );
+                      },
+                    ),
+                    onPressed: () {
+                      final wasAdded = ref
+                          .read(favoriteProductsProvider.notifier)
+                          .toggleProductFavoriteStatus(
+                            productItem.id,
+                          );
+
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            wasAdded
+                                ? '${productItem.name} is added to favorite list'
+                                : '${productItem.name} is removed to favorite list',
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

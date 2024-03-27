@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:store_app/data/status_color.dart';
 import 'package:store_app/screens/order/detail_order.dart';
 
 class OrderItem extends StatelessWidget {
@@ -97,9 +98,9 @@ class OrderItem extends StatelessWidget {
                 ),
                 Text(
                   statusPayment,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.orange,
+                    color: statusColor[statusPayment],
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -188,10 +189,10 @@ class OrderItem extends StatelessWidget {
                 ),
                 Text(
                   statusOrder,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.brown,
+                    color: statusColor[statusOrder],
                   ),
                 ),
               ],

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:persistent_shopping_cart/model/cart_model.dart';
@@ -13,10 +12,7 @@ import 'package:store_app/screens/product/product_detail.dart';
 class CartScreen extends StatefulWidget {
   const CartScreen({
     super.key,
-    required this.homeScrollController,
   });
-
-  final ScrollController homeScrollController;
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -87,6 +83,16 @@ class _CartScreenState extends State<CartScreen> {
                                 for (var image in response['images']) {
                                   images.add(image['url']);
                                 }
+                                final List<Map<String, dynamic>> reviews = [];
+                                for (var review in response['reviews']) {
+                                  reviews.add(
+                                    {
+                                      'user': review['user'].toString(),
+                                      'rating': review['rating'].toInt(),
+                                      'comment': review['comment'].toString()
+                                    },
+                                  );
+                                }
                                 final productItem = ProductItem(
                                   id: response['_id'].toString(),
                                   name: response['name'].toString(),
@@ -102,6 +108,7 @@ class _CartScreenState extends State<CartScreen> {
                                       response['description'].toString(),
                                   images: images,
                                   seller: response['seller'].toString(),
+                                  reviews: reviews,
                                 );
                                 if (!mounted) return;
                                 _selectProduct(context, productItem);

@@ -37,20 +37,32 @@ class ListProductVer extends StatelessWidget {
                 for (var image in products[index]['images']) {
                   images.add(image['url']);
                 }
+                final List<Map<String, dynamic>> reviews = [];
+                for (var review in products[index]['reviews']) {
+                  reviews.add(
+                    {
+                      'user': review['user'].toString(),
+                      'rating': review['rating'].toInt(),
+                      'comment': review['comment'].toString()
+                    },
+                  );
+                }
+                final product = ProductItem(
+                  id: products[index]['_id'].toString(),
+                  name: products[index]['name'].toString(),
+                  price: products[index]['price'].toDouble(),
+                  ratings: products[index]['ratings'].toDouble(),
+                  thumbUrl: products[index]['images'][0]['url'].toString(),
+                  numOfReviews: products[index]['numOfReviews'].toInt(),
+                  stock: products[index]['stock'].toInt(),
+                  description: products[index]['description'].toString(),
+                  seller: products[index]['seller'].toString(),
+                  category: products[index]['category'].toString(),
+                  images: images,
+                  reviews: reviews,
+                );
                 return LargeProductItem(
-                  productItem: ProductItem(
-                    id: products[index]['_id'].toString(),
-                    name: products[index]['name'].toString(),
-                    price: products[index]['price'].toDouble(),
-                    ratings: products[index]['ratings'].toDouble(),
-                    thumbUrl: products[index]['images'][0]['url'].toString(),
-                    numOfReviews: products[index]['numOfReviews'].toInt(),
-                    stock: products[index]['stock'].toInt(),
-                    description: products[index]['description'].toString(),
-                    seller: products[index]['seller'].toString(),
-                    category: products[index]['category'].toString(),
-                    images: images,
-                  ),
+                  productItem: product,
                   onSelectProduct: onSelectProduct,
                 );
               } else {
