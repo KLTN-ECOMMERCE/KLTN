@@ -94,15 +94,16 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
 
 // Logout user   =>  /api/v1/logout
 export const logout = catchAsyncErrors(async (req, res, next) => {
-  // res.cookie("token", null, {
+  // res.cookie('token', null, {
   //   expires: new Date(Date.now()),
   //   httpOnly: true,
-  // });
+  // })
+  const user = await User.findByIdAndUpdate(req?.user?._id, {
+    token: null,
+    expires: new Date(Date.now()),
+  })
 
-  // res.status(200).json({
-  //   message: "Logged Out",
-  // });
-  req.user = null
+  res.clearCookie('token', { httpOnly: true })
 
   res.status(200).json({
     message: 'Logged Out',

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose'
 
 const orderSchema = new mongoose.Schema(
   {
@@ -27,14 +27,14 @@ const orderSchema = new mongoose.Schema(
         type: Number,
         required: true,
       },
-      shippingUnit:{
+      shippingUnit: {
         type: String,
-      }
+      },
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: "User",
+      ref: 'User',
     },
     orderItems: [
       {
@@ -57,16 +57,16 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,
-          ref: "Product",
+          ref: 'Product',
         },
       },
     ],
     paymentMethod: {
       type: String,
-      required: [true, "Please select payment method"],
+      required: [true, 'Please select payment method'],
       enum: {
-        values: ["COD", "Card"],
-        message: "Please select: COD or Card",
+        values: ['COD', 'Card'],
+        message: 'Please select: COD or Card',
       },
     },
     paymentInfo: {
@@ -88,14 +88,14 @@ const orderSchema = new mongoose.Schema(
     orderStatus: {
       type: String,
       enum: {
-        values: ["NewOrder", "Confirmed", "Processing", "Shipped", "Delivered"," Cancel"],
-        message: "Please select correct order status",
+        values: ['NewOrder', 'Confirmed', 'Processing', 'Shipped', 'Delivered', 'Cancel'],
+        message: 'Please select correct order status',
       },
-      default: "NewOrder",
+      default: 'NewOrder',
     },
     deliveredAt: Date,
   },
-  { timestamps: true }
-);
+  { timestamps: true },
+)
 
-export default mongoose.model("Order", orderSchema);
+export default mongoose.model('Order', orderSchema)
