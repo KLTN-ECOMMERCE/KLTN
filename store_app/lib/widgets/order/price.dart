@@ -36,7 +36,7 @@ class PriceWidget extends StatelessWidget {
               ),
             ),
             Text(
-              '$price \$',
+              price,
               style: TextStyle(
                 fontSize: 18,
                 color: priceColor,

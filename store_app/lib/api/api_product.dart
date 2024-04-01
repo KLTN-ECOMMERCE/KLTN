@@ -164,19 +164,23 @@ class ApiProduct {
       'productId': productId,
     };
 
-    Response response = await http.put(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
-      },
-      body: jsonEncode(body),
-    );
-    final Map<String, dynamic> resData = json.decode(response.body);
-    print(resData);
-    if (response.statusCode != 200) {
-      throw const HttpException('Failed to review product');
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      print(resData);
+      if (response.statusCode != 200) {
+        throw const HttpException('Failed to review product');
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
     }
-    return resData;
   }
 }

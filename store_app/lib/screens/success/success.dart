@@ -6,10 +6,10 @@ class SuccessScreen extends StatefulWidget {
   const SuccessScreen({
     super.key,
     required this.text,
-    this.popData = '',
+    this.popData,
   });
   final String text;
-  final String popData;
+  final String? popData;
 
   @override
   State<SuccessScreen> createState() => _SuccessScreenState();
@@ -18,10 +18,12 @@ class SuccessScreen extends StatefulWidget {
 class _SuccessScreenState extends State<SuccessScreen> {
   @override
   void initState() {
-    Timer(const Duration(seconds: 5), () {
-      Navigator.of(context).pop(widget.popData);
-    });
     super.initState();
+    Timer(const Duration(seconds: 5), () {
+      if (mounted) {
+        Navigator.of(context).pop(widget.popData);
+      }
+    });
   }
 
   @override

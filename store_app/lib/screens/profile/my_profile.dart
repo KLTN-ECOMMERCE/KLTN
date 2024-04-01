@@ -132,6 +132,14 @@ class _MyProfileState extends State<MyProfileScreen> {
                           height: 12,
                         ),
                         MyProfileWidget(
+                          label: 'Point',
+                          information: profile['point'].toString(),
+                          onTap: (context) {},
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        MyProfileWidget(
                           label: 'Email',
                           information: profile['email'],
                           onTap: _selectEmail,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
+import 'package:store_app/notifications/notification_service.dart';
 import 'package:store_app/screens/cart/cart.dart';
 import 'package:store_app/screens/favorite/favorite_products.dart';
 import 'package:store_app/screens/home.dart';
+import 'package:store_app/screens/order/detail_order.dart';
 import 'package:store_app/screens/order/my_orders.dart';
 import 'package:store_app/screens/profile/profile.dart';
 
@@ -25,8 +27,29 @@ class _AppState extends State<AppScreen> {
       ScrollController(initialScrollOffset: 0.0);
 
   int _currentPageIndex = 0;
+
+  listenToNotifications() {
+    NotificationService.onNotifications.stream.listen((event) {
+      print(event);
+      if (event == 'Remind back to shop payload !!!') {
+        if (!mounted) return;
+        setState(() {
+          _currentPageIndex = 0;
+        });
+      } else {
+        if (!mounted) return;
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => DetailOrderScreen(orderId: event!),
+          ),
+        );
+      }
+    });
+  }
+
   @override
   void initState() {
+    listenToNotifications();
     super.initState();
     _currentPageIndex = widget.currentIndex;
   }

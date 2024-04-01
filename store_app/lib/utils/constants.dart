@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const ipv4Address = '192.168.0.105';
+const addOneSignalId = '944be109-15b7-4931-8e75-4ceb3905843e';
 const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);
 const kPrimaryGradientColor = LinearGradient(
@@ -43,7 +44,8 @@ const String kNamelNullError = "Please Enter your name";
 const String kNullError = "Please Enter full of section";
 const String kPhoneNumberNullError = "Please Enter your phone number";
 const String kAddressNullError = "Please Enter your address";
-const String kSpecialCharactersNullError = "Please Re-enter without Special Characters";
+const String kSpecialCharactersNullError =
+    "Please Re-enter without Special Characters";
 
 final otpInputDecoration = InputDecoration(
   contentPadding: const EdgeInsets.symmetric(vertical: 16),

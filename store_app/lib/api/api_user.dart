@@ -281,7 +281,7 @@ class ApiUser {
       throw HttpException(e.toString());
     }
   }
-  
+
   Future<dynamic> deleteShippingAddress(String shippingAddressId) async {
     final jwtToken = await storage.read(key: 'access-token');
 
@@ -304,6 +304,59 @@ class ApiUser {
         throw HttpException(resData['message'] as String);
       }
       return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> updatePoint(int point) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/updatePoint',
+    );
+    Map<String, dynamic> body = {
+      'point': point,
+    };
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> getAmountOfUser(int year) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/getAmount/$year',
+    );
+
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData;
     } catch (e) {
       throw HttpException(e.toString());
     }
