@@ -20,6 +20,7 @@ class ApiOrder {
     double taxAmount,
     DeliveryMethod deliveryMethod,
     double totalAmount,
+    double shippingAmount,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
@@ -56,7 +57,7 @@ class ApiOrder {
       'paymentInfo': paymentInfo,
       'itemsPrice': itemsPrice,
       'taxAmount': taxAmount,
-      'shippingAmount': deliveryMethod.price,
+      'shippingAmount': shippingAmount,
       'totalAmount': totalAmount,
     };
 
@@ -112,6 +113,30 @@ class ApiOrder {
     );
     try {
       Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> cancelOrder(String orderId) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/order/cancel/$orderId',
+    );
+    try {
+      Response response = await http.post(
         url,
         headers: {
           'Content-Type': 'application/json',

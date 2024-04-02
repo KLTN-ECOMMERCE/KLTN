@@ -23,6 +23,7 @@ class DetailOrderScreen extends StatefulWidget {
 
 class _DetailOrderScreenState extends State<DetailOrderScreen> {
   final ApiOrder _apiOrder = ApiOrder();
+  var _isAuthenticating = false;
 
   Future<dynamic> _getOrderDetails(String orderId) async {
     try {
@@ -483,69 +484,108 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             const SizedBox(
                               height: 25,
                             ),
-                            if (order['orderStatus'].toString() !=
-                                    'Delivered' &&
-                                order['orderStatus'].toString() != 'Shipped' &&
-                                order['orderStatus'].toString() != 'Cancel')
-                              ElevatedButton(
-                                onPressed: () {
-                                  showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) => Dialog(
-                                      child: Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        margin: const EdgeInsets.all(8),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            const SizedBox(
-                                              height: 12,
+                            if (order['orderStatus'].toString() == 'NewOrder')
+                              _isAuthenticating
+                                  ? const Center(
+                                      child: CircularProgressIndicator(),
+                                    )
+                                  : ElevatedButton(
+                                      onPressed: () async {
+                                        var message = '';
+                                        try {
+                                          setState(() {
+                                            _isAuthenticating = true;
+                                          });
+                                          final response =
+                                              await _apiOrder.cancelOrder(
+                                                  order['_id'].toString());
+                                          message =
+                                              response['success'].toString();
+                                          setState(() {
+                                            _isAuthenticating = false;
+                                          });
+                                        } catch (e) {
+                                          if (!mounted) return;
+                                          ScaffoldMessenger.of(context)
+                                              .clearSnackBars();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(e.toString()),
                                             ),
-                                            const Text(
-                                              'Cancel Order Successfully',
-                                            ),
-                                            const SizedBox(
-                                              height: 12,
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context)
-                                                    .pushReplacement(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const AppScreen(
-                                                      currentIndex: 3,
-                                                    ),
+                                          );
+                                          setState(() {
+                                            _isAuthenticating = false;
+                                          });
+                                        }
+                                        if (!mounted) return;
+                                        await showDialog(
+                                          barrierDismissible: false,
+                                          context: context,
+                                          builder: (context) => Dialog(
+                                            child: Container(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              margin: const EdgeInsets.all(8),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  const SizedBox(
+                                                    height: 12,
                                                   ),
-                                                );
-                                              },
-                                              child: const Text('Close'),
+                                                  Text(
+                                                    message == 'true'
+                                                        ? 'Cancel Order Successfully'
+                                                        : 'Fail to Cancel Order',
+                                                  ),
+                                                  const SizedBox(
+                                                    height: 12,
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      if (message == 'true') {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        Navigator.of(context)
+                                                            .pushReplacement(
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                const AppScreen(
+                                                              currentIndex: 3,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      }
+                                                    },
+                                                    child: const Text('Close'),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          ],
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Theme.of(context).colorScheme.error,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .onError,
+                                      ),
+                                      child: const SizedBox(
+                                        height: 30,
+                                        width: double.infinity,
+                                        child: Center(
+                                          child: Text(
+                                            'Cancel Order',
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.error,
-                                  foregroundColor:
-                                      Theme.of(context).colorScheme.onError,
-                                ),
-                                child: const SizedBox(
-                                  height: 30,
-                                  width: double.infinity,
-                                  child: Center(
-                                    child: Text(
-                                      'Cancel Order',
-                                    ),
-                                  ),
-                                ),
-                              ),
                             const SizedBox(
                               height: 12,
                             ),

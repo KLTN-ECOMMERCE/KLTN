@@ -1,16 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
+import 'package:store_app/notifications/notification_service.dart';
 import 'package:store_app/screens/app.dart';
 import 'package:store_app/screens/auth/login.dart';
+import 'package:store_app/utils/constants.dart';
 
 void main() async {
   await PersistentShoppingCart().init();
+
+  configOneSignal();
+  
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationService notificationService = NotificationService();
+  notificationService.initialiseNotifications();
+
   runApp(
     const ProviderScope(
       child: MyApp(),
     ),
   );
+}
+
+void configOneSignal() {
+  OneSignal.initialize(addOneSignalId);
+  OneSignal.Notifications.requestPermission(true);
 }
 
 class MyApp extends StatelessWidget {
