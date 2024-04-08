@@ -336,7 +336,6 @@ export const getDataOrderByStatus = catchAsyncErrors(async (req, res, next) => {
   const orders = await Order.aggregate([
     {
       $match: { user: req.user._id },
-      orderStatus: "Delivered",
     },
     {
       $group: {
