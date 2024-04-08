@@ -14,7 +14,6 @@ import {
   uploadProductImages,
   getFavouriteProduct,
   Sort,
-  updateProductReview,
 } from "../controllers/productControllers.js";
 import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 const router = express.Router();
@@ -48,7 +47,6 @@ router
   .route("/reviews")
   .get(isAuthenticatedUser, getProductReviews)
   .put(isAuthenticatedUser, createProductReview);
-router.route("/reviews/update").put(isAuthenticatedUser, updateProductReview);
 
 router
   .route("/admin/reviews")

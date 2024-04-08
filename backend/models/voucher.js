@@ -1,11 +1,10 @@
-import mongoose from 'mongoose'
+import mongoose from "mongoose";
 
 const voucherSchema = mongoose.Schema({
-  // user: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   //required: true,
-  //   ref: 'User',
-  // },
+  name: {
+    type: String,
+    required: true,
+  },
   description: {
     type: String,
     required: true,
@@ -18,5 +17,9 @@ const voucherSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
-})
-export default mongoose.model('Voucher', voucherSchema)
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+export default mongoose.model("Voucher", voucherSchema);

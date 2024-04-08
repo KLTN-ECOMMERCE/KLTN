@@ -13,6 +13,7 @@ export const newOrder = catchAsyncErrors(async (req, res, next) => {
     totalAmount,
     paymentMethod,
     paymentInfo,
+    voucherInfo,
   } = req.body;
 
   const order = await Order.create({
@@ -23,6 +24,7 @@ export const newOrder = catchAsyncErrors(async (req, res, next) => {
     totalAmount,
     paymentMethod,
     paymentInfo,
+    voucherInfo,
     user: req.user._id,
   });
 
@@ -275,27 +277,80 @@ export const getTotalAmountByMonth = catchAsyncErrors(
   }
 );
 //
-export const getDataCategory = catchAsyncErrors(async (req, res, next) => {
-  try {
-    const result = await Order.aggregate([
-      {
-        $match: {
-          user: req.user._id,
-        },
-      },
-      {
-        $unwind: "$orderItems",
-      },
-      {
-        $group: {
-          _id: "$orderItems.category",
-          totalQuantity: { $sum: "$orderItems.quantity" },
-        },
-      },
-    ]);
+// export const getDataCategory = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//     const allCategories = await Order.distinct("orderItems.category", {
+//       user: req.user._id,
+//     });
 
-    res.json({ categoryItemsQuantity: result });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+//     const categoryItemsQuantity = {};
+
+//     allCategories.forEach((category) => {
+//       categoryItemsQuantity[category] = 0;
+//     });
+
+//     const result = await Order.aggregate([
+//       {
+//         $match: {
+//           user: req.user._id,
+//         },
+//       },
+//       {
+//         $unwind: "$orderItems",
+//       },
+//       {
+//         $group: {
+//           _id: "$orderItems.category",
+//           totalQuantity: { $sum: "$orderItems.quantity" },
+//         },
+//       },
+//     ]);
+
+//     result.forEach((item) => {
+//       categoryItemsQuantity[item._id] = item.totalQuantity;
+//     });
+
+//     res.json({ categoryItemsQuantity });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
+
+// get dataorder by
+export const getDataOrderByStatus = catchAsyncErrors(async (req, res, next) => {
+  const orderStatusList = [
+    "NewOrder",
+    "Confirmed",
+    "Processing",
+    "Shipped",
+    "Delivered",
+    "Cancel",
+  ];
+
+  const orderCounts = {};
+
+  for (const status of orderStatusList) {
+    orderCounts[status] = 0;
   }
+
+  const orders = await Order.aggregate([
+    {
+      $match: { user: req.user._id },
+      orderStatus: "Delivered",
+    },
+    {
+      $group: {
+        _id: "$orderStatus",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  orders.forEach((order) => {
+    orderCounts[order._id] = order.count;
+  });
+
+  res.status(200).json({
+    orderCounts,
+  });
 });

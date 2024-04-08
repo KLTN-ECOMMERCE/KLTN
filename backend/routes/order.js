@@ -13,7 +13,7 @@ import {
   getOrderByStatus,
   cancelOrder,
   getTotalAmountByMonth,
-  getDataCategory,
+  getDataOrderByStatus,
 } from "../controllers/orderControllers.js";
 
 router.route("/orders/new").post(isAuthenticatedUser, newOrder);
@@ -23,12 +23,15 @@ router.route("/me/orders").get(isAuthenticatedUser, myOrders);
 router
   .route("/me/getAmount/:year")
   .get(isAuthenticatedUser, getTotalAmountByMonth);
-router.route("/me/getDataCategory").get(isAuthenticatedUser, getDataCategory);
+// router.route("/me/getDataCategory").get(isAuthenticatedUser, getDataCategory);
 
 router
   .route("/me/getOrderByStatus/:status")
   .get(isAuthenticatedUser, getOrderByStatus);
 
+router
+  .route("/me/getDataOrderByStatus")
+  .get(isAuthenticatedUser, getDataOrderByStatus);
 router
   .route("/admin/get_sales")
   .get(isAuthenticatedUser, authorizeRoles("admin"), getSales);
