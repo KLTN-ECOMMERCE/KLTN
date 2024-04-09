@@ -30,6 +30,12 @@ const orderSchema = new mongoose.Schema(
       shippingUnit: {
         type: String,
       },
+      longitude: {
+        type: String,
+      },
+      latitude: {
+        type: String,
+      },
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
