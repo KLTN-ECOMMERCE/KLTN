@@ -115,7 +115,8 @@ export const deleteAddressInfo = catchAsyncErrors(async (req, res, next) => {
 export const updateAddressInfo = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
   const addressId = req.params.addressId;
-  const { address, city, phoneNo, zipCode, country } = req.body;
+  const { address, city, phoneNo, zipCode, country, longitude, latitude } =
+    req.body;
 
   try {
     const userAddress = await Address.findOneAndUpdate(
@@ -127,6 +128,8 @@ export const updateAddressInfo = catchAsyncErrors(async (req, res, next) => {
           "shippingInfo.$.phoneNo": phoneNo,
           "shippingInfo.$.zipCode": zipCode,
           "shippingInfo.$.country": country,
+          "shippingInfo.$.longitude": longitude,
+          "shippingInfo.$.latitude": latitude,
         },
       },
       { new: true }
