@@ -155,4 +155,52 @@ export const updateAddressInfo = catchAsyncErrors(async (req, res, next) => {
   }
 });
 // address default
-export const addressDefault = catchAsyncErrors(async (req, res, next) => {});
+export const addressDefault = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const address = await Address.findOne({ "shippingInfo._id": id });
+
+    if (!address) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    address.shippingInfo.forEach((info) => {
+      if (info._id.toString() === id) {
+        info.isDefault = true;
+      } else {
+        info.isDefault = false;
+      }
+    });
+
+    await address.save();
+
+    res.status(200).json({ message: "Default shipping updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+// get address Default
+export const getAddressDefault = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+
+  try {
+    const defaultAddress = await Address.findOne({
+      user: userId,
+    });
+
+    const defaultShippingInfo = defaultAddress.shippingInfo.find(
+      (info) => info.isDefault
+    );
+
+    if (!defaultShippingInfo) {
+      return res
+        .status(404)
+        .json({ message: "Default shipping info not found" });
+    }
+
+    res.status(200).json(defaultShippingInfo);
+  } catch (error) {
+    console.error("Error fetching default address:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});

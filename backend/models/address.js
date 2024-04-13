@@ -29,12 +29,12 @@ const addressSchema = new mongoose.Schema({
       latitude: {
         type: String,
       },
+      isDefault: {
+        type: Boolean,
+        default: false,
+      },
     },
   ],
-  isDefault: {
-    type: Boolean,
-    default: false,
-  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
