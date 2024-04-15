@@ -1,4 +1,4 @@
-import express from 'express'
+import express from "express";
 import {
   allUsers,
   deleteUser,
@@ -19,36 +19,44 @@ import {
   checkOtpChangeEmail,
   checkOtpNewEmail,
   updatePoint,
-} from '../controllers/userControllers.js'
-const router = express.Router()
+  findUser,
+} from "../controllers/userControllers.js";
+const router = express.Router();
 
-import { authorizeRoles, isAuthenticatedUser } from '../middlewares/auth.js'
+import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
 
-router.route('/register').post(registerUser)
-router.route('/check').post(checkOTP)
-router.route('/login').post(loginUser)
-router.route('/logout').get(logout)
+router.route("/register").post(registerUser);
+router.route("/check").post(checkOTP);
+router.route("/login").post(loginUser);
+router.route("/logout").get(logout);
 
-router.route('/password/forgot').post(forgotPassword)
-router.route('/password/reset/:token').put(resetPassword)
+router.route("/password/forgot").post(forgotPassword);
+router.route("/password/reset/:token").put(resetPassword);
 
-router.route('/password/forgot/mobile').post(forgotPasswordMobile)
-router.route('/password/reset').put(resetPasswordWithOTP)
+router.route("/password/forgot/mobile").post(forgotPasswordMobile);
+router.route("/password/reset").put(resetPasswordWithOTP);
 
-router.route('/me').get(isAuthenticatedUser, getUserProfile)
-router.route('/me/update').put(isAuthenticatedUser, updateProfile)
-router.route('/me/checkOtpChangeEmail').post(isAuthenticatedUser, checkOtpChangeEmail)
-router.route('/me/checkOtpNewEmail').post(isAuthenticatedUser, checkOtpNewEmail)
-router.route('/password/update').put(isAuthenticatedUser, updatePassword)
-router.route('/me/upload_avatar').put(isAuthenticatedUser, uploadAvatar)
-router.route('/updatePoint').put(isAuthenticatedUser, updatePoint)
-
-router.route('/admin/users').get(isAuthenticatedUser, authorizeRoles('admin'), allUsers)
+router.route("/me").get(isAuthenticatedUser, getUserProfile);
+router.route("/me/update").put(isAuthenticatedUser, updateProfile);
+router
+  .route("/me/checkOtpChangeEmail")
+  .post(isAuthenticatedUser, checkOtpChangeEmail);
+router
+  .route("/me/checkOtpNewEmail")
+  .post(isAuthenticatedUser, checkOtpNewEmail);
+router.route("/password/update").put(isAuthenticatedUser, updatePassword);
+router.route("/me/upload_avatar").put(isAuthenticatedUser, uploadAvatar);
+router.route("/updatePoint").put(isAuthenticatedUser, updatePoint);
+router.route("/findUser/:id").get(isAuthenticatedUser, findUser);
 
 router
-  .route('/admin/users/:id')
-  .get(isAuthenticatedUser, authorizeRoles('admin'), getUserDetails)
-  .put(isAuthenticatedUser, authorizeRoles('admin'), updateUser)
-  .delete(isAuthenticatedUser, authorizeRoles('admin'), deleteUser)
+  .route("/admin/users")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), allUsers);
 
-export default router
+router
+  .route("/admin/users/:id")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), getUserDetails)
+  .put(isAuthenticatedUser, authorizeRoles("admin"), updateUser)
+  .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteUser);
+
+export default router;
