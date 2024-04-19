@@ -13,29 +13,13 @@ class LinesChart extends StatefulWidget {
 }
 
 class _LinesChartState extends State<LinesChart> {
-  final Map lineData = {
-    0: 0,
-    1: 200,
-    2: 100,
-    3: 126,
-    4: 321,
-    5: 111,
-    6: 712,
-    7: 1092,
-    8: 1000,
-    9: 0,
-    10: 2989,
-    11: 736,
-    12: 0,
-  };
+  bool isCurved = true;
+  int touchedIndex = -1;
 
   final List<Color> gradientColors = [
     Colors.blue,
     Colors.green,
   ];
-
-  bool isCurved = true;
-  int touchedIndex = -1;
 
   final ApiUser _apiUser = ApiUser();
 
@@ -61,18 +45,6 @@ class _LinesChartState extends State<LinesChart> {
 
   @override
   Widget build(BuildContext context) {
-    final keys = lineData.keys.toList();
-    final values = lineData.values.toList();
-
-    final List<FlSpot> spots = [];
-    for (var i = 0; i < keys.length; i++) {
-      spots.add(
-        FlSpot(
-          keys[i].toDouble(),
-          values[i].toDouble(),
-        ),
-      );
-    }
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(
@@ -134,7 +106,7 @@ class _LinesChartState extends State<LinesChart> {
                               minX: 0,
                               maxX: 11,
                               minY: 0,
-                              maxY: 3000,
+                              maxY: 5000,
                               gridData: FlGridData(
                                 show: true,
                                 getDrawingHorizontalLine: (value) {
@@ -205,96 +177,6 @@ class _LinesChartState extends State<LinesChart> {
                   );
                 }
               },
-            ),
-            const SizedBox(
-              height: 22,
-            ),
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.2,
-                  child: Container(
-                    padding: const EdgeInsets.only(
-                      left: 6,
-                      right: 11,
-                      top: 18,
-                      bottom: 12,
-                    ),
-                    margin: const EdgeInsets.all(12),
-                    child: LineChart(
-                      LineChartData(
-                        backgroundColor: Theme.of(context).colorScheme.surface,
-                        minX: 0,
-                        maxX: 12,
-                        minY: 0,
-                        maxY: 3000,
-                        gridData: FlGridData(
-                          show: true,
-                          getDrawingHorizontalLine: (value) {
-                            return const FlLine(
-                              strokeWidth: 0.3,
-                            );
-                          },
-                          getDrawingVerticalLine: (value) {
-                            return const FlLine(
-                              strokeWidth: 0.3,
-                            );
-                          },
-                        ),
-                        borderData: FlBorderData(
-                          show: true,
-                          border: Border.all(
-                            width: 1,
-                          ),
-                        ),
-                        titlesData: LineTitles.getTitleData(),
-                        lineBarsData: [
-                          LineChartBarData(
-                            spots: spots,
-                            isCurved: isCurved,
-                            gradient: LinearGradient(
-                              colors: gradientColors,
-                              begin: Alignment.topLeft,
-                            ),
-                            barWidth: 5,
-                            dotData: const FlDotData(
-                              show: false,
-                            ),
-                            belowBarData: BarAreaData(
-                              show: true,
-                              gradient: LinearGradient(
-                                colors: gradientColors
-                                    .map(
-                                      (e) => e.withOpacity(0.4),
-                                    )
-                                    .toList(),
-                                begin: Alignment.topLeft,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 60,
-                  height: 34,
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        isCurved = !isCurved;
-                      });
-                    },
-                    child: const Text(
-                      'Curved',
-                      style: TextStyle(
-                        fontSize: 12,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),

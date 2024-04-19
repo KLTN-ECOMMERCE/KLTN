@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/screens/success/success.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
@@ -26,25 +25,7 @@ class _LoginState extends State<LoginScreen> {
   var _enteredEmail = '';
   var _enteredPassword = '';
 
-  final List<String?> errors = [];
-
   final ApiStart _apiStart = ApiStart();
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   void _login() async {
     final isValid = _formKey.currentState!.validate();
@@ -142,21 +123,11 @@ class _LoginState extends State<LoginScreen> {
                       TextFormField(
                         keyboardType: TextInputType.emailAddress,
                         onSaved: (newValue) => _enteredEmail = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kEmailNullError);
-                          } else if (value.contains('@')) {
-                            removeError(kInvalidEmailError);
-                          }
-                          _enteredEmail = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kEmailNullError);
-                            return "";
+                            return kEmailNullError;
                           } else if (!value.contains('@')) {
-                            addError(kInvalidEmailError);
-                            return "";
+                            return kInvalidEmailError;
                           }
                           return null;
                         },
@@ -186,21 +157,11 @@ class _LoginState extends State<LoginScreen> {
                       TextFormField(
                         obscureText: true,
                         onSaved: (newValue) => _enteredPassword = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kPassNullError);
-                          } else if (value.length >= 6) {
-                            removeError(kShortPassError);
-                          }
-                          _enteredPassword = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kPassNullError);
-                            return "";
+                            return kPassNullError;
                           } else if (value.length < 6) {
-                            addError(kShortPassError);
-                            return "";
+                            return kShortPassError;
                           }
                           return null;
                         },
@@ -223,9 +184,6 @@ class _LoginState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                      ),
-                      FormError(
-                        errors: errors,
                       ),
                       const SizedBox(
                         height: 25,

@@ -11,7 +11,7 @@ class OrderItem extends StatelessWidget {
     required this.quantity,
     required this.statusOrder,
     required this.totalAmount,
-    required this.paymentId,
+    required this.paymentMethod,
     required this.statusPayment,
   });
   final String id;
@@ -19,7 +19,7 @@ class OrderItem extends StatelessWidget {
   final String quantity;
   final double totalAmount;
   final String statusOrder;
-  final String paymentId;
+  final String paymentMethod;
   final String statusPayment;
 
   @override
@@ -78,7 +78,7 @@ class OrderItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Payment Code: ',
+                      'Payment Method: ',
                       style: TextStyle(
                         fontWeight: FontWeight.w400,
                         fontSize: 16,
@@ -88,7 +88,7 @@ class OrderItem extends StatelessWidget {
                       width: 12,
                     ),
                     Text(
-                      paymentId,
+                      paymentMethod,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -173,11 +173,13 @@ class OrderItem extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: OutlinedButton(
                     onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => DetailOrderScreen(
-                          orderId: id,
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => DetailOrderScreen(
+                            orderId: id,
+                          ),
                         ),
-                      ));
+                      );
                     },
                     child: Text(
                       'Details',

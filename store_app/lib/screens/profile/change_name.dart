@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_user.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/screens/profile/my_profile.dart';
 import 'package:store_app/screens/success/success.dart';
@@ -27,24 +26,7 @@ class _ChangeNameState extends State<ChangeNameScreen> {
   var _isAuthenticating = false;
   var _hasMessage = false;
   var errorApi = '';
-  final List<String?> errors = [];
   final ApiUser _apiUser = ApiUser();
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   void _changeName() async {
     final isValid = _formKey.currentState!.validate();
@@ -136,16 +118,9 @@ class _ChangeNameState extends State<ChangeNameScreen> {
                         children: [
                           TextFormField(
                             onSaved: (newValue) => _enteredName = newValue!,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                removeError(kNamelNullError);
-                              }
-                              _enteredName = value;
-                            },
                             validator: (value) {
                               if (value!.isEmpty) {
-                                addError(kNamelNullError);
-                                return "";
+                                return kNamelNullError;
                               }
                               return null;
                             },
@@ -172,9 +147,6 @@ class _ChangeNameState extends State<ChangeNameScreen> {
                           ),
                           const SizedBox(
                             height: 20,
-                          ),
-                          FormError(
-                            errors: errors,
                           ),
                           const SizedBox(
                             height: 25,

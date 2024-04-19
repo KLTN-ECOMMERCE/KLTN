@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:persistent_shopping_cart/model/cart_model.dart';
@@ -9,6 +10,7 @@ import 'package:store_app/api/api_user.dart';
 import 'package:store_app/api/api_voucher.dart';
 import 'package:store_app/data/delivery_method.dart';
 import 'package:store_app/models/delivery_method.dart';
+import 'package:store_app/models/place.dart';
 import 'package:store_app/models/shipping_address.dart';
 import 'package:store_app/notifications/notification_service.dart';
 import 'package:store_app/screens/order/detail_order.dart';
@@ -81,6 +83,52 @@ class _OrderScreenState extends State<OrderScreen> {
     }
   }
 
+  Future<dynamic> _getDefaultAddress() async {
+    try {
+      final defaultAddress = await _apiUser.getDefaultShippingAddress();
+      if (defaultAddress != null) {
+        final countryCode = RegExp(r'\((.*?)\)')
+            .firstMatch(defaultAddress['country'].toString())
+            ?.group(1);
+        Country country = CountryParser.parseCountryCode(countryCode!);
+
+        setState(() {
+          _shippingAddress = ShippingAddress(
+            address: defaultAddress['address'].toString(),
+            city: defaultAddress['city'].toString(),
+            country: country,
+            phoneNo: defaultAddress['phoneNo'].toString(),
+            zipCode: defaultAddress['zipCode'].toString(),
+            place: Place(
+              latitude: double.parse(
+                defaultAddress['latitude'].toString(),
+              ),
+              longitude: double.parse(
+                defaultAddress['longitude'].toString(),
+              ),
+            ),
+            isDefault: defaultAddress['isDefault'],
+            id: defaultAddress['_id'].toString(),
+          );
+        });
+      } else {
+        setState(() {
+          _shippingAddress = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+      throw HttpException(e.toString());
+    }
+  }
+
   void _submitOrder() async {
     if (!_isCODSelected && !_isCreditCardSelected) {
       setState(() {
@@ -102,7 +150,7 @@ class _OrderScreenState extends State<OrderScreen> {
         _noSelectShippingAddress = true;
       });
       if (mounted) {
-        //ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -133,6 +181,7 @@ class _OrderScreenState extends State<OrderScreen> {
         _deliveryMethodChoose,
         _summary,
         _shippingAmount,
+        _voucher,
       );
       print(response);
       PersistentShoppingCart().clearCart();
@@ -181,6 +230,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   void initState() {
     _getUserProfile();
+    _getDefaultAddress();
     super.initState();
   }
 
@@ -338,12 +388,15 @@ class _OrderScreenState extends State<OrderScreen> {
                             typeOfPromotion: 'My Promotion',
                             onSelectVoucherItem: (
                               id,
+                              name,
+                              quantity,
                               description,
                               deliveryFee,
                               discount,
                             ) {
                               final data = {
                                 'id': id,
+                                'name': name,
                                 'description': description,
                                 'deliveryFee': deliveryFee,
                                 'discount': discount,
@@ -396,6 +449,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     )
                   : VoucherItem(
                       id: _voucher['id'],
+                      name: _voucher['name'],
                       description: _voucher['description'],
                       deliveryFee: _voucher['deliveryFee'],
                       discount: _voucher['discount'],
@@ -403,6 +457,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       isMargin: true,
                       onSelectVoucherItem: (
                         id,
+                        name,
+                        quantity,
                         description,
                         deliveryFee,
                         discount,
@@ -419,12 +475,16 @@ class _OrderScreenState extends State<OrderScreen> {
                             typeOfPromotion: 'My Promotion',
                             onSelectVoucherItem: (
                               id,
+                              name,
+                              quantity,
                               description,
                               deliveryFee,
                               discount,
                             ) {
                               final data = {
                                 'id': id,
+                                'name': name,
+                                'quantity': quantity,
                                 'description': description,
                                 'deliveryFee': deliveryFee,
                                 'discount': discount,
@@ -727,7 +787,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
               if (_voucher != null)
                 PriceWidget(
-                  price: '- ${_voucherSale.toString()} %',
+                  price: '- ${(_voucherSale / 0.01).toString()} %',
                   typeOfPrice: 'Voucher: ',
                   priceColor: Colors.red,
                 ),

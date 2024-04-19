@@ -21,6 +21,7 @@ class ApiOrder {
     DeliveryMethod deliveryMethod,
     double totalAmount,
     double shippingAmount,
+    dynamic voucher,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
@@ -51,6 +52,8 @@ class ApiOrder {
         'country': shippingInfo.country.displayNameNoCountryCode,
         'shippingAmount': deliveryMethod.price,
         'shippingUnit': shippingUnit,
+        'latitude': shippingInfo.place.latitude.toString(),
+        'longitude': shippingInfo.place.longitude.toString(),
       },
       'orderItems': products,
       'paymentMethod': paymentMethod,
@@ -59,6 +62,13 @@ class ApiOrder {
       'taxAmount': taxAmount,
       'shippingAmount': shippingAmount,
       'totalAmount': totalAmount,
+      'voucherInfo': {
+        'voucherId':
+            voucher != null ? voucher['id'] : 'abcabcabcabcabcabcabcabc',
+        'name': voucher != null ? voucher['name'] : 'null',
+        'deliveryFee': voucher != null ? voucher['deliveryFee'] : false,
+        'discount': voucher != null ? voucher['discount'] : 0,
+      },
     };
 
     try {
@@ -137,6 +147,30 @@ class ApiOrder {
     );
     try {
       Response response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> getDataOrderByStatus() async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/getDataOrderByStatus',
+    );
+    try {
+      Response response = await http.get(
         url,
         headers: {
           'Content-Type': 'application/json',

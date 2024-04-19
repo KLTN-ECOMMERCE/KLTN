@@ -102,12 +102,6 @@ class _MyProfileState extends State<MyProfileScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              const Center(
-                child: ProfilePic(),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
               FutureBuilder(
                 future: _getUserProfile(),
                 builder: (context, snapshot) {
@@ -123,6 +117,12 @@ class _MyProfileState extends State<MyProfileScreen> {
                     final profile = snapshot.data;
                     return Column(
                       children: [
+                        const Center(
+                          child: ProfilePic(),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         MyProfileWidget(
                           label: 'Name',
                           information: profile['name'],

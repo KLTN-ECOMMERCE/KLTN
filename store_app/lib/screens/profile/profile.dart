@@ -7,7 +7,6 @@ import 'package:store_app/screens/profile/my_profile.dart';
 import 'package:store_app/screens/promotion/promotion.dart';
 import 'package:store_app/screens/statistics/statistics.dart';
 import 'package:store_app/widgets/profile/profile_menu.dart';
-import 'package:store_app/widgets/profile/profile_pic.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -21,16 +20,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(vertical: 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const ProfilePic(),
-              const SizedBox(
-                height: 20,
-              ),
               ProfileMenu(
                 icon: 'assets/icons/User Icon.svg',
                 text: 'My Account',

@@ -78,8 +78,8 @@ class _OrdersByStatusState extends State<OrdersByStatus> {
                           quantity: quantity.toString(),
                           statusOrder: orders[index]['orderStatus'].toString(),
                           totalAmount: orders[index]['totalAmount'].toDouble(),
-                          paymentId:
-                              orders[index]['paymentInfo']['id'].toString(),
+                          paymentMethod:
+                              orders[index]['paymentMethod'].toString(),
                           statusPayment:
                               orders[index]['paymentInfo']['status'].toString(),
                         );

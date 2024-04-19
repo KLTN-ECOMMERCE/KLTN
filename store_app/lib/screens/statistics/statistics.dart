@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:store_app/screens/chart/bars_chart.dart';
 import 'package:store_app/screens/chart/lines_chart.dart';
 import 'package:store_app/screens/chart/pies_chart.dart';
 
@@ -12,6 +13,7 @@ class StatisticsScreen extends StatefulWidget {
 class _StatisticsScreenState extends State<StatisticsScreen> {
   List<String> tabs = [
     'Line Chart',
+    'Bar Chart',
     'Pie Chart',
   ];
 
@@ -68,6 +70,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         body: const TabBarView(
           children: [
             LinesChart(),
+            BarsChart(),
             PiesChart(),
           ],
         ),

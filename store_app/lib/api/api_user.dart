@@ -197,6 +197,8 @@ class ApiUser {
       'phoneNo': shippingAddress.phoneNo.trim(),
       'zipCode': shippingAddress.zipCode.trim(),
       'country': shippingAddress.country.displayNameNoCountryCode.trim(),
+      'latitude': shippingAddress.place.latitude.toString(),
+      'longitude': shippingAddress.place.longitude.toString(),
     };
 
     try {
@@ -260,6 +262,8 @@ class ApiUser {
       'phoneNo': shippingAddress.phoneNo.trim(),
       'zipCode': shippingAddress.zipCode.trim(),
       'country': shippingAddress.country.displayNameNoCountryCode.trim(),
+      'latitude': shippingAddress.place.latitude.toString(),
+      'longitude': shippingAddress.place.longitude.toString(),
     };
 
     try {
@@ -304,6 +308,60 @@ class ApiUser {
         throw HttpException(resData['message'] as String);
       }
       return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> updateDefaultShippingAddress(String shippingAddressId) async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/addressDefault/$shippingAddressId',
+    );
+
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData['message'];
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> getDefaultShippingAddress() async {
+    final jwtToken = await storage.read(key: 'access-token');
+
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/getAddressDefault',
+    );
+
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        return null;
+      }
+      return resData;
     } catch (e) {
       throw HttpException(e.toString());
     }
@@ -356,6 +414,59 @@ class ApiUser {
       if (response.statusCode != 200) {
         throw HttpException(resData['message']);
       }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> uploadAvatar(String image) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/me/upload_avatar',
+    );
+
+    Map<String, dynamic> body = {
+      'avatar': image,
+    };
+
+    try {
+      Response response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+        body: jsonEncode(body),
+      );
+
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message']);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> findUser(String userId) async {
+    final jwtToken = await storage.read(key: 'access-token');
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/findUser/$userId',
+    );
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $jwtToken',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) throw HttpException(resData['message']);
       return resData;
     } catch (e) {
       throw HttpException(e.toString());

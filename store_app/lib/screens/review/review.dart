@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:store_app/api/api_product.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -23,24 +22,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   var _isAuthenticating = false;
   bool _canReview = false;
   final _formKey = GlobalKey<FormState>();
-  final List<String?> errors = [];
   final ApiProduct _apiProduct = ApiProduct();
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   void _canReviewProduct(String productId) async {
     try {
@@ -200,6 +182,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                   SizedBox(
                                     height: 150,
                                     child: TextFormField(
+                                      maxLength: 300,
                                       enableSuggestions: false,
                                       onTapOutside: (event) {
                                         KeyboardUtil.hideKeyboard(context);
@@ -208,15 +191,8 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                       expands: true,
                                       onSaved: (newValue) =>
                                           _enteredComment = newValue!,
-                                      onChanged: (value) {
-                                        if (value.isNotEmpty) {
-                                          removeError(kNullError);
-                                        }
-                                        _enteredComment = value;
-                                      },
                                       validator: (value) {
                                         if (value!.isEmpty) {
-                                          addError(kNullError);
                                           return kNullError;
                                         }
                                         return null;
@@ -228,9 +204,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                         border: InputBorder.none,
                                       ),
                                     ),
-                                  ),
-                                  FormError(
-                                    errors: errors,
                                   ),
                                 ],
                               ),

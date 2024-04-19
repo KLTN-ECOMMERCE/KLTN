@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_start.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/screens/auth/reset_password.dart';
@@ -21,7 +20,6 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
   dynamic _responseForgotPassword;
   var _hasMessage = false;
   final _formKey = GlobalKey<FormState>();
-  final List<String?> errors = [];
 
   final ApiStart _apiStart = ApiStart();
 
@@ -38,22 +36,6 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
     );
   }
 
-    void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
-
   void _forgotPassword() async {
     final isValid = _formKey.currentState!.validate();
     if (!isValid) {
@@ -65,8 +47,7 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
       setState(() {
         _isAuthenticating = true;
       });
-      _responseForgotPassword =
-          await _apiStart.forgotPassword(_enteredEmail);
+      _responseForgotPassword = await _apiStart.forgotPassword(_enteredEmail);
       if (!mounted) return;
       setState(() {
         _isAuthenticating = false;
@@ -133,21 +114,11 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                             TextFormField(
                               keyboardType: TextInputType.emailAddress,
                               onSaved: (newValue) => _enteredEmail = newValue!,
-                              onChanged: (value) {
-                                if (value.isNotEmpty) {
-                                  removeError(kEmailNullError);
-                                } else if (value.contains('@')) {
-                                  removeError(kInvalidEmailError);
-                                }
-                                _enteredEmail = value;
-                              },
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  addError(kEmailNullError);
-                                  return "";
+                                  return kEmailNullError;
                                 } else if (!value.contains('@')) {
-                                  addError(kInvalidEmailError);
-                                  return "";
+                                  return kInvalidEmailError;
                                 }
                                 return null;
                               },
@@ -172,9 +143,6 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                                   ),
                                 ),
                               ),
-                            ),
-                            FormError(
-                              errors: errors,
                             ),
                             const SizedBox(
                               height: 25,
@@ -212,7 +180,6 @@ class _ForgotPasswordState extends State<ForgotPasswordScreen> {
                           ],
                         ),
                       ),
-                      
                     ],
                   ),
                 ),

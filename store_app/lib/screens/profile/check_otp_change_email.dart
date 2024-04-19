@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_user.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/screens/profile/check_otp_new_email.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:store_app/helper/keyboard.dart';
@@ -26,25 +25,7 @@ class _CheckOTPChangeEmailState extends State<CheckOTPChangeEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   dynamic _responseSendOtp;
 
-  final List<String?> errors = [];
-
   final ApiUser _apiUser = ApiUser();
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   void _verify() async {
     final isValid = _formKey.currentState!.validate();
@@ -64,7 +45,7 @@ class _CheckOTPChangeEmailState extends State<CheckOTPChangeEmailScreen> {
       );
 
       _responseSendOtp = responseSendOtp;
-      
+
       setState(() {
         _isAuthenticating = false;
       });
@@ -135,21 +116,11 @@ class _CheckOTPChangeEmailState extends State<CheckOTPChangeEmailScreen> {
                               maxLength: 6,
                               keyboardType: TextInputType.number,
                               onSaved: (newValue) => _enteredOtp = newValue!,
-                              onChanged: (value) {
-                                if (value.isNotEmpty) {
-                                  removeError(kOtpNullError);
-                                } else if (value.length == 6) {
-                                  removeError(kInvalidOtpError);
-                                }
-                                _enteredOtp = value;
-                              },
                               validator: (value) {
                                 if (value!.isEmpty) {
-                                  addError(kOtpNullError);
-                                  return "";
+                                  return kOtpNullError;
                                 } else if (value.length < 6) {
-                                  addError(kInvalidOtpError);
-                                  return "";
+                                  return kInvalidOtpError;
                                 }
                                 return null;
                               },
@@ -174,9 +145,6 @@ class _CheckOTPChangeEmailState extends State<CheckOTPChangeEmailScreen> {
                                   ),
                                 ),
                               ),
-                            ),
-                            FormError(
-                              errors: errors,
                             ),
                             const SizedBox(
                               height: 25,

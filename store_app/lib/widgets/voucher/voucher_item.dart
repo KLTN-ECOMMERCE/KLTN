@@ -12,10 +12,14 @@ class VoucherItem extends StatefulWidget {
     required this.deliveryFee,
     required this.discount,
     required this.typeOfPromotion,
+    required this.name,
+    this.quantity,
     this.onSelectVoucherItem,
     this.isMargin = false,
   });
   final String id;
+  final String name;
+  final int? quantity;
   final String description;
   final String deliveryFee;
   final double discount;
@@ -23,6 +27,8 @@ class VoucherItem extends StatefulWidget {
   final bool isMargin;
   final void Function(
     String id,
+    String name,
+    int? quantity,
     String description,
     String deliveryFee,
     double discount,
@@ -74,6 +80,8 @@ class _VoucherItemState extends State<VoucherItem> {
           : () {
               widget.onSelectVoucherItem!(
                 widget.id,
+                widget.name,
+                widget.quantity,
                 widget.description,
                 widget.deliveryFee,
                 widget.discount,
@@ -127,9 +135,9 @@ class _VoucherItemState extends State<VoucherItem> {
                           highlightColor: Colors.green,
                           direction: ShimmerDirection.ltr,
                           child: Text(
-                            widget.description,
+                            widget.name,
                             style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 21,
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 3,
@@ -137,6 +145,50 @@ class _VoucherItemState extends State<VoucherItem> {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Shimmer.fromColors(
+                          period: const Duration(
+                            milliseconds: 800,
+                          ),
+                          baseColor: Colors.orange,
+                          highlightColor: Colors.green,
+                          direction: ShimmerDirection.ltr,
+                          child: Text(
+                            widget.description,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 3,
+                            textAlign: TextAlign.center,
+                            softWrap: true,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        if (widget.quantity != null)
+                          Shimmer.fromColors(
+                            period: const Duration(
+                              milliseconds: 800,
+                            ),
+                            baseColor: Colors.orange,
+                            highlightColor: Colors.green,
+                            direction: ShimmerDirection.ltr,
+                            child: Text(
+                              'Only: ${widget.quantity.toString()}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 3,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         const SizedBox(
                           height: 8,
                         ),

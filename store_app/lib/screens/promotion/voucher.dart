@@ -14,6 +14,8 @@ class VoucherScreen extends StatefulWidget {
   final String typeOfPromotion;
   final void Function(
     String id,
+    String name,
+    int? quantity,
     String description,
     String deliveryFee,
     double discount,
@@ -117,9 +119,13 @@ class _VoucherScreenState extends State<VoucherScreen> {
                         final voucher = vouchers[index] as Map<String, dynamic>;
                         return VoucherItem(
                           id: voucher['_id'].toString(),
+                          name: voucher['name'].toString(),
                           description: voucher['description'].toString(),
                           deliveryFee: voucher['deliveryFee'].toString(),
                           discount: voucher['discount'].toDouble(),
+                          quantity: widget.typeOfPromotion == 'Promotions'
+                              ? voucher['quantity'].toInt()
+                              : null,
                           typeOfPromotion: widget.typeOfPromotion,
                           onSelectVoucherItem: widget.onSelectVoucherItem,
                         );

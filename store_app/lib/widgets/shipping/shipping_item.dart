@@ -10,12 +10,14 @@ class ShippingItem extends StatefulWidget {
     this.selectShippingItem,
     this.selectButton,
     this.deleteShippingAddress,
+    this.selectDefaultAdress,
   });
   final ShippingAddress shippingAddress;
   final String buttonString;
   final Function(ShippingAddress shippingAddress)? selectShippingItem;
   final Function(ShippingAddress shippingAddress)? deleteShippingAddress;
   final Function(BuildContext context)? selectButton;
+  final Function(String shippingAddressId)? selectDefaultAdress;
 
   @override
   State<ShippingItem> createState() => _ShippingItemState();
@@ -23,6 +25,7 @@ class ShippingItem extends StatefulWidget {
 
 class _ShippingItemState extends State<ShippingItem> {
   late ShippingAddress _shippingAddress;
+
   @override
   void initState() {
     super.initState();
@@ -31,9 +34,9 @@ class _ShippingItemState extends State<ShippingItem> {
 
   @override
   Widget build(BuildContext context) {
-    Key key = UniqueKey();
+    //Key key = UniqueKey();
     return Container(
-      key: key,
+      //key: key,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         shape: BoxShape.rectangle,
@@ -59,11 +62,16 @@ class _ShippingItemState extends State<ShippingItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _shippingAddress.address,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Text(
+                      _shippingAddress.address,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 3,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   TextButton(
@@ -84,7 +92,7 @@ class _ShippingItemState extends State<ShippingItem> {
                               setState(() {
                                 _shippingAddress =
                                     data['shippingAddress'] as ShippingAddress;
-                                key = data['key'] as Key;
+                                //key = data['key'] as Key;
                               });
                             }
                           },
@@ -101,11 +109,16 @@ class _ShippingItemState extends State<ShippingItem> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '${_shippingAddress.city}, ${_shippingAddress.zipCode}, ${_shippingAddress.country.displayNameNoCountryCode}',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  Expanded(
+                    child: Text(
+                      '${_shippingAddress.city}, ${_shippingAddress.zipCode}, ${_shippingAddress.country.displayNameNoCountryCode}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 3,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (widget.deleteShippingAddress != null)
@@ -118,7 +131,7 @@ class _ShippingItemState extends State<ShippingItem> {
                 ],
               ),
               const SizedBox(
-                height: 12,
+                height: 8,
               ),
               Text(
                 _shippingAddress.phoneNo,
@@ -127,6 +140,36 @@ class _ShippingItemState extends State<ShippingItem> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(
+                height: 12,
+              ),
+              if (widget.selectDefaultAdress != null)
+                CheckboxListTile(
+                  selectedTileColor: Theme.of(context).colorScheme.primary,
+                  value: _shippingAddress.isDefault,
+                  title: const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(Icons.not_listed_location_outlined),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text(
+                        'Use as the shipping address',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                    ],
+                  ),
+                  onChanged: (value) {
+                    if (value == true) {
+                      widget.selectDefaultAdress!(_shippingAddress.id!);
+                      Navigator.of(context).pop(_shippingAddress);
+                    }
+                  },
+                ),
             ],
           ),
         ),

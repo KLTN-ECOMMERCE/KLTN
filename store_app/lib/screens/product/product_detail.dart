@@ -31,6 +31,8 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 class _ProductDetailState extends ConsumerState<ProductDetailScreen> {
   final ApiProduct _apiProduct = ApiProduct();
 
+  
+
   void _selectProduct(BuildContext context, ProductItem productItem) {
     Navigator.of(context).push(
       MaterialPageRoute(

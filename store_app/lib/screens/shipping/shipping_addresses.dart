@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_user.dart';
+import 'package:store_app/models/place.dart';
 import 'package:store_app/models/shipping_address.dart';
 import 'package:store_app/screens/shipping/add_shipping_address.dart';
 import 'package:store_app/widgets/shipping/shipping_item.dart';
@@ -45,9 +46,8 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Key key = UniqueKey();
+    var shippingAddressData = _getShippingAddresses();
     return Scaffold(
-      key: key,
       appBar: AppBar(
         title: const Text(
           'Shipping Addresses',
@@ -58,16 +58,14 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          final data = await Navigator.of(context).push(
+          await Navigator.of(context).push(
             MaterialPageRoute(
               builder: (context) => const AddShippingAddressScreen(),
             ),
           );
-          if (data != null) {
-            setState(() {
-              key = data['key'] as Key;
-            });
-          }
+          setState(() {
+            shippingAddressData = _getShippingAddresses();
+          });
         },
         backgroundColor: Theme.of(context).colorScheme.secondary,
         foregroundColor: Theme.of(context).colorScheme.onSecondary,
@@ -88,7 +86,7 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 FutureBuilder(
-                  future: _getShippingAddresses(),
+                  future: shippingAddressData,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
@@ -132,6 +130,15 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
                                   .toString(),
                               zipCode: shippingAddresses[index]['zipCode']
                                   .toString(),
+                              place: Place(
+                                latitude: double.parse(
+                                  shippingAddresses[index]['latitude'],
+                                ),
+                                longitude: double.parse(
+                                  shippingAddresses[index]['longitude'],
+                                ),
+                              ),
+                              isDefault: shippingAddresses[index]['isDefault'],
                             );
                             return Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -147,7 +154,8 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
                                       shippingAddress.id as String,
                                     );
                                     setState(() {
-                                      key = UniqueKey();
+                                      shippingAddressData =
+                                          _getShippingAddresses();
                                     });
                                   } catch (e) {
                                     if (mounted) {
@@ -161,6 +169,35 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
                                       );
                                     }
                                     throw HttpException(e.toString());
+                                  }
+                                },
+                                selectDefaultAdress: (shippingAddressId) async {
+                                  try {
+                                    final response = await _apiUser
+                                        .updateDefaultShippingAddress(
+                                      shippingAddressId,
+                                    );
+                                    setState(() {
+                                      shippingAddressData =
+                                          _getShippingAddresses();
+                                    });
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(response.toString()),
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(e.toString()),
+                                      ),
+                                    );
                                   }
                                 },
                               ),

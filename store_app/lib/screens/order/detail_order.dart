@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:persistent_shopping_cart/model/cart_model.dart';
 import 'package:store_app/api/api_order.dart';
 import 'package:store_app/data/status_color.dart';
 import 'package:store_app/screens/app.dart';
+import 'package:store_app/screens/order/order.dart';
 import 'package:store_app/screens/review/review.dart';
 import 'package:store_app/widgets/order/order_information.dart';
 import 'package:shimmer/shimmer.dart';
@@ -469,9 +471,13 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                             const SizedBox(
                               height: 25,
                             ),
-                            const OrderInformation(
+                            OrderInformation(
                               title: 'Discount: ',
-                              information: 'null',
+                              information: order['voucherInfo']['deliveryFee']
+                                          .toString() ==
+                                      'true'
+                                  ? '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}%, Free Ship !!!'
+                                  : '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}% !!!',
                             ),
                             const SizedBox(
                               height: 25,
@@ -586,6 +592,66 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                         ),
                                       ),
                                     ),
+                            if (order['orderStatus'].toString() == 'Delivered')
+                              ElevatedButton(
+                                onPressed: () {
+                                  try {
+                                    List<PersistentShoppingCartItem> cartItems =
+                                        [];
+                                    for (var item in orderItems) {
+                                      cartItems.add(
+                                        PersistentShoppingCartItem(
+                                          productId: item['product'],
+                                          productName: item['name'],
+                                          unitPrice: double.parse(
+                                                item['price'],
+                                              ) /
+                                              double.parse(
+                                                item['quantity'].toString(),
+                                              ),
+                                          quantity: item['quantity'],
+                                          productThumbnail: item['image'],
+                                        ),
+                                      );
+                                    }
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return OrderScreen(
+                                            cartItems: cartItems,
+                                            totalPrice:
+                                                order['itemsPrice'].toDouble(),
+                                          );
+                                        },
+                                      ),
+                                    );
+                                  } catch (e) {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(e.toString()),
+                                      ),
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.primary,
+                                  foregroundColor:
+                                      Theme.of(context).colorScheme.onPrimary,
+                                ),
+                                child: const SizedBox(
+                                  height: 30,
+                                  width: double.infinity,
+                                  child: Center(
+                                    child: Text(
+                                      'Reorder',
+                                    ),
+                                  ),
+                                ),
+                              ),
                             const SizedBox(
                               height: 12,
                             ),

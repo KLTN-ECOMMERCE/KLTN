@@ -31,17 +31,6 @@ class LineTitles {
             showTitles: true,
             getTitlesWidget: (value, meta) {
               switch (value.toInt()) {
-                case 500:
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      '500 \$',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
                 case 1000:
                   return const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -53,17 +42,7 @@ class LineTitles {
                       ),
                     ),
                   );
-                case 1500:
-                  return const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      '1K5 \$',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  );
+
                 case 2000:
                   return const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -75,22 +54,34 @@ class LineTitles {
                       ),
                     ),
                   );
-                case 2500:
+
+                case 3000:
                   return const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      '2K5 \$',
+                      '3K \$',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   );
-                case 3000:
+                case 4000:
                   return const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
-                      '3K \$',
+                      '4K \$',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  );
+                case 5000:
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      '5K \$',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,

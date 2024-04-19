@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:store_app/api/api_user.dart';
 import 'package:store_app/components/custom_surfix_icon.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/helper/keyboard.dart';
 import 'package:store_app/screens/profile/check_otp_change_email.dart';
 import 'package:store_app/utils/constants.dart';
@@ -25,24 +24,7 @@ class _ChangeEmailState extends State<ChangeEmailScreen> {
   final _formKey = GlobalKey<FormState>();
   var _isAuthenticating = false;
   dynamic _responseChangeEmail;
-  final List<String?> errors = [];
   final ApiUser _apiUser = ApiUser();
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
-    }
-  }
 
   void _changeEmail() async {
     final isValid = _formKey.currentState!.validate();
@@ -128,21 +110,11 @@ class _ChangeEmailState extends State<ChangeEmailScreen> {
                           TextFormField(
                             keyboardType: TextInputType.emailAddress,
                             onSaved: (newValue) => _enteredEmail = newValue!,
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                removeError(kEmailNullError);
-                              } else if (value.contains('@')) {
-                                removeError(kInvalidEmailError);
-                              }
-                              _enteredEmail = value;
-                            },
                             validator: (value) {
                               if (value!.isEmpty) {
-                                addError(kEmailNullError);
-                                return "";
+                                return kEmailNullError;
                               } else if (!value.contains('@')) {
-                                addError(kInvalidEmailError);
-                                return "";
+                                return kInvalidEmailError;
                               }
                               return null;
                             },
@@ -154,7 +126,7 @@ class _ChangeEmailState extends State<ChangeEmailScreen> {
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
-                              hintText: "Enter your email",
+                              hintText: "Enter your new email",
                               floatingLabelBehavior:
                                   FloatingLabelBehavior.always,
                               suffixIcon: const CustomSurffixIcon(
@@ -169,9 +141,6 @@ class _ChangeEmailState extends State<ChangeEmailScreen> {
                           ),
                           const SizedBox(
                             height: 20,
-                          ),
-                          FormError(
-                            errors: errors,
                           ),
                           const SizedBox(
                             height: 25,

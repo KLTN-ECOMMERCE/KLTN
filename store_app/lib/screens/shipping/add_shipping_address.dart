@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:store_app/api/api_user.dart';
-import 'package:store_app/components/form_error.dart';
 import 'package:store_app/helper/keyboard.dart';
+import 'package:store_app/models/place.dart';
 import 'package:store_app/models/shipping_address.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:country_picker/country_picker.dart';
+import 'package:store_app/widgets/location/location_input.dart';
 
 class AddShippingAddressScreen extends StatefulWidget {
   const AddShippingAddressScreen({
@@ -31,8 +32,8 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
   var _enteredZipCode = '';
 
   bool _isAuthenticating = false;
+  Place? _selectedLocation;
 
-  final List<String?> errors = [];
   final _formKey = GlobalKey<FormState>();
   final ApiUser _apiUser = ApiUser();
 
@@ -42,23 +43,8 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
       _enteredCity = widget.shippingAddress!.city;
       _enteredPhoneNo = widget.shippingAddress!.phoneNo;
       _enteredZipCode = widget.shippingAddress!.zipCode;
+      _selectedLocation = widget.shippingAddress!.place;
       country = widget.shippingAddress!.country;
-    }
-  }
-
-  void addError(String? error) {
-    if (!errors.contains(error)) {
-      setState(() {
-        errors.add(error);
-      });
-    }
-  }
-
-  void removeError(String? error) {
-    if (errors.contains(error)) {
-      setState(() {
-        errors.remove(error);
-      });
     }
   }
 
@@ -151,6 +137,17 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                     }
                     _formKey.currentState!.save();
                     KeyboardUtil.hideKeyboard(context);
+                    if (_selectedLocation == null) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please select location section !'),
+                          ),
+                        );
+                      }
+                      return;
+                    }
                     final data = ShippingAddress(
                       id: widget.isUpdate ? widget.shippingAddress!.id : null,
                       address: _enteredAddress,
@@ -158,14 +155,16 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                       country: country,
                       phoneNo: _enteredPhoneNo,
                       zipCode: _enteredZipCode,
+                      place: Place(
+                        latitude: _selectedLocation!.latitude,
+                        longitude: _selectedLocation!.longitude,
+                      ),
+                      isDefault: false,
                     );
-
                     widget.isUpdate
                         ? _updateShippingAddress(data)
                         : _addNewShippingAddress(data);
-                    final key = UniqueKey();
                     final popData = {
-                      'key': key,
                       'shippingAddress': data,
                     };
                     Navigator.of(context).pop(
@@ -206,23 +205,12 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                         keyboardType: TextInputType.name,
                         initialValue: _enteredAddress,
                         onSaved: (newValue) => _enteredAddress = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kNullError);
-                          }
-                          if (!specialCharacters.hasMatch(value)) {
-                            removeError(kSpecialCharactersNullError);
-                          }
-                          _enteredAddress = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kNullError);
-                            return "";
+                            return kNullError;
                           }
                           if (specialCharacters.hasMatch(value)) {
-                            addError(kSpecialCharactersNullError);
-                            return '';
+                            return kSpecialCharactersNullError;
                           }
                           return null;
                         },
@@ -258,23 +246,12 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                         keyboardType: TextInputType.name,
                         initialValue: _enteredCity,
                         onSaved: (newValue) => _enteredCity = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kNullError);
-                          }
-                          if (!specialCharacters.hasMatch(value)) {
-                            removeError(kSpecialCharactersNullError);
-                          }
-                          _enteredCity = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kNullError);
-                            return "";
+                            return kNullError;
                           }
                           if (specialCharacters.hasMatch(value)) {
-                            addError(kSpecialCharactersNullError);
-                            return '';
+                            return kSpecialCharactersNullError;
                           }
                           return null;
                         },
@@ -310,23 +287,12 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                         keyboardType: TextInputType.phone,
                         initialValue: _enteredPhoneNo,
                         onSaved: (newValue) => _enteredPhoneNo = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kNullError);
-                          }
-                          if (!specialCharacters.hasMatch(value)) {
-                            removeError(kSpecialCharactersNullError);
-                          }
-                          _enteredPhoneNo = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kNullError);
-                            return "";
+                            return kNullError;
                           }
                           if (specialCharacters.hasMatch(value)) {
-                            addError(kSpecialCharactersNullError);
-                            return '';
+                            return kSpecialCharactersNullError;
                           }
                           return null;
                         },
@@ -403,23 +369,12 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                         keyboardType: TextInputType.number,
                         initialValue: _enteredZipCode,
                         onSaved: (newValue) => _enteredZipCode = newValue!,
-                        onChanged: (value) {
-                          if (value.isNotEmpty) {
-                            removeError(kNullError);
-                          }
-                          if (!specialCharacters.hasMatch(value)) {
-                            removeError(kSpecialCharactersNullError);
-                          }
-                          _enteredZipCode = value;
-                        },
                         validator: (value) {
                           if (value!.isEmpty) {
-                            addError(kNullError);
-                            return "";
+                            return kNullError;
                           }
                           if (specialCharacters.hasMatch(value)) {
-                            addError(kSpecialCharactersNullError);
-                            return '';
+                            return kSpecialCharactersNullError;
                           }
                           return null;
                         },
@@ -451,9 +406,26 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                       const SizedBox(
                         height: 20,
                       ),
-                      FormError(
-                        errors: errors,
+                      const SizedBox(
+                        height: 20,
                       ),
+                      if (widget.isUpdate)
+                        LocationInput(
+                          location: widget.shippingAddress!.place,
+                          onSelectLocation: (location) {
+                            setState(() {
+                              _selectedLocation = location;
+                            });
+                          },
+                        ),
+                      if (!widget.isUpdate)
+                        LocationInput(
+                          onSelectLocation: (location) {
+                            setState(() {
+                              _selectedLocation = location;
+                            });
+                          },
+                        ),
                       const SizedBox(
                         height: 20,
                       ),

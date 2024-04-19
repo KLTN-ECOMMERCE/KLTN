@@ -22,7 +22,7 @@ final viewedProductsDataProvider = Provider(
         for (var review in response['reviews']) {
           reviews.add(
             {
-              'user': review['user'].toString(),
+              'user': review['user']['_id'].toString(),
               'rating': review['rating'].toInt(),
               'comment': review['comment'].toString()
             },

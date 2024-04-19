@@ -11,7 +11,7 @@ void main() async {
   await PersistentShoppingCart().init();
 
   configOneSignal();
-  
+
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService notificationService = NotificationService();
   notificationService.initialiseNotifications();
@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
       home: const AppScreen(
         currentIndex: 0,
       ),
-      // home: const LoginScreen(),
+      //home: const LoginScreen(),
     );
   }
 }
