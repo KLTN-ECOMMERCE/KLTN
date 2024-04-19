@@ -23,6 +23,7 @@ export const registerUser = catchAsyncErrors(async (req, res, next) => {
   try {
     // Save OTP to user record
     user.otp = otp;
+    user.newEmail = email;
     await user.save();
 
     // Send OTP to user via email
@@ -309,7 +310,7 @@ export const checkOtpNewEmail = catchAsyncErrors(async (req, res, next) => {
       new: true,
     });
     user.otp = undefined;
-    user.newEmail = undefined;
+    //user.newEmail = undefined;
     user.newName = undefined;
     await user.save();
     res.status(200).json({
