@@ -26,7 +26,7 @@ class ApiOrder {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/orders/new',
+      'api/v1/mobile/orders/new',
     );
     final List<Map<String, dynamic>> products = [];
     for (final orderItem in orderItems) {
@@ -94,7 +94,7 @@ class ApiOrder {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/getOrderByStatus/$status',
+      'api/v1/mobile/me/getOrderByStatus/$status',
     );
     print(url);
     try {
@@ -119,7 +119,7 @@ class ApiOrder {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/orders/$orderId',
+      'api/v1/mobile/orders/$orderId',
     );
     try {
       Response response = await http.get(
@@ -143,7 +143,7 @@ class ApiOrder {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/order/cancel/$orderId',
+      'api/v1/mobile/order/cancel/$orderId',
     );
     try {
       Response response = await http.post(
@@ -167,7 +167,7 @@ class ApiOrder {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/getDataOrderByStatus',
+      'api/v1/mobile/me/getDataOrderByStatus',
     );
     try {
       Response response = await http.get(

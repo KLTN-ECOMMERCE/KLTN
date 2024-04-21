@@ -16,7 +16,7 @@ class ApiUser {
     print(jwtToken);
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me',
+      'api/v1/mobile/me',
     );
     try {
       Response response = await http.get(
@@ -39,7 +39,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/password/update',
+      'api/v1/mobile/password/update',
     );
     Map<String, String> body = {
       'oldPassword': oldPassword,
@@ -68,7 +68,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/update',
+      'api/v1/mobile/me/update',
     );
     Map<String, String> body = {
       'name': name,
@@ -99,7 +99,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/update',
+      'api/v1/mobile/me/update',
     );
     Map<String, String> body = {
       'name': name,
@@ -130,7 +130,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/checkOtpChangeEmail',
+      'api/v1/mobile/me/checkOtpChangeEmail',
     );
     Map<String, dynamic> body = {
       'otp': otp,
@@ -160,7 +160,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/checkOtpNewEmail',
+      'api/v1/mobile/me/checkOtpNewEmail',
     );
     Map<String, dynamic> body = {
       'otp': otp,
@@ -189,7 +189,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/createShippingInfo',
+      'api/v1/mobile/me/createShippingInfo',
     );
     Map<String, dynamic> body = {
       'address': shippingAddress.address.trim(),
@@ -225,7 +225,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/getShippingInfo',
+      'api/v1/mobile/me/getShippingInfo',
     );
 
     try {
@@ -254,7 +254,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/updateShippingInfo/${shippingAddress.id}',
+      'api/v1/mobile/me/updateShippingInfo/${shippingAddress.id}',
     );
     Map<String, dynamic> body = {
       'address': shippingAddress.address.trim(),
@@ -291,7 +291,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/deleteShippingInfo/$shippingAddressId',
+      'api/v1/mobile/me/deleteShippingInfo/$shippingAddressId',
     );
 
     try {
@@ -318,7 +318,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/addressDefault/$shippingAddressId',
+      'api/v1/mobile/me/addressDefault/$shippingAddressId',
     );
 
     try {
@@ -345,7 +345,7 @@ class ApiUser {
 
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/getAddressDefault',
+      'api/v1/mobile/me/getAddressDefault',
     );
 
     try {
@@ -371,7 +371,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/updatePoint',
+      'api/v1/mobile/updatePoint',
     );
     Map<String, dynamic> body = {
       'point': point,
@@ -399,7 +399,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/getAmount/$year',
+      'api/v1/mobile/me/getAmount/$year',
     );
 
     try {
@@ -424,7 +424,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/me/upload_avatar',
+      'api/v1/mobile/me/upload_avatar',
     );
 
     Map<String, dynamic> body = {
@@ -455,7 +455,7 @@ class ApiUser {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/findUser/$userId',
+      'api/v1/mobile/findUser/$userId',
     );
     try {
       Response response = await http.get(

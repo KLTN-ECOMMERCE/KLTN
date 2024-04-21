@@ -11,7 +11,7 @@ class ApiVoucher {
   Future<dynamic> getAllVoucher() async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/voucher/getAllVoucher',
+      'api/v1/mobile/voucher/getAllVoucher',
     );
     print(url);
     try {
@@ -35,7 +35,7 @@ class ApiVoucher {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/voucher/getVoucherbyId/$id',
+      'api/v1/mobile/voucher/getVoucherbyId/$id',
     );
     print(url);
     try {
@@ -60,7 +60,7 @@ class ApiVoucher {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/voucher/addVoucher/$id',
+      'api/v1/mobile/voucher/addVoucher/$id',
     );
     print(url);
     try {
@@ -89,7 +89,7 @@ class ApiVoucher {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/voucher/useVoucher/$id',
+      'api/v1/mobile/voucher/useVoucher/$id',
     );
     print(url);
     try {

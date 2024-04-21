@@ -22,7 +22,7 @@ class ApiProduct {
     if (filters!.isEmpty) {
       url = Uri.http(
         '$ipv4Address:4000',
-        'api/v1/products/',
+        'api/v1/mobile/products/',
         {
           'page': pageString,
           'keyword': keyword,
@@ -34,7 +34,7 @@ class ApiProduct {
     } else {
       url = Uri.http(
         '$ipv4Address:4000',
-        'api/v1/products/',
+        'api/v1/mobile/products/',
         {
           'page': pageString,
           'keyword': keyword,
@@ -74,7 +74,7 @@ class ApiProduct {
   Future<dynamic> getPopularProducts() async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/products/popular',
+      'api/v1/mobile/products/popular',
     );
     print(url);
     try {
@@ -97,7 +97,7 @@ class ApiProduct {
   Future<dynamic> getProductDetail(String productId) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/products/$productId',
+      'api/v1/mobile/products/$productId',
     );
     print(url);
     try {
@@ -121,7 +121,7 @@ class ApiProduct {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/can_review',
+      'api/v1/mobile/can_review',
       {
         'productId': productId,
       },
@@ -154,7 +154,7 @@ class ApiProduct {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/reviews',
+      'api/v1/mobile/reviews',
     );
     print(url);
 

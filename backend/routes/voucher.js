@@ -34,11 +34,11 @@ router.route("/mobile/voucher/updateVoucher/:voucherId").put(updateVoucher);
 router.route("/mobile/voucher/deleteVoucher/:voucherId").delete(deleteVoucher);
 router
   .route("/mobile/voucher/addVoucher/:voucherId")
-  .get(isAuthenticatedUser, addVoucher);
+  .get(isAuthenticatedMobileUser, addVoucher);
 router
   .route("/mobile/voucher/useVoucher/:voucherId")
-  .get(isAuthenticatedUser, useVoucher);
+  .get(isAuthenticatedMobileUser, useVoucher);
 router
   .route("/mobile/voucher/getVoucherbyId/:voucherId")
-  .get(isAuthenticatedUser, getVoucherbyId);
+  .get(isAuthenticatedMobileUser, getVoucherbyId);
 export default router;

@@ -77,7 +77,7 @@ router.route("/mobile/password/reset").put(resetPasswordWithOTP);
 router.route("/mobile/me").get(isAuthenticatedMobileUser, getUserProfile);
 router.route("/mobile/me/update").put(isAuthenticatedMobileUser, updateProfile);
 router
-  .route("/obile/me/checkOtpChangeEmail")
+  .route("/mobile/me/checkOtpChangeEmail")
   .post(isAuthenticatedMobileUser, checkOtpChangeEmail);
 router
   .route("/mobile/me/checkOtpNewEmail")

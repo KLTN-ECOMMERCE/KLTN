@@ -65,9 +65,9 @@ router.route("/mobile/products/popular").get(getFavouriteProduct);
 router.route("/mobile/products/:id").get(getProductDetails);
 
 router
-  .route("mobile/reviews")
+  .route("/mobile/reviews")
   .get(isAuthenticatedMobileUser, getProductReviews)
   .put(isAuthenticatedMobileUser, createProductReview);
 
-router.route("mobile/can_review").get(isAuthenticatedMobileUser, canUserReview);
+router.route("/mobile/can_review").get(isAuthenticatedMobileUser, canUserReview);
 export default router;

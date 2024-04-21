@@ -16,7 +16,7 @@ class ApiStart {
   Future<Object> login(Login userData) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/login',
+      'api/v1/mobile/login',
     );
     Map<String, String> body = {
       'email': userData.email,
@@ -63,7 +63,7 @@ class ApiStart {
   Future<Object> register(Register userData) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/register',
+      'api/v1/mobile/register',
     );
     Map<String, String> body = {
       'name': userData.name,
@@ -91,7 +91,7 @@ class ApiStart {
   Future<Object> sendOtp(SendOTP data) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/check',
+      'api/v1/mobile/check',
     );
     Map<String, dynamic> body = {
       'email': data.email,
@@ -117,7 +117,7 @@ class ApiStart {
   Future<Object> forgotPassword(String email) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/password/forgot/mobile',
+      'api/v1/mobile/password/forgot/mobile',
     );
     Map<String, dynamic> body = {
       'email': email,
@@ -142,7 +142,7 @@ class ApiStart {
   Future<Object> resetPassword(ResetPassword data) async {
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/password/reset',
+      'api/v1/mobile/password/reset',
     );
     Map<String, dynamic> body = {
       'otp': data.otp,
@@ -170,7 +170,7 @@ class ApiStart {
     final jwtToken = await storage.read(key: 'access-token');
     final url = Uri.http(
       '$ipv4Address:4000',
-      'api/v1/logout',
+      'api/v1/mobile/logout',
     );
     try {
       Response response = await http.get(
