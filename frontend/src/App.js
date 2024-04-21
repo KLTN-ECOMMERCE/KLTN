@@ -1,20 +1,35 @@
 import "./App.css";
-import Header from "./components/layout/Header";
+
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+
 import Footer from "./components/layout/Footer";
-import { Home } from "./components/Home";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/layout/Header";
+import { Toaster } from "react-hot-toast";
+
+import useUserRoutes from "./components/routes/userRoutes";
+import useAdminRoutes from "./components/routes/adminRoutes";
+import NotFound from "./components/layout/NotFound";
+
 function App() {
+  const userRoutes = useUserRoutes();
+  const adminRoutes = useAdminRoutes();
+
   return (
     <Router>
-      <div className="scroll-smooth"></div>
-      <Header />
-      <div>
-        <Routes>
-          <Route path="/" element={<Home />} />
-        </Routes>
+      <div className="App">
+        <Toaster position="top-center" />
+        <Header />
+        <div className="container">
+          <Routes>
+            {userRoutes}
+            {adminRoutes}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+        <Footer />
+        <div id="fb-root"></div>
+        <div id="fb-customer-chat" class="fb-customerchat"></div>
       </div>
-
-      <Footer />
     </Router>
   );
 }
