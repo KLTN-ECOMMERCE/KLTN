@@ -15,7 +15,11 @@ import {
   getFavouriteProduct,
   Sort,
 } from "../controllers/productControllers.js";
-import { authorizeRoles, isAuthenticatedUser } from "../middlewares/auth.js";
+import {
+  authorizeRoles,
+  isAuthenticatedUser,
+  isAuthenticatedMobileUser,
+} from "../middlewares/auth.js";
 const router = express.Router();
 
 router.route("/products").get(getProducts);
@@ -53,5 +57,17 @@ router
   .delete(isAuthenticatedUser, authorizeRoles("admin"), deleteReview);
 
 router.route("/can_review").get(isAuthenticatedUser, canUserReview);
+// mobile route
+router.route("/mobile/products").get(getProducts);
+router.route("/mobile/sort").get(Sort);
+router.route("/mobile/products/popular").get(getFavouriteProduct);
 
+router.route("/mobile/products/:id").get(getProductDetails);
+
+router
+  .route("mobile/reviews")
+  .get(isAuthenticatedMobileUser, getProductReviews)
+  .put(isAuthenticatedMobileUser, createProductReview);
+
+router.route("mobile/can_review").get(isAuthenticatedMobileUser, canUserReview);
 export default router;
