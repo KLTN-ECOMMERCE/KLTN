@@ -33,6 +33,11 @@ const AdminLayout = ({ children }) => {
       url: "/admin/reviews",
       icon: "fas fa-star",
     },
+    // {
+    //   name: "Voucher",
+    //   url: "/admin/voucher",
+    //   icon: "fas fa-star",
+    // },
   ];
 
   return (

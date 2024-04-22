@@ -170,6 +170,10 @@ const ProcessOrder = () => {
               <option value="Processing">Processing</option>
               <option value="Shipped">Shipped</option>
               <option value="Delivered">Delivered</option>
+              <option value="NewOrder">NewOrder</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Shipped">Shipped</option>
+              <option value="Cancel">Cancel</option>
             </select>
           </div>
 

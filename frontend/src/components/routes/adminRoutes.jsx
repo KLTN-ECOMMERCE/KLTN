@@ -11,7 +11,7 @@ import ProcessOrder from "../admin/ProcessOrder";
 import ListUsers from "../admin/ListUsers";
 import UpdateUser from "../admin/UpdateUser";
 import ProductReviews from "../admin/ProductReviews";
-
+import { Voucher } from "../admin/Voucher";
 const adminRoutes = () => {
   return (
     <>
@@ -97,6 +97,14 @@ const adminRoutes = () => {
         element={
           <ProtectedRoute admin={true}>
             <ProductReviews />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/voucher"
+        element={
+          <ProtectedRoute admin={true}>
+            <Voucher />
           </ProtectedRoute>
         }
       />
