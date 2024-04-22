@@ -25,7 +25,7 @@ const orderSchema = new mongoose.Schema(
       },
       shippingAmount: {
         type: Number,
-        required: true,
+        //required: true,
       },
       shippingUnit: {
         type: String,
@@ -95,19 +95,19 @@ const orderSchema = new mongoose.Schema(
     voucherInfo: {
       name: {
         type: String,
-        required: true,
+        //required: true,
       },
       deliveryFee: {
         type: Boolean,
-        required: true,
+        //required: true,
       },
       discount: {
         type: Number,
-        required: true,
+        //required: true,
       },
       voucherId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
+        //required: true,
         ref: "Voucher",
       },
     },
