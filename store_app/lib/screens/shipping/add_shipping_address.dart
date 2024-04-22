@@ -26,6 +26,7 @@ class AddShippingAddressScreen extends StatefulWidget {
 class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
   Country country = CountryParser.parseCountryCode('VN');
 
+  final TextEditingController _addressController = TextEditingController();
   var _enteredAddress = '';
   var _enteredCity = '';
   var _enteredPhoneNo = '';
@@ -39,7 +40,7 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
 
   void _showInitValue() {
     if (widget.shippingAddress != null) {
-      _enteredAddress = widget.shippingAddress!.address;
+      _addressController.text = widget.shippingAddress!.address;
       _enteredCity = widget.shippingAddress!.city;
       _enteredPhoneNo = widget.shippingAddress!.phoneNo;
       _enteredZipCode = widget.shippingAddress!.zipCode;
@@ -100,6 +101,12 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
   void initState() {
     super.initState();
     _showInitValue();
+  }
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    super.dispose();
   }
 
   @override
@@ -202,25 +209,26 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                   child: Column(
                     children: [
                       TextFormField(
+                        controller: _addressController,
                         keyboardType: TextInputType.name,
-                        initialValue: _enteredAddress,
+                        //initialValue: _enteredAddress,
                         onSaved: (newValue) => _enteredAddress = newValue!,
                         validator: (value) {
                           if (value!.isEmpty) {
                             return kNullError;
                           }
-                          if (specialCharacters.hasMatch(value)) {
-                            return kSpecialCharactersNullError;
-                          }
+                          // if (specialCharacters.hasMatch(value)) {
+                          //   return kSpecialCharactersNullError;
+                          // }
                           return null;
                         },
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
                             allowCharacters,
                           ),
-                          FilteringTextInputFormatter.deny(
-                            specialCharacters,
-                          ),
+                          // FilteringTextInputFormatter.deny(
+                          //   specialCharacters,
+                          // ),
                         ],
                         decoration: InputDecoration(
                           filled: true,
@@ -415,6 +423,9 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                           onSelectLocation: (location) {
                             setState(() {
                               _selectedLocation = location;
+                              _addressController.text =
+                                  _selectedLocation!.address!;
+                              _enteredAddress = _selectedLocation!.address!;
                             });
                           },
                         ),
@@ -423,6 +434,9 @@ class _AddShippingAddressScreenState extends State<AddShippingAddressScreen> {
                           onSelectLocation: (location) {
                             setState(() {
                               _selectedLocation = location;
+                              _addressController.text =
+                                  _selectedLocation!.address!;
+                              _enteredAddress = _selectedLocation!.address!;
                             });
                           },
                         ),
