@@ -50,3 +50,4 @@ export const authorizeRoles = (...roles) => {
     next();
   };
 };
+// check role for shipper

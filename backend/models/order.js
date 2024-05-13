@@ -26,6 +26,10 @@ const orderSchema = new mongoose.Schema(
       shippingAmount: {
         type: Number,
         //required: true,
+        // nhúng shipping unit vào
+        // id
+        // code
+        // sử lý tiền bạc bên orderControllers
       },
       shippingUnit: {
         type: String,
