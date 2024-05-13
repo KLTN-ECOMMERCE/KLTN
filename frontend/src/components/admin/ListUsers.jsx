@@ -11,10 +11,8 @@ import {
   useDeleteUserMutation,
   useGetAdminUsersQuery,
 } from "../../redux/api/userApi";
-
 const ListUsers = () => {
   const { data, isLoading, error } = useGetAdminUsersQuery();
-
   const [
     deleteUser,
     { error: deleteError, isLoading: isDeleteLoading, isSuccess },

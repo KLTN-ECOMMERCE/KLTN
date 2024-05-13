@@ -9,6 +9,29 @@ export const voucherApi = createApi({
       query: () => "/voucher/getAllVoucher",
       providesTags: ["AdminVoucher"],
     }),
+    deleteVoucher: builder.mutation({
+      query(id) {
+        return {
+          url: `/voucher/deleteVoucher/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["AdminVoucher"],
+    }),
+    createVoucher: builder.mutation({
+      query(body) {
+        return {
+          url: "/voucher/createVoucher",
+          method: "POST",
+          body,
+        };
+      },
+      invalidatesTags: ["AdminVoucher"],
+    }),
   }),
 });
-export const { useGetVoucherQuery } = voucherApi;
+export const {
+  useGetVoucherQuery,
+  useDeleteVoucherMutation,
+  useCreateVoucherMutation,
+} = voucherApi;

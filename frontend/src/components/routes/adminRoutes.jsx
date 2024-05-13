@@ -12,6 +12,7 @@ import ListUsers from "../admin/ListUsers";
 import UpdateUser from "../admin/UpdateUser";
 import ProductReviews from "../admin/ProductReviews";
 import { Voucher } from "../admin/Voucher";
+import NewVoucher from "../admin/NewVoucher";
 const adminRoutes = () => {
   return (
     <>
@@ -105,6 +106,14 @@ const adminRoutes = () => {
         element={
           <ProtectedRoute admin={true}>
             <Voucher />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/new/voucher"
+        element={
+          <ProtectedRoute admin={true}>
+            <NewVoucher />
           </ProtectedRoute>
         }
       />
