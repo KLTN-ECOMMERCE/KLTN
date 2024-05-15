@@ -57,7 +57,7 @@ const productSchema = new mongoose.Schema(
       type: Number,
       required: [true, "Please enter product stock"],
     },
-    Sold:{
+    Sold: {
       type: Number,
     },
     numOfReviews: {

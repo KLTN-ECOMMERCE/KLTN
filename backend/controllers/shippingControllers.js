@@ -3,11 +3,12 @@ import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import ErrorHandler from "../utils/errorHandler.js";
 // create shipping unit
 export const createShippingUnit = catchAsyncErrors(async (req, res, next) => {
-  const { name, code, description } = req.body;
+  const { name, code, description, price } = req.body;
   const shipping = await Shipping.create({
     name,
     code,
     description,
+    price,
   });
   res.status(200).json({
     shipping,

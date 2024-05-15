@@ -23,22 +23,21 @@ const orderSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
-      shippingAmount: {
-        type: Number,
-        //required: true,
-        // nhúng shipping unit vào
-        // id
-        // code
-        // sử lý tiền bạc bên orderControllers
-      },
-      shippingUnit: {
-        type: String,
-      },
       longitude: {
         type: String,
       },
       latitude: {
         type: String,
+      },
+      shipping: {
+        shippingUnit: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Shipping",
+        },
+        code: {
+          type: String,
+          unique: true, // Đảm bảo code là duy nhất
+        },
       },
     },
     user: {
@@ -99,19 +98,19 @@ const orderSchema = new mongoose.Schema(
     voucherInfo: {
       name: {
         type: String,
-        //required: true,
+        // required: true,
       },
       deliveryFee: {
         type: Boolean,
-        //required: true,
+        // required: true,
       },
       discount: {
         type: Number,
-        //required: true,
+        // required: true,
       },
       voucherId: {
         type: mongoose.Schema.Types.ObjectId,
-        //required: true,
+        // required: true,
         ref: "Voucher",
       },
     },
@@ -134,5 +133,29 @@ const orderSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+function generateRandomCode() {
+  return Math.floor(1000 + Math.random() * 9000).toString();
+}
+
+orderSchema.pre("save", async function (next) {
+  if (this.isNew) {
+    let isUnique = false;
+    let randomCode = "";
+    while (!isUnique) {
+      randomCode = generateRandomCode();
+      const existingOrder = await mongoose
+        .model("Order")
+        .findOne({ "shippingInfo.shipping.code": randomCode });
+      if (!existingOrder) {
+        isUnique = true;
+      }
+    }
+
+    this.shippingInfo.shipping.code =
+      (this.shippingInfo.shipping.code || "") + randomCode;
+  }
+  next();
+});
 
 export default mongoose.model("Order", orderSchema);

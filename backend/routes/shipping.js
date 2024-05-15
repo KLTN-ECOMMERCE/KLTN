@@ -15,13 +15,9 @@ import {
 router
   .route("/shipping/createShippingUnit")
   .post(isAuthenticatedUser, authorizeRoles("admin"), createShippingUnit);
-router
-  .route("/shipping/getShippingUnit")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getShippingUnit);
+router.route("/shipping/getShippingUnit").get(getShippingUnit);
 
-router
-  .route("/shipping/getShippingUnitById/:id")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getShippingUnitById);
+router.route("/shipping/getShippingUnitById/:id").get(getShippingUnitById);
 
 router
   .route("/shipping/updateShippingUnit/:id")

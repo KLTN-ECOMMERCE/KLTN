@@ -50,6 +50,9 @@ router
 // mobile routes
 router.route("/mobile/orders/new").post(isAuthenticatedMobileUser, newOrder);
 router
+  .route("/orders/:id")
+  .get(isAuthenticatedMobileUser, authorizeRoles("shipper"), getOrderDetails);
+router
   .route("/mobile/orders/:id")
   .get(isAuthenticatedMobileUser, getOrderDetails);
 router

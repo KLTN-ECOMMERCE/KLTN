@@ -35,6 +35,7 @@ import paymentRoutes from "./routes/payment.js";
 import addressRoutes from "./routes/address.js";
 import voucherRoutes from "./routes/voucher.js";
 import shippingRoutes from "./routes/shipping.js";
+import shipperRoutes from "./routes/shipper.js";
 app.use("/api/v1", productRoutes);
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", orderRoutes);
@@ -42,6 +43,7 @@ app.use("/api/v1", paymentRoutes);
 app.use("/api/v1", addressRoutes);
 app.use("/api/v1", voucherRoutes);
 app.use("/api/v1", shippingRoutes);
+app.use("/api/v1", shipperRoutes);
 
 // Using error middleware
 app.use(errorMiddleware);
