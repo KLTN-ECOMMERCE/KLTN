@@ -16,7 +16,8 @@ const shipperSchema = mongoose.Schema({
     },
   },
   totalPrice: {
-    type: String,
+    type: Number,
+    default: 0,
   },
 });
 export default mongoose.model("Shipper", shipperSchema);

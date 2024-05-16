@@ -9,6 +9,8 @@ import {
 import {
   getOrderByShippingUnit,
   addShippertoShippingUnit,
+  caculatorPrice,
+  deliveredSuccess,
 } from "../controllers/shipperControllers.js";
 //app shipping
 router
@@ -18,4 +20,11 @@ router
 router
   .route("/shipper/addShippertoShippingUnit")
   .post(isAuthenticatedUser, authorizeRoles("admin"), addShippertoShippingUnit);
+router
+  .route("/shipper/caculatorPrice")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), caculatorPrice);
+
+router
+  .route("/shipper/deliveredSuccess/:id")
+  .get(isAuthenticatedUser, authorizeRoles("admin"), deliveredSuccess);
 export default router;
