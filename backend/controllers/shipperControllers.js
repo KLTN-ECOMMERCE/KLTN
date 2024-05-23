@@ -1,6 +1,7 @@
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import Order from "../models/order.js";
 import Shipper from "../models/shipper.js";
+import User from "../models/user.js";
 import ErrorHandler from "../utils/errorHandler.js";
 // get order by shipping unit
 export const getOrderByShippingUnit = catchAsyncErrors(
@@ -36,10 +37,20 @@ export const getOrderByShippingUnit = catchAsyncErrors(
 export const addShippertoShippingUnit = catchAsyncErrors(
   async (req, res, next) => {
     const { shippingUnit, user } = req.body;
+    // const user = await user.findOne(req.user._id)
     const shipper = await Shipper.create({
       shippingUnit,
       user,
     });
+
+    const users = await User.findByIdAndUpdate(
+      user,
+      { role: "shipper" },
+      {
+        new: true,
+      }
+    );
+
     res.status(200).json({
       shipper,
     });
@@ -52,17 +63,24 @@ export const caculatorPrice = catchAsyncErrors(async (req, res, next) => {
     orderStatus: "Delivered",
     paymentMethod: "COD",
   });
+
   const shipper = await Shipper.findOne({ user: userId });
   const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
   shipper.totalPrice = totalAmount;
   await shipper.save();
-  res.status(200).json({ shipper });
+  res.status(200).json({ order });
 });
 // order status => Delivered
 export const deliveredSuccess = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
-  const order = await Order.findById(id);
-  order.orderStatus = "Delivered";
+  const order = await Order.findByIdAndUpdate(
+    id,
+    {
+      orderStatus: "Delivered",
+      "paymentInfo.status": "paid",
+    },
+    { new: true }
+  );
   await order.save();
   res.status(200).json({ order });
 });

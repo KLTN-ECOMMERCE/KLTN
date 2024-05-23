@@ -15,16 +15,16 @@ import {
 //app shipping
 router
   .route("/shipping/getOrderByShippingUnit")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), getOrderByShippingUnit);
+  .get(isAuthenticatedUser, authorizeRoles("shipper"), getOrderByShippingUnit);
 
 router
   .route("/shipper/addShippertoShippingUnit")
   .post(isAuthenticatedUser, authorizeRoles("admin"), addShippertoShippingUnit);
 router
   .route("/shipper/caculatorPrice")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), caculatorPrice);
+  .get(isAuthenticatedUser, authorizeRoles("shipper"), caculatorPrice);
 
 router
   .route("/shipper/deliveredSuccess/:id")
-  .get(isAuthenticatedUser, authorizeRoles("admin"), deliveredSuccess);
+  .get(isAuthenticatedUser, authorizeRoles("shipper"), deliveredSuccess);
 export default router;
