@@ -56,23 +56,11 @@ export const addShippertoShippingUnit = catchAsyncErrors(
     });
   }
 );
-// delivered
-export const caculatorPrice = catchAsyncErrors(async (req, res, next) => {
-  const userId = req.user._id;
-  const orders = await Order.find({
-    orderStatus: "Delivered",
-    paymentMethod: "COD",
-  });
 
-  const shipper = await Shipper.findOne({ user: userId });
-  const totalAmount = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-  shipper.totalPrice = totalAmount;
-  await shipper.save();
-  res.status(200).json({ order });
-});
 // order status => Delivered
 export const deliveredSuccess = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
+  const userId = req.user._id;
   const order = await Order.findByIdAndUpdate(
     id,
     {
@@ -81,6 +69,21 @@ export const deliveredSuccess = catchAsyncErrors(async (req, res, next) => {
     },
     { new: true }
   );
-  await order.save();
-  res.status(200).json({ order });
+  const shipper = await Shipper.findOne({ user: userId });
+  if (order.paymentMethod === "COD") {
+    shipper.totalPriceCOD += order.totalAmount;
+  } else {
+    shipper.totalPriceCARD += order.totalAmount;
+  }
+
+  await shipper.save();
+  res.status(200).json({ shipper });
+});
+// get shipper
+export const getShipper = catchAsyncErrors(async (req, res, next) => {
+  const id = req.user._id;
+  const shipper = await Shipper.find({ user: id });
+  res.status(200).json({
+    shipper,
+  });
 });

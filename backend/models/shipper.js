@@ -15,7 +15,11 @@ const shipperSchema = mongoose.Schema({
       type: String,
     },
   },
-  totalPrice: {
+  totalPriceCOD: {
+    type: Number,
+    default: 0,
+  },
+  totalPriceCARD: {
     type: Number,
     default: 0,
   },
