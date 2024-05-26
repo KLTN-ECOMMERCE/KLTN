@@ -19,7 +19,7 @@ import MyOrders from "../order/MyOrders";
 import OrderDetails from "../order/OrderDetails";
 import Invoice from "../invoice/Invoice";
 import Home from "../Home";
-
+import { Verify } from "../auth/Verify";
 const userRoutes = () => {
   return (
     <>
@@ -27,6 +27,7 @@ const userRoutes = () => {
       <Route path="/product/:id" element={<ProductDetails />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/verify" element={<Verify />} />
 
       <Route path="/password/forgot" element={<ForgotPassword />} />
       <Route path="/password/reset/:token" element={<ResetPassword />} />

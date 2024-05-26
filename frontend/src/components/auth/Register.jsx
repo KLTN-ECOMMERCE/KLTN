@@ -13,11 +13,8 @@ const Register = () => {
   });
 
   const { name, email, password } = user;
-
   const navigate = useNavigate();
-
   const [register, { isLoading, error, data }] = useRegisterMutation();
-
   const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
@@ -27,23 +24,22 @@ const Register = () => {
     if (error) {
       toast.error(error?.data?.message);
     }
-  }, [error, isAuthenticated]);
+    if (data) {
+      toast.success("Đăng ký thành công");
+      navigate(`/verify?email=${email}`);
+    }
+  }, [error, isAuthenticated, data]);
 
   const submitHandler = (e) => {
     e.preventDefault();
-
-    const signUpData = {
-      name,
-      email,
-      password,
-    };
-
+    const signUpData = { name, email, password };
     register(signUpData);
   };
 
   const onChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
+
   return (
     <>
       <MetaData title={"Register"} />

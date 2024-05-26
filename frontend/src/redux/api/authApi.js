@@ -39,11 +39,32 @@ export const authApi = createApi({
         }
       },
     }),
+    verify: builder.mutation({
+      query(body) {
+        return {
+          url: "/check",
+          method: "POST",
+          body,
+        };
+      },
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await dispatch(userApi.endpoints.getMe.initiate(null));
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
     logout: builder.query({
       query: () => "/logout",
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useLazyLogoutQuery } =
-  authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLazyLogoutQuery,
+  useVerifyMutation,
+} = authApi;
