@@ -53,6 +53,58 @@ export const stripeCheckoutSession = catchAsyncErrors(
     });
   }
 );
+// Create stripe payment intent  =>  /api/v1/payment/payment_intent
+export const stripeCheckoutIntent = catchAsyncErrors(async (req, res, next) => {
+  const body = req.body;
+
+  const line_items = body.orderItems.map((item) => {
+    return {
+      amount: item.price * 100,
+      currency: "usd",
+      name: item.name,
+      images: [item.image],
+      metadata: { productId: item.product },
+      quantity: item.quantity,
+    };
+  });
+
+  const amount = line_items.reduce(
+    (total, item) => total + item.amount * item.quantity,
+    0
+  );
+
+  const shippingInfo = body.shippingInfo;
+
+  const shipping_rate =
+    body?.itemsPrice >= 200
+      ? "shr_1OKh37CTjVkSlxmI107dE6s2"
+      : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount: amount + shipping_rate,
+    currency: "usd",
+    payment_method_types: ["card"],
+    metadata: {
+      ...shippingInfo,
+      itemsPrice: body.itemsPrice,
+      orderItems: JSON.stringify(body.orderItems),
+      userId: req.user._id.toString(),
+    },
+    shipping: {
+      name: shippingInfo.fullName,
+      address: {
+        line1: shippingInfo.address,
+        city: shippingInfo.city,
+        postal_code: shippingInfo.postalCode,
+        country: shippingInfo.country,
+      },
+    },
+  });
+
+  res.status(200).json({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
 
 const getOrderItems = async (line_items) => {
   return new Promise((resolve, reject) => {

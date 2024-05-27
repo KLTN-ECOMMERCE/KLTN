@@ -5,6 +5,7 @@ import { isAuthenticatedUser } from "../middlewares/auth.js";
 import {
   stripeCheckoutSession,
   stripeWebhook,
+  stripeCheckoutIntent,
 } from "../controllers/paymentControllers.js";
 
 router
@@ -12,4 +13,7 @@ router
   .post(isAuthenticatedUser, stripeCheckoutSession);
 
 router.route("/payment/webhook").post(stripeWebhook);
+router
+  .route("/payment/payment_intent")
+  .post(isAuthenticatedUser, stripeCheckoutIntent);
 export default router;
