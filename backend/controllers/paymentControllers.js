@@ -20,7 +20,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
           },
           unit_amount: item?.price * 100,
         },
-        tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
+        tax_rates: ["txr_1PLodrItb7fygiE0sLZSIrXC"],
         quantity: item?.quantity,
       };
     });
@@ -29,8 +29,8 @@ export const stripeCheckoutSession = catchAsyncErrors(
 
     const shipping_rate =
       body?.itemsPrice >= 200
-        ? "shr_1OKh37CTjVkSlxmI107dE6s2"
-        : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+        ? "shr_1PLocaItb7fygiE0CAZnC63c"
+        : "shr_1PLocCItb7fygiE0wR4Hlzkw";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -47,7 +47,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
       ],
       line_items,
     });
-
+    console.log(session.url);
     res.status(200).json({
       url: session.url,
     });
@@ -68,17 +68,23 @@ export const stripeCheckoutIntent = catchAsyncErrors(async (req, res, next) => {
     };
   });
 
-  const amount = line_items.reduce(
+  const totalAmount = line_items.reduce(
     (total, item) => total + item.amount * item.quantity,
     0
   );
 
+  // Nếu có voucher, giảm giá từ tổng số tiền
+  const voucher = body.voucherInfo;
+  const discountAmount = voucher ? voucher.discount * 100 : 0;
+  const amount = totalAmount - discountAmount;
+
   const shippingInfo = body.shippingInfo;
 
-  const shipping_rate =
-    body?.itemsPrice >= 200
-      ? "shr_1OKh37CTjVkSlxmI107dE6s2"
-      : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+  // tự tính
+  // const shipping_rate =
+  //   body?.itemsPrice >= 200
+  //     ? 0
+  //     : 500;
 
   const paymentIntent = await stripe.paymentIntents.create({
     amount: amount + shipping_rate,
@@ -89,6 +95,7 @@ export const stripeCheckoutIntent = catchAsyncErrors(async (req, res, next) => {
       itemsPrice: body.itemsPrice,
       orderItems: JSON.stringify(body.orderItems),
       userId: req.user._id.toString(),
+      voucherCode: voucher ? voucher.code : null,
     },
     shipping: {
       name: shippingInfo.fullName,
