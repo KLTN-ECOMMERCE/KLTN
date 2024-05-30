@@ -20,7 +20,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
           },
           unit_amount: item?.price * 100,
         },
-        tax_rates: ["txr_1PLodrItb7fygiE0sLZSIrXC"],
+        tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
         quantity: item?.quantity,
       };
     });
@@ -29,8 +29,8 @@ export const stripeCheckoutSession = catchAsyncErrors(
 
     const shipping_rate =
       body?.itemsPrice >= 200
-        ? "shr_1PLocaItb7fygiE0CAZnC63c"
-        : "shr_1PLocCItb7fygiE0wR4Hlzkw";
+        ? "shr_1OKh37CTjVkSlxmI107dE6s2"
+        : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -47,71 +47,12 @@ export const stripeCheckoutSession = catchAsyncErrors(
       ],
       line_items,
     });
-    console.log(session.url);
+
     res.status(200).json({
       url: session.url,
     });
   }
 );
-// Create stripe payment intent  =>  /api/v1/payment/payment_intent
-export const stripeCheckoutIntent = catchAsyncErrors(async (req, res, next) => {
-  const body = req.body;
-
-  const line_items = body.orderItems.map((item) => {
-    return {
-      amount: item.price * 100,
-      currency: "usd",
-      name: item.name,
-      images: [item.image],
-      metadata: { productId: item.product },
-      quantity: item.quantity,
-    };
-  });
-
-  const totalAmount = line_items.reduce(
-    (total, item) => total + item.amount * item.quantity,
-    0
-  );
-
-  // Nếu có voucher, giảm giá từ tổng số tiền
-  const voucher = body.voucherInfo;
-  const discountAmount = voucher ? voucher.discount * 100 : 0;
-  const amount = totalAmount - discountAmount;
-
-  const shippingInfo = body.shippingInfo;
-
-  // tự tính
-  // const shipping_rate =
-  //   body?.itemsPrice >= 200
-  //     ? 0
-  //     : 500;
-
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: amount + shipping_rate,
-    currency: "usd",
-    payment_method_types: ["card"],
-    metadata: {
-      ...shippingInfo,
-      itemsPrice: body.itemsPrice,
-      orderItems: JSON.stringify(body.orderItems),
-      userId: req.user._id.toString(),
-      voucherCode: voucher ? voucher.code : null,
-    },
-    shipping: {
-      name: shippingInfo.fullName,
-      address: {
-        line1: shippingInfo.address,
-        city: shippingInfo.city,
-        postal_code: shippingInfo.postalCode,
-        country: shippingInfo.country,
-      },
-    },
-  });
-
-  res.status(200).json({
-    clientSecret: paymentIntent.client_secret,
-  });
-});
 
 const getOrderItems = async (line_items) => {
   return new Promise((resolve, reject) => {
@@ -149,7 +90,7 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
 
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-
+      console.log("thanh cong thanh cong thanh cong");
       const line_items = await stripe.checkout.sessions.listLineItems(
         session.id
       );

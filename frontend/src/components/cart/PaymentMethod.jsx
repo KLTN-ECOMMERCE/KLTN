@@ -64,7 +64,6 @@ const PaymentMethod = () => {
         },
         paymentMethod: "COD",
       };
-
       createNewOrder(orderData);
     }
 
