@@ -20,7 +20,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
           },
           unit_amount: item?.price * 100,
         },
-        // tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
+        tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
         quantity: item?.quantity,
       };
     });
@@ -29,7 +29,6 @@ export const stripeCheckoutSession = catchAsyncErrors(
     const { shippingUnit, code } = body?.shippingInfo?.shipping;
     const { address, city, phoneNo, zipCode, country, latitude, longitude } =
       body?.shippingInfo;
-    const { name, deliveryFee, discount, voucherId } = body?.voucherInfo;
 
     const shippingInfo = {
       address,
@@ -42,14 +41,19 @@ export const stripeCheckoutSession = catchAsyncErrors(
       latitude,
       longitude,
     };
-    const voucher = {
-      name,
-      deliveryFee,
-      discount,
-      voucherId,
-    };
     console.log(shippingInfo);
-    const { shipping_rate } = body?.shippingAmount;
+    const { shippingAmount } = body;
+    let shipping_rate;
+    if ((shippingAmount = 0)) {
+      shipping_rate = "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+    } else if ((shippingAmount = 10)) {
+      shipping_rate = "shr_1OKh37CTjVkSlxmI107dE6s2";
+    } else if ((shippingAmount = 11)) {
+      shipping_rate = "shr_1PMXHcCTjVkSlxmIemWhtQOV";
+    } else {
+      shipping_rate = "shr_1PMXHsCTjVkSlxmIX4jDGNFt";
+    }
+
     // const shipping_rate =
     //   body?.itemsPrice >= 200
     //     ? "shr_1OKh37CTjVkSlxmI107dE6s2"
@@ -62,12 +66,12 @@ export const stripeCheckoutSession = catchAsyncErrors(
       customer_email: req?.user?.email,
       client_reference_id: req?.user?._id?.toString(),
       mode: "payment",
-      metadata: { shippingInfo, voucher, itemsPrice: body?.totalAmount },
-      // shipping_options: [
-      //   {
-      //     shipping_rate,
-      //   },
-      // ],
+      metadata: { ...shippingInfo, itemsPrice: body?.totalAmount },
+      shipping_options: [
+        {
+          shipping_rate,
+        },
+      ],
       line_items,
     });
     res.status(200).json({
@@ -138,18 +142,11 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         latitude: session.metadata.latitude,
         longitude: session.metadata.longitude,
       };
-      const voucherInfo = {
-        name: session.metadata.name,
-        deliveryFee: session.metadata.deliveryFee,
-        discount: session.metadata.discount,
-        voucherId: session.metadata.voucherId,
-      };
 
       const paymentInfo = {
         id: session.payment_intent,
         status: session.payment_status,
       };
-
       const orderData = {
         shippingInfo,
         orderItems,
@@ -157,7 +154,6 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         taxAmount,
         shippingAmount,
         totalAmount,
-        voucherInfo,
         paymentInfo,
         paymentMethod: "Card",
         user,
