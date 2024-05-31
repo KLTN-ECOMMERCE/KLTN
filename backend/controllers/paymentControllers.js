@@ -20,17 +20,40 @@ export const stripeCheckoutSession = catchAsyncErrors(
           },
           unit_amount: item?.price * 100,
         },
-        tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
+        // tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
         quantity: item?.quantity,
       };
     });
 
-    const shippingInfo = body?.shippingInfo;
+    // const shippingInfo = body?.shippingInfo;
+    const { shippingUnit, code } = body?.shippingInfo?.shipping;
+    const { address, city, phoneNo, zipCode, country, latitude, longitude } =
+      body?.shippingInfo;
+    const { name, deliveryFee, discount, voucherId } = body?.voucherInfo;
 
-    const shipping_rate =
-      body?.itemsPrice >= 200
-        ? "shr_1OKh37CTjVkSlxmI107dE6s2"
-        : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+    const shippingInfo = {
+      address,
+      city,
+      phoneNo,
+      zipCode,
+      country,
+      shippingUnit,
+      code,
+      latitude,
+      longitude,
+    };
+    const voucher = {
+      name,
+      deliveryFee,
+      discount,
+      voucherId,
+    };
+    console.log(shippingInfo);
+    const { shipping_rate } = body?.shippingAmount;
+    // const shipping_rate =
+    //   body?.itemsPrice >= 200
+    //     ? "shr_1OKh37CTjVkSlxmI107dE6s2"
+    //     : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -39,15 +62,14 @@ export const stripeCheckoutSession = catchAsyncErrors(
       customer_email: req?.user?.email,
       client_reference_id: req?.user?._id?.toString(),
       mode: "payment",
-      metadata: { ...shippingInfo, itemsPrice: body?.itemsPrice },
-      shipping_options: [
-        {
-          shipping_rate,
-        },
-      ],
+      metadata: { shippingInfo, voucher, itemsPrice: body?.totalAmount },
+      // shipping_options: [
+      //   {
+      //     shipping_rate,
+      //   },
+      // ],
       line_items,
     });
-
     res.status(200).json({
       url: session.url,
     });
@@ -109,6 +131,18 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         phoneNo: session.metadata.phoneNo,
         zipCode: session.metadata.zipCode,
         country: session.metadata.country,
+        shipping: {
+          shippingUnit: session.metadata.shippingUnit,
+          code: session.metadata.code,
+        },
+        latitude: session.metadata.latitude,
+        longitude: session.metadata.longitude,
+      };
+      const voucherInfo = {
+        name: session.metadata.name,
+        deliveryFee: session.metadata.deliveryFee,
+        discount: session.metadata.discount,
+        voucherId: session.metadata.voucherId,
       };
 
       const paymentInfo = {
@@ -123,6 +157,7 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         taxAmount,
         shippingAmount,
         totalAmount,
+        voucherInfo,
         paymentInfo,
         paymentMethod: "Card",
         user,

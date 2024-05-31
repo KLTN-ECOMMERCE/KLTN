@@ -129,6 +129,10 @@ const orderSchema = new mongoose.Schema(
       },
       default: "NewOrder",
     },
+    shippingAmount: {
+      type: Number,
+      required: true,
+    },
     deliveredAt: Date,
   },
   { timestamps: true }
