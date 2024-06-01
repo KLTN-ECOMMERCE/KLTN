@@ -1,6 +1,6 @@
 import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import Order from "../models/order.js";
-
+import Shipper from "../models/shipper.js";
 import Stripe from "stripe";
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -26,7 +26,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
     });
 
     // const shippingInfo = body?.shippingInfo;
-    const { shippingUnit, code } = body?.shippingInfo?.shipping;
+    // const { shippingUnit, code } = body?.shippingInfo?.shipping;
     const { address, city, phoneNo, zipCode, country, latitude, longitude } =
       body?.shippingInfo;
 
@@ -36,19 +36,109 @@ export const stripeCheckoutSession = catchAsyncErrors(
       phoneNo,
       zipCode,
       country,
-      shippingUnit,
-      code,
       latitude,
       longitude,
     };
     console.log(shippingInfo);
     const { shippingAmount } = body;
     let shipping_rate;
-    if ((shippingAmount = 0)) {
+    if (shippingAmount == 0) {
       shipping_rate = "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
-    } else if ((shippingAmount = 10)) {
+    } else if (shippingAmount == 10) {
       shipping_rate = "shr_1OKh37CTjVkSlxmI107dE6s2";
-    } else if ((shippingAmount = 11)) {
+    } else if (shippingAmount == 11) {
+      shipping_rate = "shr_1PMXHcCTjVkSlxmIemWhtQOV";
+    } else {
+      shipping_rate = "shr_1PMXHsCTjVkSlxmIX4jDGNFt";
+    }
+
+    // const shipping_rate =
+    //   body?.itemsPrice >= 200
+    //     ? "shr_1OKh37CTjVkSlxmI107dE6s2"
+    //     : "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      success_url: `${process.env.FRONTEND_URL}/me/orders?order_success=true`,
+      cancel_url: `${process.env.FRONTEND_URL}`,
+      customer_email: req?.user?.email,
+      client_reference_id: req?.user?._id?.toString(),
+      mode: "payment",
+      metadata: { ...shippingInfo, itemsPrice: body?.totalAmount },
+      shipping_options: [
+        {
+          shipping_rate,
+        },
+      ],
+      line_items,
+    });
+    res.status(200).json({
+      url: session.url,
+    });
+  }
+);
+export const stripeCheckoutSessionShipper = catchAsyncErrors(
+  async (req, res, next) => {
+    const { totalPriceCOD } = req?.body;
+    // truyền total amount vào
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      success_url: `${process.env.FRONTEND_URL}/me/orders?order_success=true`,
+      cancel_url: `${process.env.FRONTEND_URL}`,
+      customer_email: req?.user?.email,
+      client_reference_id: req?.user?._id?.toString(),
+      mode: "payment",
+      // them total amount vào
+      metadata: { price: totalPriceCOD },
+    });
+    res.status(200).json({
+      url: session.url,
+    });
+  }
+);
+// Create stripe checkout session   =>  /api/v1/payment/checkout_session
+export const stripeCheckoutSessionMobile = catchAsyncErrors(
+  async (req, res, next) => {
+    const body = req?.body;
+
+    const line_items = body?.orderItems?.map((item) => {
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item?.name,
+            images: [item?.image],
+            metadata: { productId: item?.product },
+          },
+          unit_amount: item?.price * 100,
+        },
+        tax_rates: ["txr_1OKgzdCTjVkSlxmIIcFuoEtX"],
+        quantity: item?.quantity,
+      };
+    });
+
+    // const shippingInfo = body?.shippingInfo;
+    // const { shippingUnit, code } = body?.shippingInfo?.shipping;
+    const { address, city, phoneNo, zipCode, country, latitude, longitude } =
+      body?.shippingInfo;
+
+    const shippingInfo = {
+      address,
+      city,
+      phoneNo,
+      zipCode,
+      country,
+      latitude,
+      longitude,
+    };
+    console.log(shippingInfo);
+    const { shippingAmount } = body;
+    let shipping_rate;
+    if (shippingAmount == 0) {
+      shipping_rate = "shr_1OKh3YCTjVkSlxmIxITQ7HHF";
+    } else if (shippingAmount == 10) {
+      shipping_rate = "shr_1OKh37CTjVkSlxmI107dE6s2";
+    } else if (shippingAmount == 11) {
       shipping_rate = "shr_1PMXHcCTjVkSlxmIemWhtQOV";
     } else {
       shipping_rate = "shr_1PMXHsCTjVkSlxmIX4jDGNFt";
@@ -161,6 +251,13 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
 
       await Order.create(orderData);
 
+      // shipper
+      // 1 url webhook (hình như 2 url k đc tại vì nó tự động gọi webhook)
+      const id = req.user._id;
+      const shipper = await Shipper.find({ user: id });
+      shipper.totalPriceCOD = 0;
+      await shipper.save();
+      //
       res.status(200).json({ success: true });
     }
   } catch (error) {
