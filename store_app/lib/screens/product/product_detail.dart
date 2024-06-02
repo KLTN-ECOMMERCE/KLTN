@@ -77,6 +77,7 @@ class _ProductDetailState extends ConsumerState<ProductDetailScreen> {
   Widget build(BuildContext context) {
     final favoriteProducts = ref.watch(favoriteProductsProvider);
     final isFavorite = favoriteProducts.contains(widget.productItem.id);
+
     final data = ref.watch(viewedProductsDataProvider);
 
     return Scaffold(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
 import 'package:store_app/notifications/notification_service.dart';
@@ -15,6 +16,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService notificationService = NotificationService();
   notificationService.initialiseNotifications();
+  await Hive.initFlutter();
+  await Hive.openBox<String>('favorite_products');
+
 
   runApp(
     const ProviderScope(

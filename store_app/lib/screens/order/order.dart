@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
@@ -6,12 +7,12 @@ import 'package:persistent_shopping_cart/model/cart_model.dart';
 import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:store_app/api/api_order.dart';
+import 'package:store_app/api/api_stripe.dart';
 import 'package:store_app/api/api_user.dart';
 import 'package:store_app/api/api_voucher.dart';
-import 'package:store_app/data/delivery_method.dart';
-import 'package:store_app/models/delivery_method.dart';
 import 'package:store_app/models/place.dart';
 import 'package:store_app/models/shipping_address.dart';
+import 'package:store_app/models/shipping_unit.dart';
 import 'package:store_app/notifications/notification_service.dart';
 import 'package:store_app/screens/order/detail_order.dart';
 import 'package:store_app/screens/promotion/voucher.dart';
@@ -22,6 +23,7 @@ import 'package:store_app/widgets/order/header_order.dart';
 import 'package:store_app/widgets/order/price.dart';
 import 'package:store_app/widgets/shipping/shipping_item.dart';
 import 'package:store_app/widgets/voucher/voucher_item.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({
@@ -40,12 +42,14 @@ class _OrderScreenState extends State<OrderScreen> {
   ShippingAddress? _shippingAddress;
   dynamic _voucher;
   dynamic _profile;
+  List _shippingUnits = [];
   final ApiOrder _apiOrder = ApiOrder();
   final ApiUser _apiUser = ApiUser();
   final ApiVoucher _apiVoucher = ApiVoucher();
+  final ApiStripe _apiStripe = ApiStripe();
   NotificationService notificationService = NotificationService();
 
-  bool _isCODSelected = true;
+  bool _isCODSelected = false;
   bool _isCreditCardSelected = false;
   bool _noSelectPayment = false;
   bool _noSelectShippingAddress = false;
@@ -54,13 +58,13 @@ class _OrderScreenState extends State<OrderScreen> {
   var _paymentMethod = '';
 
   int _selectedDelivery = 0;
-  DeliveryMethod _deliveryMethodChoose = dataDeliveryMethod[0];
+  ShippingUnit? _deliveryMethodChoose;
 
   double _tax = 0;
   double _summary = 0;
   double _pointSale = 0;
   double _voucherSale = 0;
-  double _shippingAmount = 0;
+  int _shippingAmount = 0;
 
   var _isAuthenticating = false;
 
@@ -70,6 +74,50 @@ class _OrderScreenState extends State<OrderScreen> {
       final profile = response['user'];
       _profile = profile;
       return profile;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<List> _getOrdersByStatus(String status) async {
+    try {
+      final response = await _apiOrder.getOrdersByStatus(status);
+      final orders = response['orders'] as List;
+      return orders;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).clearSnackBars();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+          ),
+        );
+      }
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> _getShippingUnit() async {
+    try {
+      final response = await _apiOrder.getShippingUnit();
+      final shippingUnits = response['shipping'];
+      _shippingUnits = shippingUnits;
+      _deliveryMethodChoose = ShippingUnit(
+        id: shippingUnits[0]['_id'],
+        name: shippingUnits[0]['name'],
+        price: shippingUnits[0]['price'],
+        code: shippingUnits[0]['code'],
+        description: shippingUnits[0]['description'],
+      );
+      return shippingUnits;
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
@@ -168,49 +216,118 @@ class _OrderScreenState extends State<OrderScreen> {
       if (_isCODSelected) _paymentMethod = 'COD';
       if (_isCreditCardSelected) _paymentMethod = 'CARD';
 
-      final response = await _apiOrder.createOrder(
-        _shippingAddress!,
-        widget.cartItems,
-        _paymentMethod,
-        {
-          'id': 'payment_id',
-          'status': 'Not Paid',
-        },
-        widget.totalPrice,
-        _tax,
-        _deliveryMethodChoose,
-        _summary,
-        _shippingAmount,
-        _voucher,
-      );
-      print(response);
-      PersistentShoppingCart().clearCart();
-      if (_usePoint) {
-        await _apiUser.updatePoint(0);
-      }
-      if (_voucher != null) {
-        await _apiVoucher.userUseVoucher(_voucher['id']);
-      }
-      notificationService.showNotification(
-        'Order ${response['order']['_id'].toString()}',
-        'The order ${response['order']['_id'].toString()} will be confirmed by admin soon !!!',
-        response['order']['_id'].toString(),
-      );
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => DetailOrderScreen(
-            orderId: response['order']['_id'].toString(),
+      if (_paymentMethod == 'COD') {
+        final response = await _apiOrder.createOrder(
+          _shippingAddress!,
+          widget.cartItems,
+          _paymentMethod,
+          {
+            'id': 'payment_id',
+            'status': 'Not Paid',
+          },
+          widget.totalPrice,
+          _tax,
+          _deliveryMethodChoose!,
+          _summary,
+          _shippingAmount,
+          _voucher,
+        );
+        print(response);
+        PersistentShoppingCart().clearCart();
+        if (_usePoint) {
+          await _apiUser.updatePoint(0);
+        }
+        if (_voucher != null) {
+          await _apiVoucher.userUseVoucher(_voucher['id']);
+        }
+        notificationService.showNotification(
+          'Order ${response['order']['_id'].toString()}',
+          'The order ${response['order']['_id'].toString()} will be confirmed by admin soon !!!',
+          response['order']['_id'].toString(),
+        );
+        if (!mounted) return;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => DetailOrderScreen(
+              orderId: response['order']['_id'].toString(),
+            ),
           ),
-        ),
-      );
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const SuccessScreen(
-            text: 'Order Success',
+        );
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => const SuccessScreen(
+              text: 'Order Success',
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        final response = await _apiStripe.createStripeCheckoutSession(
+          _shippingAddress!,
+          widget.cartItems,
+          widget.totalPrice,
+          _tax,
+          _deliveryMethodChoose!,
+          _summary,
+          _shippingAmount,
+          _voucher,
+        );
+        print(response);
+
+        final url = Uri.parse(
+          response['url'].toString(),
+        );
+
+        if (await canLaunchUrl(url)) {
+          await launchUrl(url);
+
+          await Future.delayed(
+            const Duration(
+              milliseconds: 100,
+            ),
+          );
+          while (WidgetsBinding.instance.lifecycleState !=
+              AppLifecycleState.resumed) {
+            await Future.delayed(
+              const Duration(
+                milliseconds: 100,
+              ),
+            );
+          }
+
+          final orders = await _getOrdersByStatus('NewOrder');
+          final order = orders[orders.length - 1];
+          PersistentShoppingCart().clearCart();
+
+          notificationService.showNotification(
+            'Order ${order['_id'].toString()}',
+            'The order ${order['_id'].toString()} will be confirmed by admin soon !!!',
+            order['_id'].toString(),
+          );
+          if (!mounted) return;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => DetailOrderScreen(
+                orderId: order['_id'].toString(),
+              ),
+            ),
+          );
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const SuccessScreen(
+                text: 'Order Success',
+              ),
+            ),
+          );
+        } else {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Can not open payment sheet now !!!'),
+            ),
+          );
+        }
+      }
     } catch (e) {
       setState(() {
         _isAuthenticating = false;
@@ -231,6 +348,7 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     _getUserProfile();
     _getDefaultAddress();
+    _getShippingUnit();
     super.initState();
   }
 
@@ -256,9 +374,11 @@ class _OrderScreenState extends State<OrderScreen> {
 
     _shippingAmount = _voucher?['deliveryFee'].toString() == 'true'
         ? 0
-        : _deliveryMethodChoose.price;
+        : _deliveryMethodChoose == null
+            ? 0
+            : _deliveryMethodChoose!.price;
 
-    _tax = (widget.totalPrice + _shippingAmount) * 0.05; // 5% tax
+    _tax = (widget.totalPrice) * 0.1; // 5% tax
 
     _summary = ((widget.totalPrice - _pointSale) * (1 - _voucherSale) +
         _shippingAmount +
@@ -371,48 +491,156 @@ class _OrderScreenState extends State<OrderScreen> {
                 height: 12,
               ),
               const HeaderOrder(
+                name: 'Payment',
+              ),
+              Container(
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius:
+                      _noSelectPayment ? BorderRadius.circular(12) : null,
+                  border: Border.all(
+                    color: _noSelectPayment ? Colors.red : surface,
+                    width: _noSelectPayment ? 3.5 : 0.1,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: const Border.symmetric(
+                          horizontal: BorderSide(
+                            width: 0.1,
+                          ),
+                        ),
+                      ),
+                      child: CheckboxListTile(
+                        tileColor: surface,
+                        selectedTileColor: primary,
+                        title: Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(8),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.local_atm),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Text(
+                                'COD',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        value: _isCODSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            _isCODSelected = value!;
+                            if (value) {
+                              _isCreditCardSelected = false;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: surface,
+                        borderRadius: BorderRadius.circular(10),
+                        border: const Border.symmetric(
+                          horizontal: BorderSide(
+                            width: 0.1,
+                          ),
+                        ),
+                      ),
+                      child: CheckboxListTile(
+                        tileColor: surface,
+                        title: Container(
+                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(8),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.credit_card),
+                              SizedBox(
+                                width: 12,
+                              ),
+                              Text(
+                                'Credit Card',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        value: _isCreditCardSelected,
+                        onChanged: (value) {
+                          setState(() {
+                            _isCreditCardSelected = value!;
+                            if (value) {
+                              _isCODSelected = false;
+                              _usePoint = false;
+                              _voucher = null;
+                            }
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              const HeaderOrder(
                 name: 'Promotion',
               ),
               _voucher == null
                   ? InkWell(
-                      onTap: () async {
-                        final data = await showModalBottomSheet(
-                          useSafeArea: true,
-                          isScrollControlled: true,
-                          shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.vertical(
-                            top: Radius.circular(30),
-                          )),
-                          context: context,
-                          builder: (context) => VoucherScreen(
-                            typeOfPromotion: 'My Promotion',
-                            onSelectVoucherItem: (
-                              id,
-                              name,
-                              quantity,
-                              description,
-                              deliveryFee,
-                              discount,
-                            ) {
-                              final data = {
-                                'id': id,
-                                'name': name,
-                                'description': description,
-                                'deliveryFee': deliveryFee,
-                                'discount': discount,
-                              };
-                              Navigator.of(context).pop(data);
+                      onTap: _isCreditCardSelected && !_isCODSelected
+                          ? null
+                          : () async {
+                              final data = await showModalBottomSheet(
+                                useSafeArea: true,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(30),
+                                )),
+                                context: context,
+                                builder: (context) => VoucherScreen(
+                                  typeOfPromotion: 'My Promotion',
+                                  onSelectVoucherItem: (
+                                    id,
+                                    name,
+                                    quantity,
+                                    description,
+                                    deliveryFee,
+                                    discount,
+                                  ) {
+                                    final data = {
+                                      'id': id,
+                                      'name': name,
+                                      'description': description,
+                                      'deliveryFee': deliveryFee,
+                                      'discount': discount,
+                                    };
+                                    Navigator.of(context).pop(data);
+                                  },
+                                ),
+                                constraints: BoxConstraints(
+                                  maxWidth: MediaQuery.of(context).size.width,
+                                  maxHeight: MediaQuery.of(context).size.height,
+                                ),
+                              );
+                              setState(() {
+                                _voucher = data;
+                              });
                             },
-                          ),
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width,
-                            maxHeight: MediaQuery.of(context).size.height,
-                          ),
-                        );
-                        setState(() {
-                          _voucher = data;
-                        });
-                      },
                       child: Container(
                         color: surface,
                         padding: const EdgeInsets.all(16),
@@ -432,17 +660,20 @@ class _OrderScreenState extends State<OrderScreen> {
                             ),
                             const Spacer(),
                             Text(
-                              'Add voucher code',
+                              _isCreditCardSelected && !_isCODSelected
+                                  ? 'Cannot add voucher code'
+                                  : 'Add voucher code',
                               style: TextStyle(
                                 color: onSurface,
                                 fontSize: 16,
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Icon(
-                              Icons.arrow_forward_ios,
-                              //color: kTextColor,
-                            )
+                            Icon(
+                              _isCreditCardSelected && !_isCODSelected
+                                  ? null
+                                  : Icons.arrow_forward_ios,
+                            ),
                           ],
                         ),
                       ),
@@ -569,11 +800,13 @@ class _OrderScreenState extends State<OrderScreen> {
                           color: Colors.red,
                         ),
                   value: _usePoint,
-                  onChanged: (value) {
-                    setState(() {
-                      _usePoint = value;
-                    });
-                  },
+                  onChanged: _isCreditCardSelected && !_isCODSelected
+                      ? null
+                      : (value) {
+                          setState(() {
+                            _usePoint = value;
+                          });
+                        },
                   subtitle: _usePoint
                       ? null
                       : Text(
@@ -584,114 +817,6 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                         ),
                 ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              const HeaderOrder(
-                name: 'Payment',
-              ),
-              StatefulBuilder(
-                builder: (context, setState) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: surface,
-                      borderRadius:
-                          _noSelectPayment ? BorderRadius.circular(12) : null,
-                      border: Border.all(
-                        color: _noSelectPayment ? Colors.red : surface,
-                        width: _noSelectPayment ? 3.5 : 0.1,
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: const Border.symmetric(
-                              horizontal: BorderSide(
-                                width: 0.1,
-                              ),
-                            ),
-                          ),
-                          child: CheckboxListTile(
-                            tileColor: surface,
-                            selectedTileColor: primary,
-                            title: Container(
-                              padding: const EdgeInsets.all(8),
-                              margin: const EdgeInsets.all(8),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.local_atm),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
-                                  Text(
-                                    'COD',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            value: _isCODSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                _isCODSelected = value!;
-                                if (value) {
-                                  _isCreditCardSelected = false;
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: surface,
-                            borderRadius: BorderRadius.circular(10),
-                            border: const Border.symmetric(
-                              horizontal: BorderSide(
-                                width: 0.1,
-                              ),
-                            ),
-                          ),
-                          child: CheckboxListTile(
-                            tileColor: surface,
-                            title: Container(
-                              padding: const EdgeInsets.all(8),
-                              margin: const EdgeInsets.all(8),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.credit_card),
-                                  SizedBox(
-                                    width: 12,
-                                  ),
-                                  Text(
-                                    'Credit Card',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            value: _isCreditCardSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                _isCreditCardSelected = value!;
-                                if (value) {
-                                  _isCODSelected = false;
-                                }
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
               ),
               const SizedBox(
                 height: 12,
@@ -711,13 +836,19 @@ class _OrderScreenState extends State<OrderScreen> {
                     mainAxisSpacing: 12.0,
                     mainAxisExtent: 150,
                   ),
-                  itemCount: dataDeliveryMethod.length,
+                  itemCount: _shippingUnits.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
                         setState(() {
                           _selectedDelivery = index;
-                          _deliveryMethodChoose = dataDeliveryMethod[index];
+                          _deliveryMethodChoose = ShippingUnit(
+                            id: _shippingUnits[index]['_id'],
+                            name: _shippingUnits[index]['name'],
+                            price: _shippingUnits[index]['price'],
+                            code: _shippingUnits[index]['code'],
+                            description: _shippingUnits[index]['description'],
+                          );
                         });
                       },
                       child: Container(
@@ -737,11 +868,13 @@ class _OrderScreenState extends State<OrderScreen> {
                               borderRadius: const BorderRadius.all(
                                 Radius.circular(16),
                               ),
-                              child: Image.asset(
-                                dataDeliveryMethod[index].image,
-                                fit: BoxFit.contain,
-                                width: double.infinity,
-                                height: 90,
+                              child: Center(
+                                child: Text(
+                                  _shippingUnits[index]['code'].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 45,
+                                  ),
+                                ),
                               ),
                             ),
                             const SizedBox(
@@ -749,7 +882,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             ),
                             Center(
                               child: Text(
-                                dataDeliveryMethod[index].duration,
+                                _shippingUnits[index]['description'].toString(),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w300,
@@ -758,7 +891,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             ),
                             Center(
                               child: Text(
-                                dataDeliveryMethod[index].name,
+                                _shippingUnits[index]['name'].toString(),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,

@@ -55,6 +55,19 @@ class _ShippingAddressesScreenState extends State<ShippingAddressesScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              setState(() {
+                shippingAddressData = _getShippingAddresses();
+              });
+            },
+            icon: const Icon(
+              Icons.refresh,
+              //size: 30,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

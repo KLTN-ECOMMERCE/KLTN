@@ -117,10 +117,12 @@ class _LocationInputState extends State<LocationInput> {
       );
     }
 
-    _savePlace(
-      pickedLocation!.latitude,
-      pickedLocation.longitude,
-    );
+    if (pickedLocation != null) {
+      _savePlace(
+        pickedLocation.latitude,
+        pickedLocation.longitude,
+      );
+    }
   }
 
   @override

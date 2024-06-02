@@ -2,6 +2,7 @@ import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 import Order from "../models/order.js";
 import Shipper from "../models/shipper.js";
 import Stripe from "stripe";
+import user from "../models/user.js";
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Create stripe checkout session   =>  /api/v1/payment/checkout_session
@@ -80,6 +81,8 @@ export const stripeCheckoutSession = catchAsyncErrors(
 export const stripeCheckoutSessionShipper = catchAsyncErrors(
   async (req, res, next) => {
     const { totalPriceCOD } = req?.body;
+    const body = req?.body;
+    const userID = req?.user?._id.toString();
 
     const line_items = body?.orderItems?.map((item) => {
       return {
@@ -87,11 +90,10 @@ export const stripeCheckoutSessionShipper = catchAsyncErrors(
           currency: "usd",
           product_data: {
             name: item?.name,
-            images: [item?.image],
-            metadata: { productId: item?.product },
           },
           unit_amount: totalPriceCOD * 100,
         },
+        quantity: 1,
       };
     });
 
@@ -104,7 +106,7 @@ export const stripeCheckoutSessionShipper = catchAsyncErrors(
       client_reference_id: req?.user?._id?.toString(),
       mode: "payment",
       // them total amount vào
-      metadata: { price: totalPriceCOD },
+      metadata: { price: totalPriceCOD, userID: userID },
       line_items,
     });
     res.status(200).json({
@@ -228,8 +230,16 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         session.id
       );
       const orderItems = await getOrderItems(line_items);
+      console.log(orderItems)
 
-      if (orderItems.length !== 0) {
+      if (orderItems[0].name === 'Total COD Amount') {
+        const id = session.metadata.userID;
+
+        const shipper = await Shipper.findOne({user: id});
+        shipper.totalPriceCOD = 0;
+        await shipper.save();
+        
+      } else {
         const user = session.client_reference_id;
 
         const totalAmount = session.amount_total / 100;
@@ -268,14 +278,6 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         };
 
         await Order.create(orderData);
-      } else {
-        // shipper
-        // 1 url webhook (hình như 2 url k đc tại vì nó tự động gọi webhook)
-        const id = req.user._id;
-        const shipper = await Shipper.find({ user: id });
-        shipper.totalPriceCOD = 0;
-        await shipper.save();
-        //
       }
       res.status(200).json({ success: true });
     }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_shopping_cart/model/cart_model.dart';
+import 'package:persistent_shopping_cart/persistent_shopping_cart.dart';
 import 'package:store_app/api/api_order.dart';
 import 'package:store_app/data/status_color.dart';
 import 'package:store_app/screens/app.dart';
-import 'package:store_app/screens/order/order.dart';
 import 'package:store_app/screens/review/review.dart';
 import 'package:store_app/widgets/order/order_information.dart';
 import 'package:shimmer/shimmer.dart';
@@ -135,17 +135,14 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                             .colorScheme
                                             .onSurface,
                                         fontWeight: FontWeight.w400,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 12,
                                     ),
                                     Text(
                                       order['paymentInfo']['id'].toString(),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                       ),
                                     ),
                                   ],
@@ -464,20 +461,23 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               height: 25,
                             ),
                             OrderInformation(
-                              title: 'Delivery Method: ',
-                              information:
-                                  '${order['shippingInfo']['shippingUnit'].toString()}, ${order['shippingInfo']['shippingAmount'].toString()}\$',
+                              title: 'Delivery Code: ',
+                              information: order['shippingInfo']['shipping']
+                                      ['code']
+                                  .toString(),
                             ),
                             const SizedBox(
                               height: 25,
                             ),
                             OrderInformation(
                               title: 'Discount: ',
-                              information: order['voucherInfo']['deliveryFee']
-                                          .toString() ==
-                                      'true'
-                                  ? '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}%, Free Ship !!!'
-                                  : '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}% !!!',
+                              information: order['voucherInfo'] == null
+                                  ? 'No voucher was applied'
+                                  : order['voucherInfo']['deliveryFee']
+                                              .toString() ==
+                                          'true'
+                                      ? '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}%, Free Ship !!!'
+                                      : '${order['voucherInfo']['name'].toString()}, Sale: ${order['voucherInfo']['discount']}% !!!',
                             ),
                             const SizedBox(
                               height: 25,
@@ -596,10 +596,8 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                               ElevatedButton(
                                 onPressed: () {
                                   try {
-                                    List<PersistentShoppingCartItem> cartItems =
-                                        [];
                                     for (var item in orderItems) {
-                                      cartItems.add(
+                                      PersistentShoppingCart().addToCart(
                                         PersistentShoppingCartItem(
                                           productId: item['product'],
                                           productName: item['name'],
@@ -617,14 +615,13 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return OrderScreen(
-                                            cartItems: cartItems,
-                                            totalPrice:
-                                                order['itemsPrice'].toDouble(),
+                                          return const AppScreen(
+                                            currentIndex: 1,
                                           );
                                         },
                                       ),
                                     );
+                                    // move to cart screen with item
                                   } catch (e) {
                                     if (!mounted) return;
                                     ScaffoldMessenger.of(context)

@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:persistent_shopping_cart/model/cart_model.dart';
-import 'package:store_app/models/delivery_method.dart';
 import 'package:store_app/models/shipping_address.dart';
+import 'package:store_app/models/shipping_unit.dart';
 import 'package:store_app/utils/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -18,9 +18,9 @@ class ApiOrder {
     Map<String, String> paymentInfo,
     double itemsPrice,
     double taxAmount,
-    DeliveryMethod deliveryMethod,
+    ShippingUnit deliveryMethod,
     double totalAmount,
-    double shippingAmount,
+    int shippingAmount,
     dynamic voucher,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
@@ -40,9 +40,6 @@ class ApiOrder {
         },
       );
     }
-
-    final shippingUnit = '${deliveryMethod.name}, ${deliveryMethod.duration}';
-
     Map<String, dynamic> body = {
       'shippingInfo': {
         'address': shippingInfo.address,
@@ -50,8 +47,11 @@ class ApiOrder {
         'phoneNo': shippingInfo.phoneNo,
         'zipCode': shippingInfo.zipCode,
         'country': shippingInfo.country.displayNameNoCountryCode,
-        'shippingAmount': deliveryMethod.price,
-        'shippingUnit': shippingUnit,
+        //'shippingAmount': deliveryMethod.price,
+        'shipping': {
+          'shippingUnit': deliveryMethod.id,
+          'code': deliveryMethod.code,
+        },
         'latitude': shippingInfo.place.latitude.toString(),
         'longitude': shippingInfo.place.longitude.toString(),
       },
@@ -175,6 +175,29 @@ class ApiOrder {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $jwtToken',
+        },
+      );
+      final Map<String, dynamic> resData = json.decode(response.body);
+      if (response.statusCode != 200) {
+        throw HttpException(resData['message'] as String);
+      }
+      return resData;
+    } catch (e) {
+      throw HttpException(e.toString());
+    }
+  }
+
+  Future<dynamic> getShippingUnit() async {
+    final url = Uri.http(
+      '$ipv4Address:4000',
+      'api/v1/shipping/getShippingUnit',
+    );
+
+    try {
+      Response response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
         },
       );
       final Map<String, dynamic> resData = json.decode(response.body);

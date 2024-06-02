@@ -1,16 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class FavoriteProductsNotifier extends StateNotifier<List<String>> {
-  FavoriteProductsNotifier() : super([]);
+  // init value state = values.toList() in box
+  FavoriteProductsNotifier()
+      : super(
+          Hive.box<String>('favorite_products').values.toList(),
+        );
 
   bool toggleProductFavoriteStatus(String productId) {
-    final productIsFavorite = state.contains(productId);
+    final box = Hive.box<String>('favorite_products');
+    final productIsFavorite = box.values.contains(productId);
 
     if (productIsFavorite) {
-      state = state.where((element) => element != productId).toList();
+      box.delete(productId);
+      state = box.values.toList();
       return false;
     } else {
-      state = [...state, productId];
+      box.put(productId, productId);
+      state = box.values.toList();
       return true;
     }
   }
