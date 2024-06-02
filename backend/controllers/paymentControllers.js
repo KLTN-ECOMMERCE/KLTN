@@ -29,7 +29,7 @@ export const stripeCheckoutSession = catchAsyncErrors(
     // const { shippingUnit, code } = body?.shippingInfo?.shipping;
     const { address, city, phoneNo, zipCode, country, latitude, longitude } =
       body?.shippingInfo;
-
+    const { shippingUnit, code } = body?.shippingInfo?.shipping;
     const shippingInfo = {
       address,
       city,
@@ -80,14 +80,21 @@ export const stripeCheckoutSession = catchAsyncErrors(
 export const stripeCheckoutSessionShipper = catchAsyncErrors(
   async (req, res, next) => {
     const { totalPriceCOD } = req?.body;
-    const data = () => {
+
+    const line_items = body?.orderItems?.map((item) => {
       return {
         price_data: {
           currency: "usd",
+          product_data: {
+            name: item?.name,
+            images: [item?.image],
+            metadata: { productId: item?.product },
+          },
           unit_amount: totalPriceCOD * 100,
         },
       };
-    };
+    });
+
     // truyền total amount vào
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -98,7 +105,7 @@ export const stripeCheckoutSessionShipper = catchAsyncErrors(
       mode: "payment",
       // them total amount vào
       metadata: { price: totalPriceCOD },
-      data,
+      line_items,
     });
     res.status(200).json({
       url: session.url,
@@ -130,6 +137,7 @@ export const stripeCheckoutSessionMobile = catchAsyncErrors(
     // const { shippingUnit, code } = body?.shippingInfo?.shipping;
     const { address, city, phoneNo, zipCode, country, latitude, longitude } =
       body?.shippingInfo;
+    const { shippingUnit, code } = body?.shippingInfo?.shipping;
 
     const shippingInfo = {
       address,
@@ -221,7 +229,7 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
       );
       const orderItems = await getOrderItems(line_items);
 
-      if (orderItems) {
+      if (orderItems.length !== 0) {
         const user = session.client_reference_id;
 
         const totalAmount = session.amount_total / 100;
