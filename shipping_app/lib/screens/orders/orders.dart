@@ -103,11 +103,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 .toString(),
                             phoneNo: orders[index]['shippingInfo']['phoneNo']
                                 .toString(),
-                            latitude: orders[index]['shippingInfo']['latitude']
-                                .toString(),
+                            latitude: orders[index]['shippingInfo']['latitude'],
                             longitude: orders[index]['shippingInfo']
-                                    ['longitude']
-                                .toString(),
+                                ['longitude'],
                             address: address,
                             cashOnDelivery: cashOnDelivery,
                             userId: orders[index]['user'].toString(),

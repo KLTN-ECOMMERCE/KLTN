@@ -39,8 +39,8 @@ class OrderItem extends StatefulWidget {
   final String statusOrder;
   final String phoneNo;
   final String address;
-  final String latitude;
-  final String longitude;
+  final String? latitude;
+  final String? longitude;
   final String paymentMethod;
   final String statusPayment;
   final List orderItems;
@@ -417,22 +417,27 @@ class _OrderItemState extends State<OrderItem> {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: OutlinedButton(
-                          onPressed: () async {
-                            final urlMap = Uri.parse(
-                                'https://www.google.com/maps?q=${widget.latitude},${widget.longitude}');
+                          onPressed: widget.longitude == null &&
+                                  widget.latitude == null
+                              ? null
+                              : () async {
+                                  final urlMap = Uri.parse(
+                                      'https://www.google.com/maps?q=${widget.latitude},${widget.longitude}');
 
-                            if (await canLaunchUrl(urlMap)) {
-                              await launchUrl(urlMap);
-                            } else {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Can not open the map now !!!'),
-                                ),
-                              );
-                            }
-                          },
+                                  if (await canLaunchUrl(urlMap)) {
+                                    await launchUrl(urlMap);
+                                  } else {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Can not open the map now !!!'),
+                                      ),
+                                    );
+                                  }
+                                },
                           child: Text(
                             'Direction',
                             style: TextStyle(
