@@ -80,6 +80,14 @@ export const stripeCheckoutSession = catchAsyncErrors(
 export const stripeCheckoutSessionShipper = catchAsyncErrors(
   async (req, res, next) => {
     const { totalPriceCOD } = req?.body;
+    const data = () => {
+      return {
+        price_data: {
+          currency: "usd",
+          unit_amount: totalPriceCOD * 100,
+        },
+      };
+    };
     // truyền total amount vào
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -90,6 +98,7 @@ export const stripeCheckoutSessionShipper = catchAsyncErrors(
       mode: "payment",
       // them total amount vào
       metadata: { price: totalPriceCOD },
+      data,
     });
     res.status(200).json({
       url: session.url,
@@ -210,54 +219,56 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
       const line_items = await stripe.checkout.sessions.listLineItems(
         session.id
       );
-
       const orderItems = await getOrderItems(line_items);
-      const user = session.client_reference_id;
 
-      const totalAmount = session.amount_total / 100;
-      const taxAmount = session.total_details.amount_tax / 100;
-      const shippingAmount = session.total_details.amount_shipping / 100;
-      const itemsPrice = session.metadata.itemsPrice;
+      if (orderItems) {
+        const user = session.client_reference_id;
 
-      const shippingInfo = {
-        address: session.metadata.address,
-        city: session.metadata.city,
-        phoneNo: session.metadata.phoneNo,
-        zipCode: session.metadata.zipCode,
-        country: session.metadata.country,
-        shipping: {
-          shippingUnit: session.metadata.shippingUnit,
-          code: session.metadata.code,
-        },
-        latitude: session.metadata.latitude,
-        longitude: session.metadata.longitude,
-      };
+        const totalAmount = session.amount_total / 100;
+        const taxAmount = session.total_details.amount_tax / 100;
+        const shippingAmount = session.total_details.amount_shipping / 100;
+        const itemsPrice = session.metadata.itemsPrice;
 
-      const paymentInfo = {
-        id: session.payment_intent,
-        status: session.payment_status,
-      };
-      const orderData = {
-        shippingInfo,
-        orderItems,
-        itemsPrice,
-        taxAmount,
-        shippingAmount,
-        totalAmount,
-        paymentInfo,
-        paymentMethod: "Card",
-        user,
-      };
+        const shippingInfo = {
+          address: session.metadata.address,
+          city: session.metadata.city,
+          phoneNo: session.metadata.phoneNo,
+          zipCode: session.metadata.zipCode,
+          country: session.metadata.country,
+          shipping: {
+            shippingUnit: session.metadata.shippingUnit,
+            code: session.metadata.code,
+          },
+          latitude: session.metadata.latitude,
+          longitude: session.metadata.longitude,
+        };
 
-      await Order.create(orderData);
+        const paymentInfo = {
+          id: session.payment_intent,
+          status: session.payment_status,
+        };
+        const orderData = {
+          shippingInfo,
+          orderItems,
+          itemsPrice,
+          taxAmount,
+          shippingAmount,
+          totalAmount,
+          paymentInfo,
+          paymentMethod: "Card",
+          user,
+        };
 
-      // shipper
-      // 1 url webhook (hình như 2 url k đc tại vì nó tự động gọi webhook)
-      const id = req.user._id;
-      const shipper = await Shipper.find({ user: id });
-      shipper.totalPriceCOD = 0;
-      await shipper.save();
-      //
+        await Order.create(orderData);
+      } else {
+        // shipper
+        // 1 url webhook (hình như 2 url k đc tại vì nó tự động gọi webhook)
+        const id = req.user._id;
+        const shipper = await Shipper.find({ user: id });
+        shipper.totalPriceCOD = 0;
+        await shipper.save();
+        //
+      }
       res.status(200).json({ success: true });
     }
   } catch (error) {
