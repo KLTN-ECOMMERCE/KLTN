@@ -86,7 +86,7 @@ const PaymentMethod = () => {
   return (
     <>
       <MetaData title={"Payment Method"} />
-      <CheckoutSteps shipping confirmOrder payment />
+      <CheckoutSteps shipping shippingunit confirmOrder payment />
 
       <div className="row wrapper">
         <div className="col-10 col-lg-5">

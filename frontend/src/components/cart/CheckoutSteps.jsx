@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const CheckoutSteps = ({ shipping, confirmOrder, payment }) => {
+const CheckoutSteps = ({ shipping, shippingunit, confirmOrder, payment }) => {
   return (
     <div className="checkout-progress d-flex justify-content-center mt-5">
       {shipping ? (
@@ -14,6 +14,19 @@ const CheckoutSteps = ({ shipping, confirmOrder, payment }) => {
         <Link to="#!" className="float-right" disabled>
           <div className="triangle2-incomplete"></div>
           <div className="step incomplete">Shipping</div>
+          <div className="triangle-incomplete"></div>
+        </Link>
+      )}
+      {shippingunit ? (
+        <Link to="/shippingunit" className="float-right">
+          <div className="triangle2-active"></div>
+          <div className="step active-step">ShippingUnit</div>
+          <div className="triangle-active"></div>
+        </Link>
+      ) : (
+        <Link to="#!" className="float-right" disabled>
+          <div className="triangle2-incomplete"></div>
+          <div className="step incomplete">ShippingUnit</div>
           <div className="triangle-incomplete"></div>
         </Link>
       )}

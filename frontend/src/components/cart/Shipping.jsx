@@ -34,7 +34,7 @@ const Shipping = () => {
     e.preventDefault();
 
     dispatch(saveShippingInfo({ address, city, phoneNo, zipCode, country }));
-    navigate("/confirm_order");
+    navigate("/shippingunit");
   };
 
   return (

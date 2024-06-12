@@ -11,11 +11,11 @@ const ConfirmOrder = () => {
 
   const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
     caluclateOrderCost(cartItems);
-
+  console.log("shippingInfo", shippingInfo);
   return (
     <>
       <MetaData title={"Confirm Order Info"} />
-      <CheckoutSteps shipping confirmOrder />
+      <CheckoutSteps shipping confirmOrder shippingunit />
       <div className="row d-flex justify-content-between">
         <div className="col-12 col-lg-8 mt-5 order-confirm">
           <h4 className="mb-3">Shipping Info</h4>

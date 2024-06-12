@@ -20,6 +20,9 @@ import OrderDetails from "../order/OrderDetails";
 import Invoice from "../invoice/Invoice";
 import Home from "../Home";
 import { Verify } from "../auth/Verify";
+import ShippingUnit from "../cart/ShippingUnit";
+import Success from "../paymentMobile/Success";
+import Error from "../paymentMobile/Error";
 const userRoutes = () => {
   return (
     <>
@@ -28,7 +31,8 @@ const userRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify" element={<Verify />} />
-
+      <Route path="/payment/mobile/error" element={<Error />} />
+      <Route path="/payment/mobile/success" element={<Success />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />
       <Route path="/password/reset/:token" element={<ResetPassword />} />
 
@@ -82,6 +86,14 @@ const userRoutes = () => {
         element={
           <ProtectedRoute>
             <ConfirmOrder />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/shippingunit"
+        element={
+          <ProtectedRoute>
+            <ShippingUnit />
           </ProtectedRoute>
         }
       />

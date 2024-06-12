@@ -40,7 +40,6 @@ export const stripeCheckoutSession = catchAsyncErrors(
       latitude,
       longitude,
     };
-    console.log(shippingInfo);
     const { shippingAmount } = body;
     let shipping_rate;
     if (shippingAmount == 0) {
@@ -170,7 +169,7 @@ export const stripeCheckoutSessionMobile = catchAsyncErrors(
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
-      success_url: `${process.env.FRONTEND_URL}/me/orders?order_success=true`,
+      success_url: `${process.env.FRONTEND_URL}/payment/mobile/success`,
       cancel_url: `${process.env.FRONTEND_URL}`,
       customer_email: req?.user?.email,
       client_reference_id: req?.user?._id?.toString(),
@@ -230,15 +229,14 @@ export const stripeWebhook = catchAsyncErrors(async (req, res, next) => {
         session.id
       );
       const orderItems = await getOrderItems(line_items);
-      console.log(orderItems)
+      console.log(orderItems);
 
-      if (orderItems[0].name === 'Total COD Amount') {
+      if (orderItems[0].name === "Total COD Amount") {
         const id = session.metadata.userID;
 
-        const shipper = await Shipper.findOne({user: id});
+        const shipper = await Shipper.findOne({ user: id });
         shipper.totalPriceCOD = 0;
         await shipper.save();
-        
       } else {
         const user = session.client_reference_id;
 
