@@ -23,6 +23,7 @@ import { Verify } from "../auth/Verify";
 import ShippingUnit from "../cart/ShippingUnit";
 import Success from "../paymentMobile/Success";
 import Error from "../paymentMobile/Error";
+import ChangeMail from "../user/ChangeMail";
 const userRoutes = () => {
   return (
     <>
@@ -31,6 +32,7 @@ const userRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify" element={<Verify />} />
+      <Route path="/checkotpchangemail" element={<ChangeMail />} />
       <Route path="/payment/mobile/error" element={<Error />} />
       <Route path="/payment/mobile/success" element={<Success />} />
       <Route path="/password/forgot" element={<ForgotPassword />} />

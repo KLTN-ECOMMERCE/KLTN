@@ -263,6 +263,7 @@ export const updateProfile = catchAsyncErrors(async (req, res, next) => {
       });
       res.status(200).json({
         message: `Email sent to: ${user.email}`,
+        email: user.email,
         otp: otp,
       });
     } catch (error) {
@@ -293,6 +294,7 @@ export const checkOtpChangeEmail = catchAsyncErrors(async (req, res, next) => {
     });
     res.status(200).json({
       message: `Email sent to: ${user.newEmail}`,
+      email: user.newEmail,
       otp: otp,
     });
   }

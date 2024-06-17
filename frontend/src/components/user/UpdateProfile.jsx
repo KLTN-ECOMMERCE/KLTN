@@ -12,11 +12,10 @@ const UpdateProfile = () => {
 
   const navigate = useNavigate();
 
-  const [updateProfile, { isLoading, error, isSuccess }] =
+  const [updateProfile, { isLoading, error, isSuccess, data }] =
     useUpdateProfileMutation();
 
   const { user } = useSelector((state) => state.auth);
-
   useEffect(() => {
     if (user) {
       setName(user?.name);
@@ -31,7 +30,11 @@ const UpdateProfile = () => {
       toast.success("User Updated");
       navigate("/me/profile");
     }
-  }, [user, error, isSuccess]);
+    if (data?.otp) {
+      navigate(`/checkotpchangemail?email=${data.email}`);
+      console.log("data.otp", data);
+    }
+  }, [user, error, isSuccess, data]);
 
   const submitHandler = (e) => {
     e.preventDefault();

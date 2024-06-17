@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { useGetShippingQuery } from "../../redux/api/shipping";
 import { useSelector, useDispatch } from "react-redux";
 import { saveShippingInfo } from "../../redux/features/cartSlice";
+import { Link } from "react-router-dom";
+import StarRatings from "react-star-ratings";
 
 const ShippingUnit = () => {
   const { data, isLoading, error } = useGetShippingQuery();
@@ -13,60 +15,75 @@ const ShippingUnit = () => {
   const { shippingInfo, cartItems } = useSelector((state) => state.cart);
 
   const { address, city, phoneNo, zipCode, country } = shippingInfo;
+
   const handleChangePage = () => {
     dispatch(
       saveShippingInfo({ address, city, phoneNo, zipCode, country, shipping })
     );
-
     navigate("/confirm_order");
   };
+
   const [code, setCode] = useState();
   const [shippingUnit, setShippingUnit] = useState();
+  const [selectedItemId, setSelectedItemId] = useState(null); // State để lưu id của item được chọn
   const [shipping, setShipping] = useState({
     shippingUnit,
     code,
   });
+
   const handleClick = (item) => {
     setCode(item.code);
     setShippingUnit(item._id);
+    setSelectedItemId(item._id); // Cập nhật item được chọn
   };
+
   useEffect(() => {
     setShipping({
       shippingUnit,
       code,
     });
   }, [code, shippingUnit]);
+
   return (
     <>
       <MetaData title={"Shipping Info"} />
       <CheckoutSteps shipping shippingunit />
-
-      <div className="container mx-auto p-4">
-        <h2 className="text-2xl font-bold mb-4">Shipping Information</h2>
-
-        <div className="shipping-container flex flex-wrap">
-          {/* Map through cartItems to render each product's shipping information */}
-          {data &&
-            data.shipping.map((item) => (
-              <div
-                className="bg-white shadow-md rounded-lg overflow-hidden border shipping-card p-4 flex flex-col items-center"
-                onClick={() => handleClick(item)}
-              >
+      <div className="row">
+        {data &&
+          data.shipping.map((item, index) => (
+            <div
+              key={index}
+              className={`col-sm-12 col-md-6 col-lg-3 my-3 ${
+                selectedItemId === item._id ? "selected" : ""
+              }`}
+              onClick={() => handleClick(item)}
+            >
+              <div className="card p-3 rounded">
                 <img
-                  className="w-48 object-cover mb-4"
-                  src={item.image}
-                  alt={item.name}
+                  className="card-img-top mx-auto"
+                  src="https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png"
+                  alt=""
                 />
-                <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
-                <h3 className="text-lg font-semibold mb-2">
-                  Price: {item.price}
-                </h3>
-                <p className="text-gray-600 mb-4">{item.description}</p>
+                <div className="card-body ps-3 d-flex justify-content-center flex-column">
+                  <p className="card-text ">{item.name}</p>
+                  <p className="card-text ">{item.code}</p>
+                  <p className="card-text ">{item.description}</p>
+                  <p className="card-text ">{item.price}</p>
+                </div>
               </div>
-            ))}
-        </div>
-        <button onClick={handleChangePage}>next</button>
+            </div>
+          ))}
       </div>
+      <button className="btn btn-block" onClick={handleChangePage}>
+        Next
+      </button>
+
+      <style jsx>{`
+        .selected .card {
+          background-color: rgba(0, 0, 0, 0.1);
+          border: 2px solid;
+        }
+      `}</style>
     </>
   );
 };
