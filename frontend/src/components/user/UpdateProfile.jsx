@@ -32,7 +32,6 @@ const UpdateProfile = () => {
     }
     if (data?.otp) {
       navigate(`/checkotpchangemail?email=${data.email}`);
-      console.log("data.otp", data);
     }
   }, [user, error, isSuccess, data]);
 

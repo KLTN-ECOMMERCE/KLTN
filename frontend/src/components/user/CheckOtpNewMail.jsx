@@ -4,14 +4,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { useCheckOtpChangeMailMutation } from "../../redux/api/userApi";
+import { useCheckOtpNewMailMutation } from "../../redux/api/userApi";
 import toast from "react-hot-toast";
 
 const ChangeMail = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
-  const [checkOtpChangeMail, { isLoading, isSuccess, error, data }] =
-    useCheckOtpChangeMailMutation();
+  const [checkOtpNewMail, { isLoading, isSuccess, error, data }] =
+    useCheckOtpNewMailMutation();
   const { isAuthenticated } = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -54,7 +54,7 @@ const ChangeMail = () => {
     const otpValue = otp.join("");
     const signUpData = { otp: +otpValue };
     console.log("dataRequest", otpValue);
-    checkOtpChangeMail(signUpData);
+    checkOtpNewMail(signUpData);
   };
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const ChangeMail = () => {
       console.error("Verification failed");
     }
     if (isSuccess) {
-      navigate(`/checkotpnewemail`);
+      navigate(`/me/profile`);
       console.log("success");
     }
   }, [data, error, isAuthenticated, isSuccess, navigate]);

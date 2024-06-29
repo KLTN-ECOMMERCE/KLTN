@@ -96,6 +96,24 @@ export const userApi = createApi({
       },
       invalidatesTags: ["AdminUsers"],
     }),
+    checkOtpChangeMail: builder.mutation({
+      query(body) {
+        return {
+          url: `/me/checkOtpChangeEmail`,
+          method: "POST",
+          body,
+        };
+      },
+    }),
+    checkOtpNewMail: builder.mutation({
+      query(body){
+        return {
+          url: `/me/checkOtpNewEmail`,
+          method: "POST",
+          body,
+        }
+      }
+    })
   }),
 });
 
@@ -110,4 +128,6 @@ export const {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
+  useCheckOtpChangeMailMutation,
+  useCheckOtpNewMailMutation
 } = userApi;
