@@ -8,7 +8,7 @@ import { authApi } from "./api/authApi";
 import { userApi } from "./api/userApi";
 import { orderApi } from "./api/orderApi";
 import { voucherApi } from "./api/voucherApi";
-import { shippingApi } from "./api/shipping";
+import { shippingApi } from "./api/shippingApi";
 export const store = configureStore({
   reducer: {
     auth: userReducer,

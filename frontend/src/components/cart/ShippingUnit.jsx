@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CheckoutSteps from "./CheckoutSteps";
 import MetaData from "../layout/MetaData";
 import { useNavigate } from "react-router-dom";
-import { useGetShippingQuery } from "../../redux/api/shipping";
+import { useGetShippingQuery } from "../../redux/api/shippingApi";
 import { useSelector, useDispatch } from "react-redux";
 import { saveShippingInfo } from "../../redux/features/cartSlice";
 import { Link } from "react-router-dom";

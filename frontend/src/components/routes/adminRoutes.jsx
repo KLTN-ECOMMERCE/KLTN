@@ -13,6 +13,8 @@ import UpdateUser from "../admin/UpdateUser";
 import ProductReviews from "../admin/ProductReviews";
 import { Voucher } from "../admin/Voucher";
 import NewVoucher from "../admin/NewVoucher";
+import Shipping from "../admin/Shipping";
+import NewShipping from "../admin/NewShipping";
 const adminRoutes = () => {
   return (
     <>
@@ -114,6 +116,22 @@ const adminRoutes = () => {
         element={
           <ProtectedRoute admin={true}>
             <NewVoucher />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/shipping"
+        element={
+          <ProtectedRoute admin={true}>
+            <Shipping />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/new/shipping"
+        element={
+          <ProtectedRoute admin={true}>
+            <NewShipping />
           </ProtectedRoute>
         }
       />
