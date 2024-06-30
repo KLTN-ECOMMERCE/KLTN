@@ -68,7 +68,7 @@ export const Voucher = () => {
       rows: data.voucher.map((voucher) => ({
         name: voucher.name,
         description: voucher.description,
-        deliveryFee: voucher.quantity,
+        quantity: voucher.quantity,
         discount: voucher.discount,
         actions: (
           <div>

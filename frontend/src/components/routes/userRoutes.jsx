@@ -5,6 +5,7 @@ import ProductDetails from "../product/ProductDetails";
 import Login from "../auth/Login";
 import Register from "../auth/Register";
 import Profile from "../user/Profile";
+import Voucher from "../user/Voucher";
 import UpdateProfile from "../user/UpdateProfile";
 import ProtectedRoute from "../auth/ProtectedRoute";
 import UploadAvatar from "../user/UploadAvatar";
@@ -45,6 +46,14 @@ const userRoutes = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/me/voucher"
+        element={
+          <ProtectedRoute>
+            <Voucher />
           </ProtectedRoute>
         }
       />

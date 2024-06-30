@@ -1,17 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import MetaData from "../layout/MetaData";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { caluclateOrderCost } from "../../helpers/helpers";
 import CheckoutSteps from "./CheckoutSteps";
+import Voucher from "../user/Voucher";
 
 const ConfirmOrder = () => {
   const { cartItems, shippingInfo } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
+  const [voucher, setVoucher] = useState(null);
 
   const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
     caluclateOrderCost(cartItems);
-  console.log("shippingInfo", shippingInfo);
+
+  console.log("voucher", voucher);
+
   return (
     <>
       <MetaData title={"Confirm Order Info"} />
@@ -33,8 +37,8 @@ const ConfirmOrder = () => {
           <hr />
           <h4 className="mt-4">Your Cart Items:</h4>
 
-          {cartItems?.map((item) => (
-            <>
+          {cartItems?.map((item, index) => (
+            <div key={index}>
               <hr />
               <div className="cart-item my-1">
                 <div className="row">
@@ -60,8 +64,9 @@ const ConfirmOrder = () => {
                 </div>
               </div>
               <hr />
-            </>
+            </div>
           ))}
+          <Voucher setVoucher={setVoucher} />
         </div>
 
         <div className="col-12 col-lg-3 my-4">
@@ -79,11 +84,18 @@ const ConfirmOrder = () => {
             <p>
               Tax: <span className="order-summary-values">${taxPrice}</span>
             </p>
+            <p>
+              Discount:{" "}
+              <span className="order-summary-values">{voucher?.discount}%</span>
+            </p>
 
             <hr />
 
             <p>
-              Total: <span className="order-summary-values">${totalPrice}</span>
+              Total:{" "}
+              <span className="order-summary-values">
+                ${totalPrice - totalPrice * (voucher?.discount / 100)}
+              </span>
             </p>
 
             <hr />

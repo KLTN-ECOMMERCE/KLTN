@@ -24,7 +24,11 @@ const Header = () => {
       <div className="col-12 col-md-3 ps-5">
         <div className="navbar-brand">
           <a href="/">
-            <img src="/images/store.png" alt="EcStore Logo" className="w-50 h-100"/>
+            <img
+              src="/images/store.png"
+              alt="EcStore Logo"
+              className="w-50 h-100"
+            />
           </a>
         </div>
       </div>
@@ -35,7 +39,7 @@ const Header = () => {
         <a href="/cart" style={{ textDecoration: "none" }}>
           <span id="cart" className="ms-3">
             {" "}
-            <GrCart size={25}/>{" "}
+            <GrCart size={25} />{" "}
           </span>
           <span className="ms-1" id="cart_count">
             {cartItems?.length}
@@ -84,7 +88,10 @@ const Header = () => {
                 {" "}
                 Profile{" "}
               </Link>
-
+              <Link className="dropdown-item" to="/me/voucher">
+                {" "}
+                Voucher{" "}
+              </Link>
               <Link
                 className="dropdown-item text-danger"
                 to="/"

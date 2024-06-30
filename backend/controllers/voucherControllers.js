@@ -83,7 +83,6 @@ export const addVoucher = catchAsyncErrors(async (req, res, next) => {
 });
 
 export const useVoucher = catchAsyncErrors(async (req, res, next) => {
-  const userId = req.user._id;
   const voucherId = req.params.voucherId;
 
   const voucher = await Voucher.findById(voucherId);
@@ -91,11 +90,12 @@ export const useVoucher = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Voucher not found", 404));
   }
 
-  const user = await User.findByIdAndUpdate(
-    userId,
-    { $pull: { voucher: voucherId } },
-    { new: true }
-  );
+  if (voucher.quantity <= 0) {
+    return next(new ErrorHandler("Voucher out of stock", 400));
+  }
+
+  voucher.quantity -= 1;
+  await voucher.save();
 
   res.status(200).json({
     success: true,

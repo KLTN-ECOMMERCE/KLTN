@@ -15,6 +15,8 @@ import { Voucher } from "../admin/Voucher";
 import NewVoucher from "../admin/NewVoucher";
 import Shipping from "../admin/Shipping";
 import NewShipping from "../admin/NewShipping";
+import Shipper from "../admin/Shipper";
+import UpdateShipper from "../admin/UpdateShipper";
 const adminRoutes = () => {
   return (
     <>
@@ -31,6 +33,22 @@ const adminRoutes = () => {
         element={
           <ProtectedRoute admin={true}>
             <ListProducts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/shipper"
+        element={
+          <ProtectedRoute admin={true}>
+            <Shipper />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/updateshipper/:id"
+        element={
+          <ProtectedRoute admin={true}>
+            <UpdateShipper />
           </ProtectedRoute>
         }
       />

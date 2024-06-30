@@ -53,6 +53,11 @@ const AdminLayout = ({ children }) => {
       url: "/admin/new/shipping",
       icon: "fas fa-star",
     },
+    {
+      name: "Shipper",
+      url: "/admin/shipper",
+      icon: "fas fa-star",
+    },
   ];
 
   return (

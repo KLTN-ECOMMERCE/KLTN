@@ -1,33 +1,37 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../layout/Loader";
 import { toast } from "react-hot-toast";
-
 import { useNavigate, useParams } from "react-router-dom";
 import MetaData from "../layout/MetaData";
-
 import AdminLayout from "../layout/AdminLayout";
 import {
   useGetUserDetailsQuery,
   useUpdateUserMutation,
 } from "../../redux/api/userApi";
+import {
+  useAddShipperMutation,
+  useGetShippingQuery,
+} from "../../redux/api/shippingApi";
 
-const UpdateUser = () => {
+const UpdateShipper = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-
+  const [shippingUnit, setShippingUnit] = useState("");
+  const { data: dataShipping, isLoading: shippingLoading } =
+    useGetShippingQuery();
   const navigate = useNavigate();
   const params = useParams();
-
-  const { data } = useGetUserDetailsQuery(params?.id);
-
-  const [updateUser, { error, isSuccess }] = useUpdateUserMutation();
+  const { data, isLoading: userDetailsLoading } = useGetUserDetailsQuery(
+    params?.id
+  );
+  const [addShipper, { error, isSuccess }] = useAddShipperMutation();
 
   useEffect(() => {
     if (data?.user) {
-      setName(data?.user?.name);
-      setEmail(data?.user?.email);
-      setRole(data?.user?.role);
+      setName(data.user.name);
+      setEmail(data.user.email);
+      setRole(data.user.role);
     }
   }, [data]);
 
@@ -38,21 +42,31 @@ const UpdateUser = () => {
 
     if (isSuccess) {
       toast.success("User Updated");
-      navigate("/admin/users");
+      navigate("/admin/shipper");
     }
   }, [error, isSuccess]);
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    const userData = {
-      name,
-      email,
-      role,
-    };
+    if (!data?.user) {
+      toast.error("User data is not available yet.");
+      return;
+    }
 
-    updateUser({ id: params?.id, body: userData });
+    const userData = {
+      user: data.user._id,
+      shippingUnit: {
+        shippingUnitId: shippingUnit,
+      },
+    };
+    console.log("shipper", userData);
+    addShipper(userData);
   };
+
+  if (userDetailsLoading || shippingLoading) {
+    return <Loader />;
+  }
 
   return (
     <AdminLayout>
@@ -92,17 +106,21 @@ const UpdateUser = () => {
 
             <div className="mb-3">
               <label htmlFor="role_field" className="form-label">
-                Role
+                ShippingUnit
               </label>
               <select
                 id="role_field"
                 className="form-select"
                 name="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
+                value={shippingUnit}
+                onChange={(e) => setShippingUnit(e.target.value)}
               >
-                <option value="user">user</option>
-                <option value="admin">admin</option>
+                {dataShipping?.shipping &&
+                  dataShipping?.shipping.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.code}
+                    </option>
+                  ))}
               </select>
             </div>
             <button type="submit" className="btn update-btn w-100 py-2">
@@ -115,4 +133,4 @@ const UpdateUser = () => {
   );
 };
 
-export default UpdateUser;
+export default UpdateShipper;

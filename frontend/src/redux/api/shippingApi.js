@@ -39,6 +39,15 @@ export const shippingApi = createApi({
       query: (id) => `/shipping/getShippingUnitById/${id}`,
       providesTags: ["Shipping"],
     }),
+    addShipper: builder.mutation({
+      query(body) {
+        return {
+          url: `shipper/addShippertoShippingUnit`,
+          method: "POST",
+          body,
+        };
+      },
+    }),
   }),
 });
 
@@ -47,4 +56,5 @@ export const {
   useCreateShippingMutation,
   useUpdateShippingMutation,
   useDeleteShippingMutation,
+  useAddShipperMutation,
 } = shippingApi;
