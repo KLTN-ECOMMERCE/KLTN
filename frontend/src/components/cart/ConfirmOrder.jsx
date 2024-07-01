@@ -14,7 +14,7 @@ const ConfirmOrder = () => {
   const { itemsPrice, shippingPrice, taxPrice, totalPrice } =
     caluclateOrderCost(cartItems);
 
-  console.log("voucher", voucher);
+  console.log("voucher", shippingPrice);
 
   return (
     <>
@@ -94,7 +94,9 @@ const ConfirmOrder = () => {
             <p>
               Total:{" "}
               <span className="order-summary-values">
-                ${totalPrice - totalPrice * (voucher?.discount / 100)}
+                {voucher?.discount
+                  ? totalPrice - totalPrice * (voucher?.discount / 100)
+                  : totalPrice}
               </span>
             </p>
 
