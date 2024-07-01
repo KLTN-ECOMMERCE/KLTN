@@ -47,7 +47,7 @@ const NewVoucher = () => {
       <div className="row wrapper">
         <div className="col-10 col-lg-10 mt-5 mt-lg-0">
           <form className="shadow rounded bg-body" onSubmit={submitHandler}>
-            <h2 className="mb-4">New Product</h2>
+            <h2 className="mb-4">New Voucher</h2>
             <div className="mb-3">
               <label htmlFor="name_field" className="form-label">
                 {" "}
