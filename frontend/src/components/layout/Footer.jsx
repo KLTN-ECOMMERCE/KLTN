@@ -6,12 +6,16 @@ import { FaYoutube } from "react-icons/fa";
 const Footer = () => {
   return (
     <>
-      <div className="Footer bg-black ">
+      <div className="Footer bg-footer">
         <div className="container text-white">
           <div className="row">
             <div className="col-md-6 col-lg-4 col-12 ft-1">
-              <div className="navbar-brand">
-                <img src="/images/store.png" alt="EcStore Logo"></img>
+              <div className="navbar-brand ">
+                <img
+                  src="/images/logo.png"
+                  alt="EcStore Logo"
+                  className="w-25 h-25"
+                ></img>
               </div>
               <p className="text-white">
                 Trang Web bán hàng điện tử số 1 Việt Nam chuyên cung cấp tất cả
@@ -104,9 +108,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="Last-footer text-white">
-        <p>Design By Đỗ Ngọc Duy Hưng @</p>
       </div>
     </>
   );

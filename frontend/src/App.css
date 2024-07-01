@@ -8,7 +8,7 @@ body {
   overflow-x: hidden;
 }
 :root {
-  --primary-color: #232f3e;
+  --primary-color: rgba(0, 122, 255, 255);
 }
 
 /* Scroll Bar */
@@ -23,14 +23,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgba(66, 66, 66, 0.2);
+  background-color: rgba(0, 122, 255, 255);
   border: 0px;
   background-clip: padding-box;
   border-radius: 5px;
 }
 
 nav {
-  background-color: #000;
+  background-color: #252525;
   padding: 1rem 1rem;
 }
 
@@ -47,7 +47,9 @@ nav {
 #search_btn {
   background-color: #fff;
 }
-
+.bg-footer {
+  background-color: #252525;
+}
 .input-group {
   width: 90%;
   margin-right: 35%;

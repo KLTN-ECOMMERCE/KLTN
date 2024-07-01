@@ -64,7 +64,12 @@ export const stripeCheckoutSession = catchAsyncErrors(
       customer_email: req?.user?.email,
       client_reference_id: req?.user?._id?.toString(),
       mode: "payment",
-      metadata: { ...shippingInfo, itemsPrice: body?.totalAmount },
+      metadata: {
+        ...shippingInfo,
+        shippingUnit,
+        code,
+        itemsPrice: body?.totalAmount,
+      },
       shipping_options: [
         {
           shipping_rate,
@@ -174,7 +179,12 @@ export const stripeCheckoutSessionMobile = catchAsyncErrors(
       customer_email: req?.user?.email,
       client_reference_id: req?.user?._id?.toString(),
       mode: "payment",
-      metadata: { ...shippingInfo, itemsPrice: body?.totalAmount },
+      metadata: {
+        ...shippingInfo,
+        shippingUnit,
+        code,
+        itemsPrice: body?.totalAmount,
+      },
       shipping_options: [
         {
           shipping_rate,

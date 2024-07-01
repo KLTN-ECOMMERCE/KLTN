@@ -10,7 +10,7 @@ const OrderDetails = () => {
   const params = useParams();
   const { data, isLoading, error } = useOrderDetailsQuery(params?.id);
   const order = data?.order || {};
-
+  console.log("params ", params.id);
   const {
     shippingInfo,
     orderItems,
@@ -37,7 +37,7 @@ const OrderDetails = () => {
         <div className="col-12 col-lg-9 mt-5 order-details">
           <div className="d-flex justify-content-between align-items-center">
             <h3 className="mt-5 mb-4">Your Order Details</h3>
-            <a className="btn btn-success" href="/invoice/order/order-id">
+            <a className="btn btn-success" href={`/invoice/order/${params.id}`}>
               <i className="fa fa-print"></i> Invoice
             </a>
           </div>
