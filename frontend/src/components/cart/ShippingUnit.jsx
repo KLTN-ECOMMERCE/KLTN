@@ -59,22 +59,17 @@ const ShippingUnit = () => {
               onClick={() => handleClick(item)}
             >
               <div className="card p-3 rounded">
-                <img
-                  className="card-img-top mx-auto"
-                  src="https://res.cloudinary.com/daf4umk5i/image/upload/v1693391876/Products/iphone-14-promax_qo10yv.png"
-                  alt=""
-                />
                 <div className="card-body ps-3 d-flex justify-content-center flex-column">
-                  <p className="card-text ">{item.name}</p>
-                  <p className="card-text ">{item.code}</p>
-                  <p className="card-text ">{item.description}</p>
-                  <p className="card-text ">{item.price}</p>
+                  <p className="fs-1 font-bold large-font">{item.code}</p>
+                  <p className="card-text">{item.name}</p>
+                  <p className="card-text">{item.description}</p>
+                  <p className="card-text">{item.price}</p>
                 </div>
               </div>
             </div>
           ))}
       </div>
-      <button className="btn btn-block" onClick={handleChangePage}>
+      <button className="btn btn-primary flex " onClick={handleChangePage}>
         Next
       </button>
 
@@ -82,6 +77,9 @@ const ShippingUnit = () => {
         .selected .card {
           background-color: rgba(0, 0, 0, 0.1);
           border: 2px solid;
+        }
+        .large-font {
+          font-size: 2rem;
         }
       `}</style>
     </>
