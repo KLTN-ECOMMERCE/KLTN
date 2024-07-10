@@ -27,19 +27,19 @@ const Voucher = ({ setVoucher }) => {
             style={{ cursor: "pointer" }}
           >
             <div
-              className={`card p-3 rounded ${
+              className={`card p-3 rounded voucher-card ${
                 selectedVoucher?._id === voucher._id
                   ? "border border-primary"
                   : ""
               }`}
             >
               <div className="card-body ps-3 d-flex justify-content-center flex-column">
-                <p className="text-nowrap">Tên: {voucher.name}</p>
-                <p className="text-nowrap">{`Giảm giá: ${voucher.discount} %`}</p>
-                <p className="font-sm text-nowrap">
-                  Số lượng còn lại: {voucher.quantity}
+                <p className="voucher-title">Tên: {voucher.name}</p>
+                <p className="voucher-discount">{`Giảm giá: ${voucher.discount} %`}</p>
+                <p className="voucher-quantity">Số lượng: {voucher.quantity}</p>
+                <p className="voucher-description">
+                  Mô tả: {voucher.description}
                 </p>
-                <p className="">Mô tả: {voucher.description}</p>
               </div>
             </div>
           </div>
@@ -47,6 +47,32 @@ const Voucher = ({ setVoucher }) => {
       </div>
     </>
   );
+  <style jsx>{`
+    .voucher-card {
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .voucher-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .voucher-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .voucher-discount {
+      color: #dc3545;
+      font-size: 1.1rem;
+    }
+    .voucher-quantity {
+      font-size: 1rem;
+      color: #6c757d;
+    }
+    .voucher-description {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+  `}</style>;
 };
 
 export default Voucher;

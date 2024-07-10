@@ -27,8 +27,6 @@ function App() {
           </Routes>
         </div>
         <Footer />
-        <div id="fb-root"></div>
-        <div id="fb-customer-chat" class="fb-customerchat"></div>
       </div>
     </Router>
   );

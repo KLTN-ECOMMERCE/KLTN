@@ -25,7 +25,6 @@ const Register = () => {
       toast.error(error?.data?.message);
     }
     if (data) {
-      toast.success("Đăng ký thành công");
       navigate(`/verify?email=${email}`);
     }
   }, [error, isAuthenticated, data]);

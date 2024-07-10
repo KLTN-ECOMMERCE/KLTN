@@ -55,7 +55,7 @@ export const Verify = () => {
     e.preventDefault();
     const otpValue = otp.join("");
     const signUpData = { email, otp: +otpValue };
-    console.log(signUpData);
+    console.log("signup data", signUpData);
     verify(signUpData);
   };
 
@@ -67,6 +67,8 @@ export const Verify = () => {
       toast.error(error?.data?.message);
     }
     if (data) {
+      toast.success("Xác thực thành công");
+      navigate("/");
       console.log("Verification successful");
     }
     if (error) {
