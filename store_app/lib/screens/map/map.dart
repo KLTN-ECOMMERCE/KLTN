@@ -70,7 +70,7 @@ class _MapScreenState extends State<MapScreen> {
             padding: const EdgeInsets.all(8.0),
             child: GooglePlaceAutoCompleteTextField(
               textEditingController: _searchController,
-              googleAPIKey: 'AIzaSyDefmc5IMJgfB6bkf3D-RxrTyidNFdkrUs',
+              googleAPIKey: ggMapApiKey,
               inputDecoration: InputDecoration(
                 filled: true,
                 fillColor: kSecondaryColor.withOpacity(0.1),

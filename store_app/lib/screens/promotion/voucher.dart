@@ -10,6 +10,7 @@ class VoucherScreen extends StatefulWidget {
     super.key,
     required this.typeOfPromotion,
     this.onSelectVoucherItem,
+    this.haveAddButton = true,
   });
   final String typeOfPromotion;
   final void Function(
@@ -20,6 +21,7 @@ class VoucherScreen extends StatefulWidget {
     String deliveryFee,
     double discount,
   )? onSelectVoucherItem;
+  final bool haveAddButton;
 
   @override
   State<VoucherScreen> createState() => _VoucherScreenState();
@@ -128,6 +130,7 @@ class _VoucherScreenState extends State<VoucherScreen> {
                               : null,
                           typeOfPromotion: widget.typeOfPromotion,
                           onSelectVoucherItem: widget.onSelectVoucherItem,
+                          haveAddButton: widget.haveAddButton,
                         );
                       },
                     );

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-const ipv4Address = '192.168.0.102';
+const host = 'kltn-web.onrender.com';
 const addOneSignalId = '944be109-15b7-4931-8e75-4ceb3905843e';
+const ggMapApiKey = 'AIzaSyAwNIFrBjwMQnnYK2Inr6kX2N5NxrVaVQc';
 const stripePublishableKey =
     'pk_test_51PLoaDItb7fygiE0KMgBVEtUBNvnO8tketOozqKfjoq3veNz4T07mWJenDf1qycKqwIEKEUxsob5EWhYzsd92SEM00eh7YbYAs';
 const kPrimaryColor = Color(0xFFFF7643);

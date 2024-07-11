@@ -11,8 +11,8 @@ class ApiStart {
   final storage = const FlutterSecureStorage();
 
   Future<Object> login(Login userData) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/login',
     );
     Map<String, String> body = {
@@ -59,8 +59,8 @@ class ApiStart {
 
   Future<dynamic> logout() async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/logout',
     );
     try {

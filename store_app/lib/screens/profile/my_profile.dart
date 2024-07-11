@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:store_app/api/api_user.dart';
 import 'package:store_app/screens/profile/change_email.dart';
 import 'package:store_app/screens/profile/change_name.dart';
@@ -115,6 +116,11 @@ class _MyProfileState extends State<MyProfileScreen> {
                     );
                   } else {
                     final profile = snapshot.data;
+                    String joinedOn = DateFormat('yyyy-MM-dd').format(
+                      DateTime.parse(
+                        profile['createdAt'],
+                      ),
+                    );
                     return Column(
                       children: [
                         const Center(
@@ -151,6 +157,14 @@ class _MyProfileState extends State<MyProfileScreen> {
                           label: 'Password',
                           information: '*********************',
                           onTap: _selectPassword,
+                        ),
+                        const SizedBox(
+                          height: 12,
+                        ),
+                        MyProfileWidget(
+                          label: 'Joined On',
+                          information: joinedOn,
+                          onTap: (context) {},
                         ),
                       ],
                     );

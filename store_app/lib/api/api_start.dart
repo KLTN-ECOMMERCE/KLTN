@@ -14,8 +14,8 @@ class ApiStart {
   final storage = const FlutterSecureStorage();
 
   Future<Object> login(Login userData) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/login',
     );
     Map<String, String> body = {
@@ -61,8 +61,8 @@ class ApiStart {
   }
 
   Future<Object> register(Register userData) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/register',
     );
     Map<String, String> body = {
@@ -89,8 +89,8 @@ class ApiStart {
   }
 
   Future<Object> sendOtp(SendOTP data) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/check',
     );
     Map<String, dynamic> body = {
@@ -115,8 +115,8 @@ class ApiStart {
   }
 
   Future<Object> forgotPassword(String email) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/password/forgot/mobile',
     );
     Map<String, dynamic> body = {
@@ -140,8 +140,8 @@ class ApiStart {
   }
 
   Future<Object> resetPassword(ResetPassword data) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/password/reset',
     );
     Map<String, dynamic> body = {
@@ -168,8 +168,8 @@ class ApiStart {
 
   Future<dynamic> logout() async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/logout',
     );
     try {

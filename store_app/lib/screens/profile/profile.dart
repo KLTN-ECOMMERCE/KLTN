@@ -4,7 +4,7 @@ import 'package:store_app/api/api_start.dart';
 import 'package:store_app/screens/auth/login.dart';
 import 'package:store_app/screens/notification/notifications.dart';
 import 'package:store_app/screens/profile/my_profile.dart';
-import 'package:store_app/screens/promotion/promotion.dart';
+//import 'package:store_app/screens/promotion/promotion.dart';
 import 'package:store_app/screens/statistics/statistics.dart';
 import 'package:store_app/widgets/profile/profile_menu.dart';
 
@@ -58,17 +58,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 },
               ),
-              ProfileMenu(
-                icon: 'assets/icons/Gift Icon.svg',
-                text: 'Promotions',
-                onSelectMenu: (context) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const PromotionScreen(),
-                    ),
-                  );
-                },
-              ),
+              // ProfileMenu(
+              //   icon: 'assets/icons/Gift Icon.svg',
+              //   text: 'Promotions',
+              //   onSelectMenu: (context) {
+              //     Navigator.of(context).push(
+              //       MaterialPageRoute(
+              //         builder: (context) => const PromotionScreen(),
+              //       ),
+              //     );
+              //   },
+              // ),
               ProfileMenu(
                 icon: 'assets/icons/Bell.svg',
                 text: 'Notifications',

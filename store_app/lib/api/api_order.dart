@@ -24,8 +24,8 @@ class ApiOrder {
     dynamic voucher,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/orders/new',
     );
     final List<Map<String, dynamic>> products = [];
@@ -92,8 +92,8 @@ class ApiOrder {
 
   Future<dynamic> getOrdersByStatus(String status) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/getOrderByStatus/$status',
     );
     print(url);
@@ -117,8 +117,8 @@ class ApiOrder {
 
   Future<dynamic> getOrderDetails(String orderId) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/orders/$orderId',
     );
     try {
@@ -141,8 +141,8 @@ class ApiOrder {
 
   Future<dynamic> cancelOrder(String orderId) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/order/cancel/$orderId',
     );
     try {
@@ -165,8 +165,8 @@ class ApiOrder {
 
   Future<dynamic> getDataOrderByStatus() async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/getDataOrderByStatus',
     );
     try {
@@ -188,8 +188,8 @@ class ApiOrder {
   }
 
   Future<dynamic> getShippingUnit() async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/shipping/getShippingUnit',
     );
 

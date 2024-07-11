@@ -16,6 +16,7 @@ class VoucherItem extends StatefulWidget {
     this.quantity,
     this.onSelectVoucherItem,
     this.isMargin = false,
+    this.haveAddButton = true,
   });
   final String id;
   final String name;
@@ -33,6 +34,7 @@ class VoucherItem extends StatefulWidget {
     String deliveryFee,
     double discount,
   )? onSelectVoucherItem;
+  final bool haveAddButton;
 
   @override
   State<VoucherItem> createState() => _VoucherItemState();
@@ -229,7 +231,8 @@ class _VoucherItemState extends State<VoucherItem> {
                       ],
                     ),
                   ),
-                  if (widget.typeOfPromotion == 'Promotions')
+                  if (widget.typeOfPromotion == 'Promotions' &&
+                      widget.haveAddButton == true)
                     Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

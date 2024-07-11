@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -208,106 +209,48 @@ class _OrderScreenState extends State<OrderScreen> {
         );
       }
     }
-    try {
-      setState(() {
-        _isAuthenticating = true;
-      });
+    if ((_isCODSelected || _isCreditCardSelected) && _shippingAddress != null) {
+      try {
+        setState(() {
+          _isAuthenticating = true;
+        });
 
-      if (_isCODSelected) _paymentMethod = 'COD';
-      if (_isCreditCardSelected) _paymentMethod = 'CARD';
+        if (_isCODSelected) _paymentMethod = 'COD';
+        if (_isCreditCardSelected) _paymentMethod = 'CARD';
 
-      if (_paymentMethod == 'COD') {
-        final response = await _apiOrder.createOrder(
-          _shippingAddress!,
-          widget.cartItems,
-          _paymentMethod,
-          {
-            'id': 'payment_id',
-            'status': 'Not Paid',
-          },
-          widget.totalPrice,
-          _tax,
-          _deliveryMethodChoose!,
-          _summary,
-          _shippingAmount,
-          _voucher,
-        );
-        print(response);
-        PersistentShoppingCart().clearCart();
-        if (_usePoint) {
-          await _apiUser.updatePoint(0);
-        }
-        if (_voucher != null) {
-          await _apiVoucher.userUseVoucher(_voucher['id']);
-        }
-        notificationService.showNotification(
-          'Order ${response['order']['_id'].toString()}',
-          'The order ${response['order']['_id'].toString()} will be confirmed by admin soon !!!',
-          response['order']['_id'].toString(),
-        );
-        if (!mounted) return;
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => DetailOrderScreen(
-              orderId: response['order']['_id'].toString(),
-            ),
-          ),
-        );
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const SuccessScreen(
-              text: 'Order Success',
-            ),
-          ),
-        );
-      } else {
-        final response = await _apiStripe.createStripeCheckoutSession(
-          _shippingAddress!,
-          widget.cartItems,
-          widget.totalPrice,
-          _tax,
-          _deliveryMethodChoose!,
-          _summary,
-          _shippingAmount,
-          _voucher,
-        );
-        print(response);
-
-        final url = Uri.parse(
-          response['url'].toString(),
-        );
-
-        if (await canLaunchUrl(url)) {
-          await launchUrl(url);
-
-          await Future.delayed(
-            const Duration(
-              milliseconds: 100,
-            ),
+        if (_paymentMethod == 'COD') {
+          final response = await _apiOrder.createOrder(
+            _shippingAddress!,
+            widget.cartItems,
+            _paymentMethod,
+            {
+              'status': 'Not Paid',
+            },
+            widget.totalPrice,
+            _tax,
+            _deliveryMethodChoose!,
+            _summary,
+            _shippingAmount,
+            _voucher,
           );
-          while (WidgetsBinding.instance.lifecycleState !=
-              AppLifecycleState.resumed) {
-            await Future.delayed(
-              const Duration(
-                milliseconds: 100,
-              ),
-            );
-          }
-
-          final orders = await _getOrdersByStatus('NewOrder');
-          final order = orders[orders.length - 1];
+          print(response);
           PersistentShoppingCart().clearCart();
-
+          if (_usePoint) {
+            await _apiUser.updatePoint(0);
+          }
+          if (_voucher != null) {
+            await _apiVoucher.userUseVoucher(_voucher['id']);
+          }
           notificationService.showNotification(
-            'Order ${order['_id'].toString()}',
-            'The order ${order['_id'].toString()} will be confirmed by admin soon !!!',
-            order['_id'].toString(),
+            'Order ${response['order']['_id'].toString()}',
+            'The order ${response['order']['_id'].toString()} will be confirmed by admin soon !!!',
+            response['order']['_id'].toString(),
           );
           if (!mounted) return;
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => DetailOrderScreen(
-                orderId: order['_id'].toString(),
+                orderId: response['order']['_id'].toString(),
               ),
             ),
           );
@@ -318,29 +261,106 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
             ),
           );
-        } else {
-          if (!mounted) return;
+        }
+
+        if (_paymentMethod == 'CARD') {
+          final response = await _apiStripe.createStripeCheckoutSession(
+            _shippingAddress!,
+            widget.cartItems,
+            widget.totalPrice,
+            _tax,
+            _deliveryMethodChoose!,
+            _summary,
+            _shippingAmount,
+            _voucher,
+          );
+          print(response);
+
+          final url = Uri.parse(
+            response['url'].toString(),
+          );
+
+          if (await canLaunchUrl(url)) {
+            await launchUrl(url);
+
+            await Future.delayed(
+              const Duration(
+                milliseconds: 100,
+              ),
+            );
+            while (WidgetsBinding.instance.lifecycleState !=
+                AppLifecycleState.resumed) {
+              await Future.delayed(
+                const Duration(
+                  milliseconds: 100,
+                ),
+              );
+            }
+            if (!mounted) return;
+            final finishedOrder = await showOkCancelAlertDialog(
+              context: context,
+              title: 'Have you done?',
+              message:
+                  'Did you finish order ? Please be sure everything go well. Thanks',
+              okLabel: 'Confirm',
+              defaultType: OkCancelAlertDefaultType.cancel,
+              isDestructiveAction: true,
+            );
+
+            if (finishedOrder == OkCancelResult.ok) {
+              final orders = await _getOrdersByStatus('NewOrder');
+              final order = orders[orders.length - 1];
+              PersistentShoppingCart().clearCart();
+
+              notificationService.showNotification(
+                'Order ${order['_id'].toString()}',
+                'The order ${order['_id'].toString()} will be confirmed by admin soon !!!',
+                order['_id'].toString(),
+              );
+              if (!mounted) return;
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => DetailOrderScreen(
+                    orderId: order['_id'].toString(),
+                  ),
+                ),
+              );
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const SuccessScreen(
+                    text: 'Order Success',
+                  ),
+                ),
+              );
+            } else {
+              setState(() {
+                _isAuthenticating = false;
+              });
+            }
+          } else {
+            if (!mounted) return;
+            ScaffoldMessenger.of(context).clearSnackBars();
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Can not open payment sheet now !!!'),
+              ),
+            );
+          }
+        }
+      } catch (e) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+        if (mounted) {
           ScaffoldMessenger.of(context).clearSnackBars();
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Can not open payment sheet now !!!'),
+            SnackBar(
+              content: Text(e.toString()),
             ),
           );
         }
+        throw HttpException(e.toString());
       }
-    } catch (e) {
-      setState(() {
-        _isAuthenticating = false;
-      });
-      if (mounted) {
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-          ),
-        );
-      }
-      throw HttpException(e.toString());
     }
   }
 
@@ -608,12 +628,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                 useSafeArea: true,
                                 isScrollControlled: true,
                                 shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.vertical(
-                                  top: Radius.circular(30),
-                                )),
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(30),
+                                  ),
+                                ),
                                 context: context,
                                 builder: (context) => VoucherScreen(
-                                  typeOfPromotion: 'My Promotion',
+                                  typeOfPromotion: 'Promotions',
                                   onSelectVoucherItem: (
                                     id,
                                     name,
@@ -631,10 +652,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                     };
                                     Navigator.of(context).pop(data);
                                   },
+                                  haveAddButton: false,
                                 ),
                                 constraints: BoxConstraints(
                                   maxWidth: MediaQuery.of(context).size.width,
-                                  maxHeight: MediaQuery.of(context).size.height,
+                                  maxHeight:
+                                      MediaQuery.of(context).size.height / 1.2,
                                 ),
                               );
                               setState(() {
@@ -703,7 +726,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           )),
                           context: context,
                           builder: (context) => VoucherScreen(
-                            typeOfPromotion: 'My Promotion',
+                            typeOfPromotion: 'Promotions',
                             onSelectVoucherItem: (
                               id,
                               name,
@@ -722,10 +745,11 @@ class _OrderScreenState extends State<OrderScreen> {
                               };
                               Navigator.of(context).pop(data);
                             },
+                            haveAddButton: false,
                           ),
                           constraints: BoxConstraints(
                             maxWidth: MediaQuery.of(context).size.width,
-                            maxHeight: MediaQuery.of(context).size.height,
+                            maxHeight: MediaQuery.of(context).size.height / 1.2,
                           ),
                         );
                         setState(() {

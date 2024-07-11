@@ -19,7 +19,6 @@ void main() async {
   await Hive.initFlutter();
   await Hive.openBox<String>('favorite_products');
 
-
   runApp(
     const ProviderScope(
       child: MyApp(),

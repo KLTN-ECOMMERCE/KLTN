@@ -20,8 +20,8 @@ class ApiProduct {
     var sortString = sort.toString();
     Uri url;
     if (filters!.isEmpty) {
-      url = Uri.http(
-        '$ipv4Address:4000',
+      url = Uri.https(
+        host,
         'api/v1/mobile/products/',
         {
           'page': pageString,
@@ -32,8 +32,8 @@ class ApiProduct {
       );
       print(url);
     } else {
-      url = Uri.http(
-        '$ipv4Address:4000',
+      url = Uri.https(
+        host,
         'api/v1/mobile/products/',
         {
           'page': pageString,
@@ -72,8 +72,8 @@ class ApiProduct {
   }
 
   Future<dynamic> getPopularProducts() async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/products/popular',
     );
     print(url);
@@ -95,8 +95,8 @@ class ApiProduct {
   }
 
   Future<dynamic> getProductDetail(String productId) async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/products/$productId',
     );
     print(url);
@@ -119,8 +119,8 @@ class ApiProduct {
 
   Future<dynamic> canUserReview(String productId) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/can_review',
       {
         'productId': productId,
@@ -152,8 +152,8 @@ class ApiProduct {
     double rating,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/reviews',
     );
     print(url);

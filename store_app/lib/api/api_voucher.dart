@@ -9,8 +9,8 @@ import 'package:http/http.dart' as http;
 class ApiVoucher {
   final storage = const FlutterSecureStorage();
   Future<dynamic> getAllVoucher() async {
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/voucher/getAllVoucher',
     );
     print(url);
@@ -33,8 +33,8 @@ class ApiVoucher {
 
   Future<dynamic> getVoucherById(String id) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/voucher/getVoucherbyId/$id',
     );
     print(url);
@@ -58,8 +58,8 @@ class ApiVoucher {
 
   Future<dynamic> userAddVoucher(String id) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/voucher/addVoucher/$id',
     );
     print(url);
@@ -87,8 +87,8 @@ class ApiVoucher {
   
   Future<dynamic> userUseVoucher(String id) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/voucher/useVoucher/$id',
     );
     print(url);

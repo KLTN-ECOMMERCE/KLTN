@@ -13,8 +13,8 @@ class ApiUser {
   Future<dynamic> getProfile() async {
     final jwtToken = await storage.read(key: 'access-token');
     print(jwtToken);
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me',
     );
     try {
@@ -36,8 +36,8 @@ class ApiUser {
 
   Future<dynamic> changePassword(String oldPassword, String newPassword) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/password/update',
     );
     Map<String, String> body = {
@@ -65,8 +65,8 @@ class ApiUser {
 
   Future<dynamic> changeName(String name, String email) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/update',
     );
     Map<String, String> body = {
@@ -96,8 +96,8 @@ class ApiUser {
   Future<dynamic> changeEmail(String email, String name) async {
     final jwtToken = await storage.read(key: 'access-token');
 
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/update',
     );
     Map<String, String> body = {
@@ -127,8 +127,8 @@ class ApiUser {
   Future<dynamic> checkOtpChangeEmail(int otp) async {
     final jwtToken = await storage.read(key: 'access-token');
 
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/checkOtpChangeEmail',
     );
     Map<String, dynamic> body = {
@@ -157,8 +157,8 @@ class ApiUser {
   Future<dynamic> checkOtpNewEmail(int otp) async {
     final jwtToken = await storage.read(key: 'access-token');
 
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/checkOtpNewEmail',
     );
     Map<String, dynamic> body = {
@@ -186,8 +186,8 @@ class ApiUser {
 
   Future<dynamic> uploadAvatar(String image) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/me/upload_avatar',
     );
 
@@ -217,8 +217,8 @@ class ApiUser {
 
   Future<dynamic> findUser(String userId) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/mobile/findUser/$userId',
     );
     try {

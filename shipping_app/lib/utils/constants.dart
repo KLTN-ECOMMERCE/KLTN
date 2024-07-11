@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const ipv4Address = '192.168.0.102';
+const host = 'kltn-web.onrender.com';
 const addOneSignalId = '944be109-15b7-4931-8e75-4ceb3905843e';
 const kPrimaryColor = Color(0xFFFF7643);
 const kPrimaryLightColor = Color(0xFFFFECDF);

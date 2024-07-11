@@ -22,8 +22,8 @@ class ApiStripe {
     dynamic voucher,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/payment/checkout_session/mobile',
     );
     final List<Map<String, dynamic>> products = [];

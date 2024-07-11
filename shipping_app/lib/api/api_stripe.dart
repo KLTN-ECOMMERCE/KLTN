@@ -12,8 +12,8 @@ class ApiStripe {
     double totalAmount,
   ) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/shipper/payment/checkout_session',
     );
 

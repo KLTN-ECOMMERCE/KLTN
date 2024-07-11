@@ -135,7 +135,7 @@ class _DetailOrderScreenState extends State<DetailOrderScreen> {
                                             .colorScheme
                                             .onSurface,
                                         fontWeight: FontWeight.w400,
-                                        fontSize: 15,
+                                        fontSize: 14,
                                       ),
                                     ),
                                     Text(

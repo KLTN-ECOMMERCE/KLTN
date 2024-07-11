@@ -10,8 +10,8 @@ class ApiShipper {
 
   Future<dynamic> getOrderByShippingUnit() async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/shipping/getOrderByShippingUnit',
     );
     try {
@@ -35,8 +35,8 @@ class ApiShipper {
 
   Future<dynamic> deliveredSucessfully(String orderId) async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/shipper/deliveredSuccess/$orderId',
     );
     try {
@@ -58,8 +58,8 @@ class ApiShipper {
 
   Future<dynamic> getShipper() async {
     final jwtToken = await storage.read(key: 'access-token');
-    final url = Uri.http(
-      '$ipv4Address:4000',
+    final url = Uri.https(
+      host,
       'api/v1/shipper',
     );
     try {
